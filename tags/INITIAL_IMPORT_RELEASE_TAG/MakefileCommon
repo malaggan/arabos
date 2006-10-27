@@ -1,0 +1,102 @@
+.PHONY: default clean_files
+
+# $(MODULE_NAME) must be equal to the name of the module directory
+# anyway $(MODULE_NAME) was just put to make 'make' shows 
+# ``$(MODULE_NAME) is up to date " instead of ``'build' is up to date"
+
+default: all
+
+INCLUDE := ../include -I../include/c++ -I../include/c++/c++
+CC := gcc
+CPP := g++
+LINT := SPLINT
+#########################
+
+# !-ansi for __asm__
+# -mno-stack-arg-probe for alloca
+# -g for debug symbols, -O for optimization
+# i use pedantic to require gcc extensions to use __extenstion__ or use __ prefix to ease finding non-ansi stuff
+# -Wno-unused-parameter to temporarily stops warning about non-used params
+# -Wconversion -Wpacked
+# i substituted '-ffreestanding' for "-nostdinc -mno-stack-arg-probe -fno-builtin"
+CFLAGS := -Wall -Wextra -Wfloat-equal -Wshadow\
+	-Wpadded -Winline\
+	-Wunreachable-code -c -pedantic -Wno-unused-parameter\
+	-I$(INCLUDE) -std=c99 -ffreestanding
+
+#-nostartfiles -nostdlib -fno-rtti -fno-exceptions
+# since i didn't specify -nostartfiles, a fucn called _init will be created to initiate construtors of global objs
+# i think i should call it myself, since there is no main, that if the function returns w/out calling main
+CPPFLAGS := \
+	-I$(INCLUDE) -Wunreachable-code -c -pedantic -Wno-unused-parameter\
+	-Wall -Wextra -Wfloat-equal -Wshadow\
+	-Wpadded -Winline
+#########################
+
+AS := nasm
+ASFLAGS := -felf
+
+#########################
+
+# -s for strip all sybols, -x for discard local symbols
+LDFLAGS := --script kernel.ld -Map kernel.map -x
+
+#########################
+
+define DEPEND
+$(SHELL) -ec '$(CC) -M $(CFLAGS) $< \
+| sed '\''s/\($*\)\.o[ :]*/\1.o $@ : /g'\'' > $@; \
+[ -s $@ ] || rm -f $@'
+endef
+
+define DEPENDCPP
+$(SHELL) -ec '$(CPP) -M $(CPPFLAGS) $< \
+| sed '\''s/\($*\)\.o[ :]*/\1.o $@ : /g'\'' > $@; \
+[ -s $@ ] || rm -f $@'
+endef
+
+SRCS = $(wildcard *.c) $(wildcard *.S) $(wildcard *.asm) $(wildcard *.cpp)
+
+list0 = $(SRCS:%.cpp=%.o)
+list1 = $(list0:%.asm=%.o)
+list2 = $(list1:%.S=%.o)
+list3 = $(list2:%.c=%.o)
+
+build_$(MODULE_NAME): $(list2:%.c=%.o)
+	
+#########################
+# implicit ruels
+
+%.o: %.asm
+	@$(AS) $< -o $@ $(ASFLAGS)
+	
+%.o: %.cpp
+	@$(CPP) $< $(CPPFLAGS)
+
+%.o: %.c
+	@$(CC) $< $(CFLAGS)
+#	-@$(LINT) $< -I$(INCLUDE)
+
+%.o: %.S
+	@$(CC) $< $(CFLAGS) 
+
+%.d: %.cpp
+	@$(DEPENDCPP)
+
+%.d: %.c
+	@$(DEPEND)
+	
+%.d: %.S
+	@$(DEPEND)
+	
+%.d: %.asm
+	@echo "$< $@ :" > $*.d
+
+#########################
+
+clean_files:
+	-rm *.o *.d
+	
+#########################
+
+include $(list3:%.o=%.d)

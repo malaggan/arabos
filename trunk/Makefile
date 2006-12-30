@@ -45,8 +45,8 @@ kernel.k: $(wildcard $(MODULES:%.$(MODULE_SUFFIX)=%/*.o))
 
 install:
 	@echo
-	@tar -czf iso/kernel.tgz kernel.k 
-#	@cp kernel.k iso/kernel.tgz
+#	@tar -czf iso/kernel.tgz kernel.k 
+	@cp kernel.k iso/kernel.tgz
 	@echo
 	@echo kernel was put in iso
 	@echo

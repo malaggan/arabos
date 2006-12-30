@@ -17,6 +17,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 /* Macros. */
 
+/* just to make sure it is define -- only on linux*/
+#ifndef __ELF__
+#define __ELF__
+#endif
+
 /* The magic number for the Multiboot header. */
 #define MULTIBOOT_HEADER_MAGIC	0x1BADB002
 

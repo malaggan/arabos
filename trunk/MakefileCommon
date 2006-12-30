@@ -22,7 +22,7 @@ LINT := SPLINT
 CFLAGS := -Wall -Wextra -Wfloat-equal -Wshadow\
 	-Wpadded -Winline\
 	-Wunreachable-code -c -pedantic -Wno-unused-parameter\
-	-I$(INCLUDE) -std=c99 -ffreestanding
+	-I$(INCLUDE) -std=c99 -ffreestanding -fno-stack-protector
 
 #-nostartfiles -nostdlib -fno-rtti -fno-exceptions
 # since i didn't specify -nostartfiles, a fucn called _init will be created to initiate construtors of global objs
@@ -30,7 +30,7 @@ CFLAGS := -Wall -Wextra -Wfloat-equal -Wshadow\
 CPPFLAGS := \
 	-I$(INCLUDE) -Wunreachable-code -c -pedantic -Wno-unused-parameter\
 	-Wall -Wextra -Wfloat-equal -Wshadow\
-	-Wpadded -Winline
+	-Wpadded -Winline -fno-stack-protector
 #########################
 
 AS := nasm

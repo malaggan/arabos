@@ -50,7 +50,7 @@ install:
 	@echo
 	@echo kernel was put in iso
 	@echo
-	@./makeiso.sh
+	@./makeiso
 	@echo iso made
 	@echo
 	

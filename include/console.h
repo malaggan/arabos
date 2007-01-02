@@ -16,12 +16,45 @@ extern "C" {
 /* The number of lines. */
 #define LINES	25
 
+/* ECMA values
+ref : http://pueblo.sourceforge.net/doc/manual/ansi_color_codes.html */
+
+#define ECMA_PREFIX 	"\033["
+#define ECMA_SUFFIX	"m"
+#define ECMA_SEPARATOR	";"
+
+#define ECMA_SET_DEFAULT	"0"
+#define ECMA_SET_BOLD		"1"
+#define ECMA_SET_ITALICS	"3"
+#define ECMA_SET_UNDERLINE	"4"
+#define ECMA_SET_INVERTED_COLOR	"7"
+#define ECMA_SET_STRIKETHROUGH	"9"
+
+#define ECMA_UNSET_BOLD			"22"
+#define ECMA_UNSET_ITALICS		"23"
+#define ECMA_UNSET_UNDERLINE		"24"
+#define ECMA_UNSET_INVERTED_COLOR	"27"
+#define ECMA_UNSET_STRIKETHROUGH	"29"
+
+#define ECMA_BACK_GND 	"3"
+#define ECMA_FORE_GND 	"4"
+
+#define ECMA_BLACK	"0"
+#define ECMA_RED	"4" /*"1"*/
+#define ECMA_GREEN	"2"
+#define ECMA_YELLOW	"3"
+#define ECMA_BLUE	"1" /*"4"*/
+#define ECMA_MAGENTA	"5"
+#define ECMA_CYAN	"6"
+#define ECMA_WHITE	"7"
+#define ECMA_DEFAULT	"9"
+
 /* The attribute of an character. */
-#define NORMAL	"\033[0m"
-#define WHITE	"\033[37;1m"
-#define GREENB	"\033[32;1m" /* B for bold*/
-#define REDB	"\033[34;1m"
-#define BLUEB	"\033[31;1m"
+#define NORMAL	ECMA_PREFIX ECMA_SET_DEFAULT ECMA_SUFFIX
+#define WHITE	ECMA_PREFIX ECMA_BACK_GND ECMA_WHITE ECMA_SEPARATOR ECMA_SET_BOLD ECMA_SUFFIX
+#define GREENB	ECMA_PREFIX ECMA_BACK_GND ECMA_GREEN ECMA_SEPARATOR ECMA_SET_BOLD ECMA_SUFFIX /* B for bold*/
+#define REDB	ECMA_PREFIX ECMA_BACK_GND ECMA_RED   ECMA_SEPARATOR ECMA_SET_BOLD ECMA_SUFFIX
+#define BLUEB	ECMA_PREFIX ECMA_BACK_GND ECMA_BLUE  ECMA_SEPARATOR ECMA_SET_BOLD ECMA_SUFFIX
 
 extern char ATTRIBUTE; /* COOL this value determines the color */
 

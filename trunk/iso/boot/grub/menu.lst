@@ -1,4 +1,0 @@
-default 0
-timeout 0
-title ArOS
-kernel /kernel.tgz

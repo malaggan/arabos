@@ -176,9 +176,9 @@ cmain (unsigned long magic, unsigned long addr)
 	//											(kernel__end_addr-kernel_load_addr)>>10,
 	//											kernel__end_addr,kernel_load_addr);
 
-	panic(ECMA_PREFIX ECMA_SET_UNDERLINE ECMA_SUFFIX "panic test..." ECMA_PREFIX ECMA_UNSET_UNDERLINE ECMA_SUFFIX );
-	//int i = 0;
-	//for(; i <  5000; i++);
+	unsigned long i = 0;
+	for(; i <  500000; i++);
+	panic("panic test...");
 
 	//void __cxa_finalize(void *d);
 	//__cxa_finalize(0);

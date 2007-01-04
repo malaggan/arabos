@@ -63,13 +63,13 @@ printf (const char *format, ...)
 	}
 }
 
-__attribute__((noreturn)) void panic (const char *format) 
+__attribute__((noreturn)) void panic (const char *message) 
 {
-	printf("\n" NORMAL				 "-------------\n");
-	printf(REDB						 "KERNEL PANIC: " BLUEB "\n\"");
-	printf(format);
-	printf("\"" NORMAL			   "\nSYSTEM HALTED (tick %d)\n"
-									 "-------------",timer_ticks);
+	printf("\n" NORMAL	"-------------\n");
+	printf(REDB 		"KERNEL PANIC: " BLUEB "\n\"");
+	printf(			message);
+	printf("\"" NORMAL	"\nSYSTEM HALTED (tick %d; %d ms after timer start)\n"
+				"-------------",timer_ticks,timer_ticks*(1000/TICKS_PER_SEC));
 	ASM ( "hlt" );
 	while(1);
 }

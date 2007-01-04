@@ -269,7 +269,7 @@ boot: cdrom
 # 200Mhz Pentium with Linux 2.x                   approx 0.5 Mips
 #
 #=======================================================================
-ips: 10000000
+ips: 100000000
 
 #=======================================================================
 # CLOCK:
@@ -475,6 +475,7 @@ sb16: midimode=1, midi=/dev/midi00, wavemode=1, wave=/dev/dsp, loglevel=2, log=/
 #   vga_update_interval: 250000
 #=======================================================================
 vga_update_interval: 300000
+#vga_update_interval: 1
 
 # using for Winstone '98 tests
 #vga_update_interval:  100000

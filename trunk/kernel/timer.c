@@ -17,11 +17,11 @@ void timer_handler(struct interrupt_frame *r)
 	/* Increment our 'tick count' */
 	timer_ticks++;
 
-	/* Every 100 clocks (approximately 1 second), we will
+	/* Every 10 ticks (approximately 1 second), we will
 	*	display a message on the screen */
-	if (timer_ticks % TICKS_PER_SEC == 0)
+	if ((timer_ticks % TICKS_PER_SEC) == 0)
 	{
-		printf("One second has passed\n");
+		//printf("One second has passed (%d)\n",timer_ticks/TICKS_PER_SEC);
 	}
 }
 
@@ -36,7 +36,7 @@ void timer_install()
 
 void timer_phase(int hz)
 {
-	int divisor = 1193180 / hz;	/* Calculate our divisor */
+	int divisor = (1193180 + hz/2) / hz;	/* Calculate our divisor */
 	outportb((unsigned short)0x43, (char)0x36);	/* Set our command byte 0x36 */
 	outportb((unsigned short)0x40, (char)(divisor & 0xFF));	/* Set low byte of divisor */
 	outportb((unsigned short)0x40, (char)(divisor >> 8));	/* Set high byte of divisor */

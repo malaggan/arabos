@@ -21,7 +21,7 @@ void timer_handler(struct interrupt_frame *r)
 	*	display a message on the screen */
 	if (timer_ticks % TICKS_PER_SEC == 0)
 	{
-		//printf("One second has passed\n");
+		printf("One second has passed\n");
 	}
 }
 

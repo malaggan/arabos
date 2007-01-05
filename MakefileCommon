@@ -60,7 +60,7 @@ SRCS = $(wildcard *.c) $(wildcard *.S) $(wildcard *.asm) $(wildcard *.cpp)
 list0 = $(SRCS:%.cpp=%.o)
 list1 = $(list0:%.asm=%.o)
 list2 = $(list1:%.S=%.o)
-list3 = $(list2:%.c=%.o)
+OBJS = $(list2:%.c=%.o)
 
 build_$(MODULE_NAME): $(list2:%.c=%.o)
 	
@@ -80,6 +80,7 @@ build_$(MODULE_NAME): $(list2:%.c=%.o)
 %.o: %.S
 	@$(CC) $< $(CFLAGS) 
 
+# dependency files
 %.d: %.cpp
 	@$(DEPENDCPP)
 
@@ -99,4 +100,4 @@ clean_files:
 	
 #########################
 
-include $(list3:%.o=%.d)
+include $(OBJS:%.o=%.d)

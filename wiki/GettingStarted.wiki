@@ -1,17 +1,18 @@
 #summary How to checkout and run the OS
+#labels Phase-Implementation,Featured
 
 = Introduction =
 
-Add your content here.
-folder "iso"
-grub_eltorito in iso/
-bochsrc ( iso file name )
-run.c
+This is guide through checking out the OS, successfully compiling it, and running it.
+
+Contents:
+
+  * The _iso_ folder and _grub_eltorito_ file
+  * Change the _iso file path_ in _bochsrc_
+  * (Optional) Edit and recompile _run.c_
+  * (Optional) Using _Netbeans_ (5.5) as a development IDE
 
 
 = Details =
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+To be added.

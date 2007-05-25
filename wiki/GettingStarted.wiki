@@ -22,7 +22,7 @@ Contents:
   # Open Netbeans
   # Install Subversion module for Netbeans from the Update Center
   # From the Subversion menu choode "Check out"
-  # Use the address specified <a href=http://code.google.com/p/arabos/source>here</a>
+  # Use the address specified in this page : http://code.google.com/p/arabos/source
   # Press next, and browse and choose "trunk"
   # Press finish
   # It will ask you for a location to place the code, choose a location

@@ -5,6 +5,8 @@
 
 This is guide through checking out the OS, successfully compiling it, and running it.
 
+Note: This guide is supposed to work on a Linux system with GCC 4.2, Nasm, Bochs, LD, Netbeans and Make installed. You may be able to work on Cygwin, but some differences in code might need to be adjusted (plus you can't produce ELF on Cygwin yet; a bug in GCC Cygwin).
+
 Contents:
 
   * The _iso_ folder and _grub_eltorito_ file
@@ -15,4 +17,21 @@ Contents:
 
 = Details =
 
-To be added.
+== Walkthrough using Netbeans ==
+
+  # Open Netbeans
+  # Install Subversion module for Netbeans from the Update Center
+  # From the Subversion menu choode "Check out"
+  # Use the address specified <a href=http://code.google.com/p/arabos/source>here</a>
+  # Press next, and browse and choose "trunk"
+  # Press finish
+  # It will ask you for a location to place the code, choose a location
+  # It will also ask for a location to place the project files, choose a location
+  # It will then ask you to determine the project type, select _C++ from existing sources_
+  # Then specify the include directory _include_
+  # Leave the macro directory empty
+  # Workaround: The produced file I select the compiled file from run.c so I can run Bochs directly from within the IDE
+  # Then before compiling you need to follow the rest of the steps
+Note: These steps are from memory, need to be rechecked for accuracy of ordering and if any point is missing.
+
+The rest of the steps : _To be added_

@@ -7,7 +7,7 @@ This is guide through checking out the OS, successfully compiling it, and runnin
 
 Note: This guide is supposed to work on a Linux system with GCC 4.2, Nasm, Bochs, LD, Netbeans and Make installed. You may be able to work on Cygwin, but some differences in code might need to be adjusted (plus you can't produce ELF on Cygwin yet; a bug in GCC Cygwin).
 
-Contents:
+=== Contents: ===
 
   * The _iso_ folder and _grub_eltorito_ file
   * Change the _iso file path_ in _bochsrc_
@@ -17,13 +17,13 @@ Contents:
 
 = Details =
 
-== Walkthrough using Netbeans ==
+=== Walkthrough using Netbeans ===
 
   # Open Netbeans
   # Install Subversion module for Netbeans from the Update Center
   # Install the _C++ pack for Netbeans_
   # From the Subversion menu choode "Check out"
-  # Use the address specified in this page: http://code.google.com/p/arabos/source
+  # Use the addresshttp://arabos.googlecode.com/svn/ specified in this page: http://code.google.com/p/arabos/source (Usually: http://arabos.googlecode.com/svn/, or *https:*//arabos.googlecode.com/svn/ if you are allowed to commit)
   # Press next, and browse and choose "trunk"
   # Press finish
   # It will ask you for a location to place the code, choose a location
@@ -32,9 +32,8 @@ Contents:
   # Specify _Makefile_ is the makefile for the project
   # Then specify the include directory _include_
   # Leave the macro directory empty
-  # Workaround: The produced file I select the compiled file from run.c so I can run Bochs directly from within the IDE
+  # It will ask you about the file produced from the build so that will be the file it tries to execute after a successful build. I use the output executable from run.c, it's made just for that to execute Bochs using the newly produced kernel. It depends on the the name you will give to the compiled file of run.c
   # Then before compiling you need to follow the rest of the steps
 Note: These steps are from memory, need to be rechecked for accuracy of ordering and if any point is missing.
 
 The rest of the steps : _To be added_
-

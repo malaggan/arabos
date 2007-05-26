@@ -229,7 +229,7 @@ ata3: enabled=0, ioaddr1=0x168, ioaddr2=0x360, irq=9
 #   ata3-slave:  type=cdrom, path=iso.sample, status=inserted
 #=======================================================================
 #ata0-master: type=disk, path="$HOME/.bochs/guest.hd0", cylinders=#cylinders#\, heads=16, spt=63
-ata0-slave: type=cdrom, path=$HOME/Desktop/ArOS/ArOS/grub.iso, status=inserted
+ata0-slave: type=cdrom, path=$HOME/ArOS/ArOS-google-code/trunk/grub.iso, status=inserted
 
 #=======================================================================
 # BOOT:

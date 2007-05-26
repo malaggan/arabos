@@ -9,13 +9,30 @@ Note: This guide is supposed to work on a Linux system with GCC 4.2, Nasm, Bochs
 
 === Contents: ===
 
-  * The _iso_ folder and _grub_eltorito_ file
+  * The _iso_ folder and _stage2_eltorito_ file
   * Change the _iso file path_ in _bochsrc_
   * (Optional) Edit and recompile _run.c_
   * (Optional) Using _Netbeans_ (5.5) as a development IDE
 
 
 = Details =
+
+=== Live CD ===
+
+To be able to generate the live CD follow the following
+
+  # In the main folder which contains the Makefile create _iso/boot/grub_ directory
+  # Put in it this file http://arabos.googlecode.com/files/stage2_eltorito
+  # Create new text document and rename it to _menu.lst_
+  # Put the following in that text file
+    {{{
+      default 0
+      timeout 0
+      title ArOS
+      kernel /kernel.tgz
+    }}}
+  # The Makefile automatically puts the kernel file _kernel.k_ in iso/ and creates an ISO file from the whole iso/ folder. The generated file is called grub.iso. If you haven't guessed yet, the menu.lst and stage2_eltorito is needed by GRUB to be able to load the CD
+  # You can use the grub.iso in any virtual machine (I use Bochs) or on your own machine
 
 === Walkthrough using Netbeans ===
 
@@ -38,3 +55,5 @@ Note: This guide is supposed to work on a Linux system with GCC 4.2, Nasm, Bochs
 Note: These steps are from memory, need to be rechecked for accuracy of ordering and if any point is missing.
 
 The rest of the steps : _To be added_
+
+

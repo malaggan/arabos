@@ -15,15 +15,14 @@
 ; along with this program; if not, write to the Free Software
 ; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-; In just a few pages in this tutorial, we will add our Interrupt
-; Service Routines (ISRs) right here!
+; i mean 4bytes by dword
 
 %macro isr_no_err_code 1
 	global _isr%1
 	_isr%1:
 	cli
-	push byte 0
-	push byte %1
+	push dword 0 
+	push dword %1
 	jmp isr_common_stub
 %endmacro
 
@@ -31,7 +30,7 @@
 	global _isr%1
 	_isr%1:
 	cli
-	push byte %1
+	push dword %1
 	jmp isr_common_stub
 %endmacro
 
@@ -119,16 +118,17 @@ extern fault_handler
 ; up for kernel mode segments, calls the C-level fault handler,
 ; and finally restores the stack frame.
 isr_common_stub:
-	pusha
+	pushad
+        push ss
 	push ds
 	push es
 	push fs
 	push gs
-	mov ax, 0x10
+	mov ax, 0x10        
 	mov ds, ax
 	mov es, ax
 	mov fs, ax
-	mov gs, ax
+	mov gs, ax        
 	mov eax, esp
 	push eax
 	mov eax, fault_handler
@@ -138,6 +138,7 @@ isr_common_stub:
 	pop fs
 	pop es
 	pop ds
-	popa
-	add esp, 8
+	popad
+; i think this should remove both the interrupt number and the error code
+	add esp, 8 
 	iret

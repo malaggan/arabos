@@ -50,15 +50,16 @@ extern "C" {
 /* This defines what the stack looks like after when ISR/IRQ handler is called */
 struct interrupt_frame
 {
-	unsigned int gs, fs, es, ds;		/* we pushed the segs last */
+	unsigned int gs, fs, es, ds, ss;		/* we pushed the segs last */
 
 	unsigned int edi, esi, ebp, esp,
-				 ebx, edx, ecx, eax;	/* pushed by 'pusha' */
+				 ebx, edx, ecx, eax;	/* pushed by 'pushad' */
 
-	unsigned char int_no, err_code;		/* our 'push byte #' and error codes do this */
+	unsigned int int_no,err_code;
+        /* our 'push byte #' and error codes do this */
 
-	unsigned int eip, cs, eflags,
-				 useresp, ss;			/* pushed by the processor automatically */
+	unsigned int eip, cs, eflags;   /* pushed by the processor automatically */
+        /*useresp, ss << these only are pushed on a privilage level change*/
 } __attribute__((packed));
 
 /* Defines an IDT entry */

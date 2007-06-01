@@ -18,7 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #ifndef STRING_H
 #define STRING_H
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -29,7 +29,7 @@ void itoa (char *buf, int base, int d);
 
 inline int strlen(const char *str);
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 }
 #endif
 

@@ -18,7 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #ifndef IDT_H
 #define IDT_H
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -92,7 +92,7 @@ void irq_install();
 void irq_install_custom_handler(int irq,interrupt_handler_t handler);
 void irq_uninstall_custom_handler(int irq);
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 }
 #endif
 

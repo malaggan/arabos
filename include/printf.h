@@ -18,7 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #ifndef PRINTF_H
 #define PRINTF_H
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -29,7 +29,7 @@ extern "C" {
 void printf (const char *format, ...);
 void panic (const char *format);
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 }
 #endif
 

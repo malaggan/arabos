@@ -47,7 +47,8 @@ CFLAGS := -Wall -Wextra -Wfloat-equal -Wshadow\
 CPPFLAGS := \
 	-I$(INCLUDE) -Wunreachable-code -c -pedantic -Wno-unused-parameter\
 	-Wall -Wextra -Wfloat-equal -Wshadow\
-	-Wpadded -Winline -fno-stack-protector
+	-Wpadded -Winline -fno-stack-protector\
+	-nostartfiles -nostdlib -fno-rtti -fno-exceptions
 #########################
 
 AS := nasm
@@ -80,13 +81,13 @@ list2 = $(list1:%.S=%.o)
 OBJS = $(list2:%.c=%.o)
 
 build_$(MODULE_NAME): $(list2:%.c=%.o)
-	
+
 #########################
 # implicit ruels
 
 %.o: %.asm
 	@$(AS) $< -o $@ $(ASFLAGS)
-	
+
 %.o: %.cpp
 	@$(CPP) $< $(CPPFLAGS)
 
@@ -103,10 +104,10 @@ build_$(MODULE_NAME): $(list2:%.c=%.o)
 
 %.d: %.c
 	@$(DEPEND)
-	
+
 %.d: %.S
 	@$(DEPEND)
-	
+
 %.d: %.asm
 	@echo "$< $@ :" > $*.d
 
@@ -114,7 +115,7 @@ build_$(MODULE_NAME): $(list2:%.c=%.o)
 
 clean_files:
 	-rm *.o *.d
-	
+
 #########################
 
 include $(OBJS:%.o=%.d)

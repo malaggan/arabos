@@ -18,7 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #ifndef MEM_H
 #define MEM_H
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -36,7 +36,7 @@ void *memset(unsigned char *dest, char val, size_t count);
 // fills the memory area with `val'; used for words
 inline unsigned short *memsetw(unsigned short *dest, unsigned short val, size_t count);
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 }
 #endif
 

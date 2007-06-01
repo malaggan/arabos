@@ -18,7 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #ifndef GDT_H
 #define GDT_H
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -81,7 +81,7 @@ extern void gdt_flush();
 void gdt_set_gate(int num, unsigned long base, unsigned long limit, unsigned char access, unsigned char gran);
 void gdt_install();
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 }
 #endif
 

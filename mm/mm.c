@@ -122,5 +122,5 @@ inline void enable_paging()
 
 	// if it was enabled right, then accessing *8MB will cause a page fault
 	int cause_it = 0; // 1
-	*(char*)(1024*1024*4-1+cause_it) = 0;
+	*(char*)(1024*1024*8-1+cause_it) = 0;
 }

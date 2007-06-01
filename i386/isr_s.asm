@@ -15,7 +15,7 @@
 ; along with this program; if not, write to the Free Software
 ; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-; i mean 4bytes by dword
+; i mean 4bytes by dword 
 
 %macro isr_no_err_code 1
 	global _isr%1

@@ -96,6 +96,18 @@ char *exception_messages[] =
 	"Reserved"
 };
 
+int get_cr2()
+{
+    int cr2 = 0;
+    ASM("mov %%cr2,%0" :"=r"(cr2) );
+    return cr2;
+}
+
+void* get_faulted_address()
+{
+    return (void*)get_cr2();
+}
+
 /* All of our Exception handling Interrupt Service Routines will
 *	point to this function. This will tell us what exception has
 *	happened! Right now, we simply halt the system by hitting an
@@ -107,13 +119,16 @@ void fault_handler(struct interrupt_frame *r)
 
 	if (r->int_no < 32)
 	{
-		printf("Int %d(Ecode %d):",r->int_no,r->err_code);
-		printf(exception_messages[r->int_no]);
+		printf("Int %d(Ecode %d):",r->int_no,r->err_code);                
+		printf(exception_messages[r->int_no]);                
 		printf("\n");
+                if(r->int_no == 14 /*page fault*/)
+                    printf("Faulting virtual address = 0x%x\n",get_faulted_address());
 		printf("At EIP:0x%x CS:0x%x\n",r->eip,r->cs);
 		printf("DS:0x%x SS:0x%x\n",r->ds,r->ss);
 		printf("Tick: %d\n",timer_ticks);
 		printf("Exception. System Halted!\n");
 		for (;;);
+                //ASM("hlt");
 	}
 }

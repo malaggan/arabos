@@ -26,13 +26,18 @@ SECTIONS
 {
   .text __physLow : AT(__phys) {
     code = .;
-    *(.text)
+    *(.text)   
+
     . = ALIGN(4096);
   }
   .data : AT(__phys + (data - code))
   {
     data = .;
     *(.data)
+
+    ctors = .;
+    *(.ctors)
+
     __end_data = .;
     . = ALIGN(4096);
   }
@@ -41,7 +46,8 @@ SECTIONS
     bss = .;
     *(.bss)
     *(COMMON)
-    __end_bss = .;
+    __end_bss = .;    
+
     . = ALIGN(4096);
   }
   __end = .;

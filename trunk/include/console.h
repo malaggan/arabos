@@ -18,7 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -108,7 +108,7 @@ void init_video(void);
 #define SHOW_STAT_OK(strWhat) SHOW_STAT(strWhat,STAT_OK("OK"),strlen("OK"))
 #define SHOW_STAT_FAILED(strWhat) SHOW_STAT(strWhat,STAT_FAILED(/*"FAILED"*/"NOT IMPLEMENTED YET"),strlen("NOT IMPLEMENTED YET"))
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 }
 #endif
 

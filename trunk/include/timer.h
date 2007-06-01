@@ -18,7 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #ifndef TIMER_H
 #define TIMER_H
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -32,7 +32,7 @@ void timer_phase(int hz);
 void timer_install();
 void timer_wait(int ticks);
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 }
 #endif
 

@@ -18,7 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #ifndef SYS_H
 #define SYS_H
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -38,7 +38,7 @@ void outportb (unsigned short _port, char _data);
 #define IO_WAIT() \
 		ASM("nop"); ASM("nop"); ASM("nop"); ASM("nop");
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 }
 #endif
 

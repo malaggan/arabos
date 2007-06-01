@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #include <timer.h>
 #include <kb.h>
 #include <mm.h>
+#include <cpptest.h>
 /* Macros. */
 
 /* Check if the bit BIT in FLAGS is set. */
@@ -178,7 +179,8 @@ cmain (unsigned long magic, unsigned long addr)
 	//printf("Kernel size is %d bytes (%d KB) [end= %x,load= %x\n",(kernel__end_addr-kernel_load_addr),
 	//											(kernel__end_addr-kernel_load_addr)>>10,
 	//											kernel__end_addr,kernel_load_addr);
-
+        cppmain();
+        
 	unsigned long i = 0;
 	for(; i <  500000; i++);
 	panic("panic test...");

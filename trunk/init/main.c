@@ -184,7 +184,4 @@ cmain (unsigned long magic, unsigned long addr)
 	unsigned long i = 0;
 	for(; i <  500000; i++);
 	panic("panic test...");
-
-	//void __cxa_finalize(void *d);
-	//__cxa_finalize(0);
 }

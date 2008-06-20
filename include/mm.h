@@ -18,6 +18,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #ifndef MM_H
 #define MM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // page table entry format :
 // addr/avail to os/zero/zero/dirty/accessed/page cache disable/pg write throuhg(1) back(0)/user,supervisor/write,read/present
 
@@ -32,5 +36,9 @@ extern page_directory_t kernel_page_dir;
 
 void init_paging();
 inline void enable_paging();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // MM_H 

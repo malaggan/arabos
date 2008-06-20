@@ -58,7 +58,7 @@ void call_ctors()
 // dtors I can have is only 32.
 #define MAX_DTORS 32
 
-void *__dso_handle; // filled by GCC
+void *__dso_handle; // only the address of this symbol is taken by GCC
 
 struct dtor
 {
@@ -102,3 +102,32 @@ void __cxa_finalize(void /* unsed */ *dso_handle)
     }
     printk(TRACE "-exit __cxa_finalize()\n");
 }
+
+//overload the operator "new"
+/*
+void * operator new (unsigned int size)
+{
+    //return kmalloc(size);
+            return 0;
+}
+
+//overload the operator "new[]"
+void * operator new[] (unsigned int size)
+{
+    //return kmalloc(size);
+            return 0;
+}
+
+//overload the operator "delete"
+void operator delete (void * p)
+{
+    //kfree(p);
+}
+
+//overload the operator "delete[]"
+void operator delete[] (void * p)
+{
+    //kfree(p);
+}//operator new should actually use kcalloc (allocate and zero) otherwise the variables will be filled with garbage which you will then need to clear manually -- AR
+
+*/

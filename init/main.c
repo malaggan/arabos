@@ -150,9 +150,11 @@ cmain (unsigned long magic, unsigned long addr)
 		mem_check(magic,addr);		
 	}
 
-        printk(LOG "Kernel size is %d bytes (%d KB) [end= 0x%x,load= 0x%x]\n",(kernel_end_addr-kernel_load_addr),
+        printk(LOG "Kernel size is %d bytes (%d KB) [end= 0x%x,load= 0x%x]\n",
+            (kernel_end_addr-kernel_load_addr),
             (kernel_end_addr-kernel_load_addr)>>10,
-            kernel_end_addr,kernel_load_addr);        
+            kernel_end_addr,
+            kernel_load_addr);        
         
 	SHOW_STAT_OK("Boot");
 

@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #include <timer.h>
 #include <kb.h>
 #include <mm.h>
-#include <cpptest.h>
+#include <cpp.h>
 /* Macros. */
 
 /* Check if the bit BIT in FLAGS is set. */
@@ -46,7 +46,7 @@ void mem_check(unsigned long magic,unsigned long addr)
 	/* Am I booted by a Multiboot-compliant boot loader? */
 	if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
 	{
-		printf ("Invalid magic number: 0x%x\n", (unsigned) magic);
+		printk (SEVERE "Invalid magic number: 0x%x\n", (unsigned) magic);
 		return;
 	}
 
@@ -54,33 +54,33 @@ void mem_check(unsigned long magic,unsigned long addr)
 	mbi = (multiboot_info_t *) addr;
 
 	/* Print out the flags. */
-	printf ("flags = 0x%x\n", (unsigned) mbi->flags);
+	printk (DEBUG "flags = 0x%x\n", (unsigned) mbi->flags);
 
 	/* Are mem_* valid? */
 	if (CHECK_FLAG (mbi->flags, 0))
-		printf ("mem_lower = %uKB, mem_upper = %uKB\n",
+		printk (DEBUG "mem_lower = %uKB, mem_upper = %uKB\n",
 		(unsigned) mbi->mem_lower, (unsigned) mbi->mem_upper);
 
 	/* Is boot_device valid? */
 	if (CHECK_FLAG (mbi->flags, 1))
-		printf ("boot_device = 0x%x\n", (unsigned) mbi->boot_device);
+		printk (DEBUG "boot_device = 0x%x\n", (unsigned) mbi->boot_device);
 
 	/* Is the command line passed? */
 	if (CHECK_FLAG (mbi->flags, 2))
-		printf ("cmdline = %s\n", (char *) mbi->cmdline);
+		printk (DEBUG "cmdline = %s\n", (char *) mbi->cmdline);
 
 	/* Are mods_* valid? */
 	if (CHECK_FLAG (mbi->flags, 3))
 	{
 		module_t *mod;
-		int i;
+		unsigned int i;
 
-		printf ("mods_count = %d, mods_addr = 0x%x\n",
+		printk (DEBUG "mods_count = %d, mods_addr = 0x%x\n",
 			(int) mbi->mods_count, (int) mbi->mods_addr);
 		for (i = 0, mod = (module_t *) mbi->mods_addr;
 			i < mbi->mods_count;
 			i++, mod += sizeof (module_t))
-			printf (" mod_start = 0x%x, mod_end = 0x%x, string = %s\n",
+			printk (DEBUG " mod_start = 0x%x, mod_end = 0x%x, string = %s\n",
 			(unsigned) mod->mod_start,
 			(unsigned) mod->mod_end,
 			(char *) mod->string);
@@ -89,7 +89,7 @@ void mem_check(unsigned long magic,unsigned long addr)
 	/* Bits 4 and 5 are mutually exclusive! */
 	if (CHECK_FLAG (mbi->flags, 4) && CHECK_FLAG (mbi->flags, 5))
 	{
-		printf ("Both bits 4 and 5 are set.\n");
+		printk (WARNING "Both bits 4 and 5 are set.\n");
 		return;
 	}
 
@@ -98,7 +98,7 @@ void mem_check(unsigned long magic,unsigned long addr)
 	{
 		aout_symbol_table_t *aout_sym = &(mbi->u.aout_sym);
 
-		printf ("aout_symbol_table: tabsize = 0x%0x, "
+		printk (DEBUG "aout_symbol_table: tabsize = 0x%0x, "
 			"strsize = 0x%x, addr = 0x%x\n",
 			(unsigned) aout_sym->tabsize,
 			(unsigned) aout_sym->strsize,
@@ -110,7 +110,7 @@ void mem_check(unsigned long magic,unsigned long addr)
 	{
 		elf_section_header_table_t *elf_sec = &(mbi->u.elf_sec);
 
-		printf ("elf_sec: num = %u, size = 0x%x,"
+		printk (DEBUG "elf_sec: num = %u, size = 0x%x,"
 			" addr = 0x%x, shndx = 0x%x\n",
 			(unsigned) elf_sec->num, (unsigned) elf_sec->size,
 			(unsigned) elf_sec->addr, (unsigned) elf_sec->shndx);
@@ -121,13 +121,13 @@ void mem_check(unsigned long magic,unsigned long addr)
 	{
 		memory_map_t *mmap;
 
-		printf ("mmap_addr = 0x%x, mmap_length = 0x%x\n",
+		printk (LOG "mmap_addr = 0x%x, mmap_length = 0x%x\n",
 			(unsigned) mbi->mmap_addr, (unsigned) mbi->mmap_length);
 		for (mmap = (memory_map_t *) mbi->mmap_addr;
 			(unsigned long) mmap < mbi->mmap_addr + mbi->mmap_length;
 			mmap = (memory_map_t *) ((unsigned long) mmap
 			+ mmap->size + sizeof (mmap->size)))
-			printf (" size = 0x%x, base_addr = 0x%x%x,"
+			printk (LOG " size = 0x%x, base_addr = 0x%x%x,"
 			" length = 0x%x%x, type = 0x%x\n",
 			(unsigned) mmap->size,
 			(unsigned) mmap->base_addr_high,
@@ -150,18 +150,19 @@ cmain (unsigned long magic, unsigned long addr)
 		mem_check(magic,addr);		
 	}
 
-
-	printf(WHITE "Welcome to " REDB "ArOS" BLUEB " v 0.003_1!\n" NORMAL);	
+        printk(LOG "Kernel size is %d bytes (%d KB) [end= 0x%x,load= 0x%x]\n",(kernel_end_addr-kernel_load_addr),
+            (kernel_end_addr-kernel_load_addr)>>10,
+            kernel_end_addr,kernel_load_addr);        
+        
 	SHOW_STAT_OK("Boot");
 
 	gdt_install();
 	SHOW_STAT_OK("GDT");
 
-	idt_install();
-	//SHOW_STAT_OK("IDT");	
-	irq_install();
-	//SHOW_STAT_OK("IRQ");	
+	idt_install(); //SHOW_STAT_OK("IDT");	
+	irq_install(); //SHOW_STAT_OK("IRQ");	
 	timer_install();
+        printk(LOG "Setting interrupts\n");
 	ASM ("sti");
 	SHOW_STAT_OK("IDT");
 
@@ -169,19 +170,15 @@ cmain (unsigned long magic, unsigned long addr)
 
 	init_paging();
         
-        SHOW_STAT_FAILED("Kernel memory allocator");
-	SHOW_STAT_FAILED("Process manager");
-	SHOW_STAT_FAILED("Discovering devices");
-	SHOW_STAT_FAILED("Filesystem");
-	SHOW_STAT_FAILED("Networking");
-	SHOW_STAT_FAILED("Shell");
-								
-	//printf("Kernel size is %d bytes (%d KB) [end= %x,load= %x\n",(kernel__end_addr-kernel_load_addr),
-	//											(kernel__end_addr-kernel_load_addr)>>10,
-	//											kernel__end_addr,kernel_load_addr);
-        cppmain();
-        
-	unsigned long i = 0;
-	for(; i <  500000; i++);
-	panic("panic test...");
+        //SHOW_STAT_FAILED("Kernel memory allocator");
+	//SHOW_STAT_FAILED("Process manager");
+	//SHOW_STAT_FAILED("Discovering devices");
+	//SHOW_STAT_FAILED("Filesystem");
+	//SHOW_STAT_FAILED("Networking");
+	//SHOW_STAT_FAILED("Shell");
+	
+        printk(DEBUG "Entering C++ main\n");
+        enter_cpp();
+                
+        printk(LOG "exiting cmain\n");
 }

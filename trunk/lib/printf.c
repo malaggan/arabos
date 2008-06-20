@@ -21,12 +21,55 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 
 int printed_chars = 0; // guard for MAX_CHARS
 
+void print0(char **format);
+
 /* Format a string and print it on the screen, just like the libc
 function printf. */
 void
 printf (const char *format, ...)
 {
-	char **arg = (char **) &format;
+    print0((char **)&format);
+}
+
+// first character is a printk level code 
+void
+printk (const char *format, ...)
+{    
+    char level = format[0];
+    
+    if(level < *TRACE || level > *SEVERE) // no printk level specified
+        printf(format);    
+    else if(level >= *PRINTK_LEVEL)
+    {
+        if(*TRACE == level)                
+            printf(ECMA_PREFIX ECMA_BACK_GND ECMA_WHITE ECMA_SUFFIX 
+                    "TRC: ");
+        else if(*DEBUG == level)
+            printf(ECMA_PREFIX ECMA_BACK_GND ECMA_GREEN ECMA_SUFFIX 
+                    "DBG: ");
+        else if(*LOG == level)                
+            printf(ECMA_PREFIX ECMA_BACK_GND ECMA_GREEN ECMA_SEPARATOR ECMA_SET_BOLD ECMA_SUFFIX 
+                    "LOG: ");
+        else if(*WARNING == level)
+            printf(ECMA_PREFIX ECMA_BACK_GND ECMA_MAGENTA ECMA_SUFFIX 
+                    "WRN: ");
+        else if(*ERROR == level)                
+            printf(ECMA_PREFIX ECMA_BACK_GND ECMA_RED ECMA_SUFFIX 
+                    "ERR: ");
+        else if(*SEVERE == level)                
+            printf(ECMA_PREFIX ECMA_BACK_GND ECMA_RED ECMA_SEPARATOR ECMA_SET_BOLD ECMA_SUFFIX 
+                    "SVR: ");
+        printf(format+1);
+        printf(NORMAL);
+    }
+}
+
+// a non-variable arg list version
+void print0 (char **format0)
+{
+    const char * format = (const char *)*format0;
+    
+    char **arg = format0;
 	int c;
 	char buf[20];
 
@@ -46,7 +89,7 @@ printf (const char *format, ...)
 			ECMA48(&(format));
 		}
 		/* meemo : ECMA-48 end*/
-		else
+                else // % specifier
 		{
 			char *p;
 			int print = 0;

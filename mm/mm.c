@@ -43,12 +43,12 @@ void free_page(page_table_entry page)   //****
 	// don't forget to call INVLPG to flush the presenet bit
 	// don't forget to check for overflows and undetflows
 	*(page_stack.tos--) = /*get the physical address of the vaddr*/
-						   *(   (page_table_entry*)  
-								(
-									(page_table_t)
-										(kernel_page_dir[	((int)page & 0xFFC00000)	>>22	])
-								)[	((int)page & 0x003FF000)	>>12	]
-							);
+                               *(   (page_table_entry*)  
+                                            (
+                                                    (page_table_t)
+                                                            (kernel_page_dir[	((int)page & 0xFFC00000)	>>22	])
+                                            )[	((int)page & 0x003FF000)	>>12	]
+                                    );
 
 }
 
@@ -98,7 +98,7 @@ void init_paging()
 	{
 		free_page_stack_table[i] = ((i+1024) << 12)|3;
 	}
-	page_stack.tos = 1024*1024*8-sizeof(page_table_entry); // 8 MB. we subtract that value so we don't exceed the boundary
+	page_stack.tos = (page_table_entry*)(1024*1024*8-sizeof(page_table_entry)); // 8 MB. we subtract that value so we don't exceed the boundary
 
 	// ******** now push the free pages, consider the reserved memory aread specified by GRUB to be not free.
 	//*****************************************>>>
@@ -118,7 +118,7 @@ inline void enable_paging()
 		"jmp $0x08,$next\r\n" // flush TLB (?)
 		"next: xorl %eax,%eax\r\n");
 
-	printf("Paging has been just enabled\n");
+	printk(LOG "Paging has been just enabled\n");
 
 	// if it was enabled right, then accessing *8MB will cause a page fault
 	int cause_it = 0; // 1

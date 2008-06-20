@@ -16,4 +16,4 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*/
 
 #include <stdlib.h>
-int main() { return system("bochs -f /home/meemo/ArOS/ArOS-google-code/trunk/bochsrc"); }
+int main() { return system("bochs -f ./bochsrc"); }

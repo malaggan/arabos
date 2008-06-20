@@ -57,19 +57,15 @@ void cppmain()
         
     for(unsigned int i = 0xffffff; i; i--);
     printk(        "Testing printk\n");
-    for(unsigned int i = 0xffffff; i; i--);
     printk(TRACE   "Testing printk\n");
-    for(unsigned int i = 0xffffff; i; i--);
     printk(DEBUG   "Testing printk\n");
-    for(unsigned int i = 0xffffff; i; i--);
     printk(LOG     "Testing printk\n");
-    for(unsigned int i = 0xffffff; i; i--);
     printk(WARNING "Testing printk\n");
-    for(unsigned int i = 0xffffff; i; i--);
     printk(ERROR   "Testing printk\n");
-    for(unsigned int i = 0xffffff; i; i--);
     printk(SEVERE  "Testing printk\n");
-    for(unsigned int i = 0xffffff; i; i--);
+    
+    printf("testing printf %d %x\n",154,0x154);
+    printk("testing printk %d %x\n",154,0x154);
 }
 
 

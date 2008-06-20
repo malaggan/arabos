@@ -21,14 +21,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 
 int printed_chars = 0; // guard for MAX_CHARS
 
-void print0(char **format);
+void print0 (char **format0, int ignore_first_char);
 
 /* Format a string and print it on the screen, just like the libc
 function printf. */
 void
 printf (const char *format, ...)
 {
-    print0((char **)&format);
+    print0((char **)&format,0);
 }
 
 // first character is a printk level code 
@@ -38,7 +38,7 @@ printk (const char *format, ...)
     char level = format[0];
     
     if(level < *TRACE || level > *SEVERE) // no printk level specified
-        printf(format);    
+        print0((char**)&format,0);    
     else if(level >= *PRINTK_LEVEL)
     {
         if(*TRACE == level)                
@@ -59,15 +59,18 @@ printk (const char *format, ...)
         else if(*SEVERE == level)                
             printf(ECMA_PREFIX ECMA_BACK_GND ECMA_RED ECMA_SEPARATOR ECMA_SET_BOLD ECMA_SUFFIX 
                     "SVR: ");
-        printf(format+1);
+        
+        print0((char**)&format, 1);
         printf(NORMAL);
     }
 }
 
 // a non-variable arg list version
-void print0 (char **format0)
+void print0 (char **format0, int ignore_first_char)
 {
     const char * format = (const char *)*format0;
+    if(ignore_first_char)
+        format++;
     
     char **arg = format0;
 	int c;

@@ -142,7 +142,7 @@ cmain (unsigned long magic, unsigned long addr)
 {
 	init_video(); 
     
-        int memCheck = 1;
+        int memCheck = 0;
         if(memCheck)
         {
                 mem_check(magic,addr);		

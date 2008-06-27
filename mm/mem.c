@@ -27,6 +27,15 @@ inline void *memcpy(unsigned char *dest, const unsigned char *src, size_t count)
 	return dest;
 }
 
+// copies string of words of lenght `count'
+inline void *memcpyw(unsigned short *dest, const unsigned short *src, size_t count)
+{
+	ASM("cld\n"
+            "rep\n"
+            "movsw" :: "S"(src), "D"(dest), "c"(count));
+	return dest;
+}
+
 // fills the memory area with `val'
 inline void *memset(unsigned char *dest, char val, size_t count)
 {

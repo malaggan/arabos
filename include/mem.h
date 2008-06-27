@@ -30,6 +30,9 @@ extern "C" {
 // copies string of bytes of lenght `count'
 void *memcpy(unsigned char *dest, const unsigned char *src, size_t count);
 
+// copies string of words of lenght `count'
+void *memcpyw(unsigned short *dest, const unsigned short *src, size_t count);
+
 // fills the memory area with `val'
 void *memset(unsigned char *dest, char val, size_t count);
 

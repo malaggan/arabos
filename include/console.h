@@ -93,6 +93,10 @@ void putchar (unsigned char c);
 void ECMA48(const char ** format); /*color coded ascii*/
 void update_cursor(void);
 void init_video(void);
+extern unsigned short *current_tty;
+extern unsigned short tty0[];
+void flush_video(unsigned short* tty);
+void flush_current_tty();
 
 /* utility stuff */
 #define LBRACK	WHITE "[" NORMAL

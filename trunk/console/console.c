@@ -26,13 +26,24 @@ int xpos = 0;
 int ypos = 0;
 
 /* Point to the video memory. */
-volatile unsigned short *video = NULL;
+volatile unsigned short *video = (unsigned short *)VIDEO;
+unsigned short tty0[COLUMNS*LINES];
+unsigned short* current_tty = NULL;
 
 char ATTRIBUTE	=	0x07; /* COOL this value determines the color */
 
+void flush_current_tty()
+{
+    flush_video(current_tty);
+}
+
+void flush_video(unsigned short* tty)
+{
+    memcpyw(video,tty,COLUMNS*LINES);
+}
+
 void scroll(void)
 {
-
 	unsigned short blank;
 
 	if(ypos >= LINES)
@@ -44,11 +55,11 @@ void scroll(void)
 		/* Row 25 is the end, this means we need to scroll up */
 		/* Move the current text chunk that makes up the screen
 		*	back in the buffer by a line */
-		memcpy ((void*)video, (void*)(video + COLUMNS),COLUMNS*2*(LINES-1));
+		memcpy ((void*)current_tty, (void*)(current_tty + COLUMNS),COLUMNS*2*(LINES-1));
 
 		/* Finally, we set the chunk of memory that occupies
 		*	the last line of text to our 'blank' character */
-		memsetw ((unsigned short*)(video + ((LINES-1) * COLUMNS)), blank, COLUMNS);
+		memsetw ((unsigned short*)(current_tty + ((LINES-1) * COLUMNS)), blank, COLUMNS);
 		ypos = LINES - 1;
 	}
 }
@@ -90,12 +101,12 @@ putchar (unsigned char c)
 	*	Index = [(y * width) + x] */
 	else if(c >= ' ')
 	{
-		where = video + (ypos * COLUMNS + xpos);
+		where = current_tty + (ypos * COLUMNS + xpos);
 		*where = c | ATTRIBUTE<<8;	/* Character AND attributes: color */
 		xpos++;
 	}
 
-	/* If the cursor has reached the edge of the screen's width, we
+	/* If the cursor has reached the edge of the tty0's width, we
 	*	insert a new line in there */
 	if(xpos >= COLUMNS)
 	{
@@ -103,7 +114,7 @@ putchar (unsigned char c)
 		ypos++;
 	}
 
-	/* Scroll the screen if needed, and finally move the cursor */
+	/* Scroll the tty if needed, and finally move the cursor */
 	scroll();
 	update_cursor();
 
@@ -132,10 +143,10 @@ void ECMA48(const char ** format)
 	*	0	reset all attributes to their defaults
 	*	1	set bold
 	*	x5	set blink // x for not implemented
-	*	x7	set reverse video
+	*	x7	set reverse screen
 	*	x22	set normal intensity
 	*	x25	blink off
-	*	x27	reverse video off
+	*	x27	reverse screen off
 	*/
 	const char* fmt = *format;
 	if(*fmt == '[')
@@ -200,7 +211,7 @@ void ECMA48(const char ** format)
 void
 cls (void)
 {
-	memsetw((unsigned short*)video,(unsigned short)0x0700,COLUMNS*LINES);
+	memsetw((unsigned short*)current_tty,(unsigned short)0x0700,COLUMNS*LINES);
 
 	xpos = 0;
 	ypos = 0;
@@ -225,16 +236,18 @@ void update_cursor(void)
 	*	programming documents. A great start to graphics:
 	*	http://www.brackeen.com/home/vga */	 	
 	
-	outportb (0x3D4, 0x0F); outportb (0x3D5, temp & 0xFF);
+	outportb (0x3D4, 0x0F); 
+        outportb (0x3D5, temp & 0xFF);
 	temp >>= 8;
-	outportb(0x3D4, 0xE); outportb(0x3D5, temp & 0xFF);
+	outportb(0x3D4, 0xE); 
+        outportb(0x3D5, temp & 0xFF);
 }
 
 void init_video(void)
 {
-	video = (unsigned short *)VIDEO;
-	xpos = 0;
-	ypos = 0;
-	update_cursor();
-	cls();
+    current_tty = tty0;
+    xpos = 0;
+    ypos = 0;
+    update_cursor();
+    cls();
 }

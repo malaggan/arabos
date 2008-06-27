@@ -33,7 +33,7 @@ extern int printed_chars; // counter to compare for MAX_CHARS
 unsigned char inportb (unsigned short _port);
 void outportb (unsigned short _port, char _data);
 
-#define ASM __asm__ __volatile__
+#include <asm.h>
 
 #define IO_WAIT() \
 		ASM("nop"); ASM("nop"); ASM("nop"); ASM("nop");

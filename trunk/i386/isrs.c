@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #include <idt.h>
 #include <printf.h>
 #include <timer.h>
+#include <asm.h>
 
 /* These are function prototypes for all of the exception
 *	handlers: The first 32 entries in the IDT are reserved
@@ -96,16 +97,11 @@ char *exception_messages[] =
 	"Reserved"
 };
 
-int get_cr2()
-{
-    int cr2 = 0;
-    ASM("mov %%cr2,%0" :"=r"(cr2) );
-    return cr2;
-}
-
 void* get_faulted_address()
 {
-    return (void*)get_cr2();
+    int cr2;
+    rcr2(cr2);
+    return cr2;
 }
 
 /* All of our Exception handling Interrupt Service Routines will
@@ -128,7 +124,7 @@ void fault_handler(struct interrupt_frame *r)
 		printf("DS:0x%x SS:0x%x\n",r->ds,r->ss);
 		printf("Tick: %d\n",timer_ticks);
 		printf("Exception. System Halted!\n");
-		for (;;);
-                //ASM("hlt");
+                hlt();
+		for (;;);                
 	}
 }

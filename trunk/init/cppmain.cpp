@@ -15,6 +15,15 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*/
 
+#include <multiboot.h>
+#include <printf.h>
+#include <console.h>
+#include <mem.h>
+#include <gdt.h>
+#include <idt.h>
+#include <timer.h>
+#include <kb.h>
+#include <mm.h>
 #include <cpp.h>
 
 extern "C" void call_ctors();
@@ -36,36 +45,44 @@ void enter_cpp()
 
 class Koko { public: Koko() {printf("koko\n");} ~Koko(){printf("~koko\n");}} kk;
 
+extern int __end,__phys;
+int kernel_end_addr=(int)(&__end),kernel_load_addr=(int)(&__phys); // the linker symbol have only an address (in the symbol table)
+
 void cppmain()
-{        
+{          
+    cpuid_check();
+    
     printf(WHITE "Welcome to " REDB "ArOS" BLUEB " v 0.003_1!\n" NORMAL);	
-    
-    printf("Current PRINTK_LEVEL is ");
-    
-    if(*TRACE == *PRINTK_LEVEL)                
-        printf("TRACE\n");
-    else if(*DEBUG == *PRINTK_LEVEL)
-        printf("DEBUG\n");
-    else if(*LOG == *PRINTK_LEVEL)                
-        printf("LOG\n");
-    else if(*WARNING == *PRINTK_LEVEL)
-        printf("WARNING\n");
-    else if(*ERROR == *PRINTK_LEVEL)                
-        printf("ERROR\n");
-    else if(*SEVERE == *PRINTK_LEVEL)                
-        printf("SEVERE\n");
-        
-    for(unsigned int i = 0xffffff; i; i--);
-    printk(        "Testing printk\n");
-    printk(TRACE   "Testing printk\n");
-    printk(DEBUG   "Testing printk\n");
-    printk(LOG     "Testing printk\n");
-    printk(WARNING "Testing printk\n");
-    printk(ERROR   "Testing printk\n");
-    printk(SEVERE  "Testing printk\n");
-    
-    printf("testing printf %d %x\n",154,0x154);
-    printk("testing printk %d %x\n",154,0x154);
+ 
+    printk(LOG "Kernel size is %d bytes (%d KB) [end= 0x%x,load= 0x%x]\n",
+        (kernel_end_addr-kernel_load_addr),
+        (kernel_end_addr-kernel_load_addr)>>10,
+        kernel_end_addr,
+        kernel_load_addr);        
+
+    SHOW_STAT_OK("Boot");
+
+    gdt_install();
+    SHOW_STAT_OK("GDT");
+
+    idt_install(); //SHOW_STAT_OK("IDT");	
+    irq_install(); //SHOW_STAT_OK("IRQ");	
+    timer_install();
+    printk(LOG "Setting interrupts\n");
+    ASM ("sti");
+    SHOW_STAT_OK("IDT");
+
+    init_kb();
+
+    init_paging();
+
+    //SHOW_STAT_FAILED("Kernel memory allocator");
+    //SHOW_STAT_FAILED("Process manager");
+    //SHOW_STAT_FAILED("Discovering devices");
+    //SHOW_STAT_FAILED("Filesystem");
+    //SHOW_STAT_FAILED("Networking");
+    //SHOW_STAT_FAILED("Shell");
+	
 }
 
 

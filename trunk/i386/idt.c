@@ -58,5 +58,5 @@ void idt_install()
 	isr_install();
 
 	/* Points the processor's internal register to the new IDT */
-	idt_load();
+        lidt(idt_ptr);
 }

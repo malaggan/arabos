@@ -99,7 +99,7 @@ void init_video(void);
 #define RBRACK	WHITE "]" NORMAL
 #define STAT_OK(str)	GREENB str NORMAL
 #define STAT_FAILED(str)	REDB str NORMAL
-#define PREFILL(ch)	memsetw((void*)(video+ypos*COLUMNS),ch|ATTRIBUTE<<8,COLUMNS);
+#define PREFILL(ch)	memsetw((unsigned short*)(video+ypos*COLUMNS),ch|ATTRIBUTE<<8,COLUMNS);
 #define SHOW_STAT(strWhat,strStat,len)	\
 	PREFILL('.');\
 	printf(WHITE strWhat NORMAL);\

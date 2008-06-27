@@ -16,28 +16,31 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*/
 
 #include <mem.h>
+#include <asm.h>
 
 // copies string of bytes of lenght `count'
 inline void *memcpy(unsigned char *dest, const unsigned char *src, size_t count)
 {
-	const char *sp = (const char *)src;
-	char *dp = (char *)dest;
-	for(; count != 0; count--) *dp++ = *sp++;
+	ASM("cld\n"
+            "rep\n"
+            "movsb" :: "S"(src), "D"(dest), "c"(count));
 	return dest;
 }
 
 // fills the memory area with `val'
 inline void *memset(unsigned char *dest, char val, size_t count)
 {
-	char *temp = (char *)dest;
-	for( ; count != 0; count--) *temp++ = val;
+	ASM("cld\n"
+            "rep\n"
+            "stosb" :: "a"(val), "D"(dest), "c"(count));
 	return dest;
 }
 
 // fills the memory area with `val'; used for words
 inline unsigned short *memsetw(unsigned short *dest, unsigned short val, size_t count)
 {
-	unsigned short *temp = (unsigned short *)dest;
-	for( ; count != 0; count--) *temp++ = val;
+	ASM("cld\n"
+            "rep\n"
+            "stosw" :: "a"(val), "D"(dest), "c"(count));
 	return dest;
 }

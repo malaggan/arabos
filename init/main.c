@@ -30,9 +30,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 /* Check if the bit BIT in FLAGS is set. */
 #define CHECK_FLAG(flags,bit)	((flags) & (1 << (bit)))
 
-extern int __end,__phys;
-int kernel_end_addr=(int)(&__end),kernel_load_addr=(int)(&__phys); // the linker symbol have only an address (in the symbol table)
-
 /* Forward declarations. */
 void cmain (unsigned long magic, unsigned long addr);
 
@@ -143,42 +140,14 @@ pointed by ADDR. */
 void
 cmain (unsigned long magic, unsigned long addr)
 {
-	init_video();
-	int memCheck = 1;
-	if(memCheck)
-	{
-		mem_check(magic,addr);		
-	}
-
-        printk(LOG "Kernel size is %d bytes (%d KB) [end= 0x%x,load= 0x%x]\n",
-            (kernel_end_addr-kernel_load_addr),
-            (kernel_end_addr-kernel_load_addr)>>10,
-            kernel_end_addr,
-            kernel_load_addr);        
+	init_video(); 
+    
+        int memCheck = 1;
+        if(memCheck)
+        {
+                mem_check(magic,addr);		
+        }
         
-	SHOW_STAT_OK("Boot");
-
-	gdt_install();
-	SHOW_STAT_OK("GDT");
-
-	idt_install(); //SHOW_STAT_OK("IDT");	
-	irq_install(); //SHOW_STAT_OK("IRQ");	
-	timer_install();
-        printk(LOG "Setting interrupts\n");
-	ASM ("sti");
-	SHOW_STAT_OK("IDT");
-
-	init_kb();
-
-	init_paging();
-        
-        //SHOW_STAT_FAILED("Kernel memory allocator");
-	//SHOW_STAT_FAILED("Process manager");
-	//SHOW_STAT_FAILED("Discovering devices");
-	//SHOW_STAT_FAILED("Filesystem");
-	//SHOW_STAT_FAILED("Networking");
-	//SHOW_STAT_FAILED("Shell");
-	
         printk(DEBUG "Entering C++ main\n");
         enter_cpp();
                 

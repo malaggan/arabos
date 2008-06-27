@@ -106,18 +106,20 @@ void init_paging()
 	enable_paging();	
 }
 
+void turn_paging_on()
+{
+    int cr0 = 0;
+    rcr0(cr0);
+    cr0 |= 0x80000000;
+    lcr0(cr0);
+}
+
 inline void enable_paging()
 {
-	ASM ( "movl %0,%%cr3"
-		:
-		:"a"(kernel_page_dir));
-
-	ASM ( "movl %cr0,%eax\r\n"
-		"orl $0x80000000,%eax\r\n"
-		"movl %eax,%cr0\r\n"
-		"jmp $0x08,$next\r\n" // flush TLB (?)
-		"next: xorl %eax,%eax\r\n");
-
+	lcr3(kernel_page_dir);
+                
+        turn_paging_on();
+        
 	printk(LOG "Paging has been just enabled\n");
 
 	// if it was enabled right, then accessing *8MB will cause a page fault

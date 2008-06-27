@@ -16,6 +16,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*/
 
 #include <gdt.h>
+#include <sys.h> // for ASM
+#include <asm.h>
 
 /* Our GDT, with 3 entries, and finally our special GDT pointer */
 struct gdt_entry gdt[3] = { {0,0,0,0,0,0}, };
@@ -73,5 +75,12 @@ void gdt_install()
 		KERNEL_GRAN);
 
 	/* Flush out the old GDT and install the new changes! */
-	gdt_flush();
+        lgdt(gdt_ptr);
+	lgs(0x10);
+        lfs(0x10);
+        les(0x10);
+        lds(0x10);
+        lss(0x10);              
+	lcs(0x08);
+	
 }

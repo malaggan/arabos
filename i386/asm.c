@@ -16,29 +16,29 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*/
 
 #include <asm.h>
-#include <printf.h>
+#include <lib.h>
 
-        char* edx_features[] = {"FPU ", "VME ", "DE ", "PSE ", "TSC ", "MSR ", "PAE ",
-                                "MCE ", "CX8 ", "APIC ", "--- ", "SEP ", "MTRR ", 
-                                "PGE ", "MCA ", "CMOV ", "PAT ", "PSE_36 ", "PSN ",
-                                "CLFSH ", "--- ", "DS ", "ACPI ", "MMX ", "FXSR ", 
-                                "SSE ", "SSE2 ", "SS ", "HTT ", "TM ", "IA64 ", "PBE "};
-        char* ecx_features[] = {"SSE3 ", "--- ", "--- ", "MONITOR ", "DS_CPL ",
-                                "VMX ", "--- ", "EST ", "TM2 ", "SSSE3 ", "CID ", 
-                                "--- ", "--- ", "CX16 ", "xTPR ", "--- ", "--- ",
-                                "--- ", "DCA "};
-        char* edx_features_lower_case[] 
-                             = {"fpu ", "vme ", "de ", "pse ", "tsc ", "msr ", "pae ",
-                                "mce ", "cx8 ", "apic ", "--- ", "sep ", "mtrr ", 
-                                "pge ", "mca ", "cmov ", "pat ", "pse_36 ", "psn ",
-                                "clfsh ", "--- ", "ds ", "acpi ", "mmx ", "fxsr ", 
-                                "sse ", "sse2 ", "ss ", "htt ", "tm ", "ia64 ", "pbe "};
-        char* ecx_features_lower_case[] 
-                             = {"sse3 ", "--- ", "--- ", "monitor ", "ds_cpl ",
-                                "vmx ", "--- ", "est ", "tm2 ", "ssse3 ", "cid ", 
-                                "--- ", "--- ", "cx16 ", "xtpr ", "--- ", "--- ",
-                                "--- ", "dca "};
-
+char* edx_features[] = {"FPU ", "VME ", "DE ", "PSE ", "TSC ", "MSR ", "PAE ",
+                        "MCE ", "CX8 ", "APIC ", "-", "SEP ", "MTRR ", 
+                        "PGE ", "MCA ", "CMOV ", "PAT ", "PSE_36 ", "PSN ",
+                        "CLFSH ", "-", "DS ", "ACPI ", "MMX ", "FXSR ", 
+                        "SSE ", "SSE2 ", "SS ", "HTT ", "TM ", "IA64 ", "PBE "};
+char* ecx_features[] = {"SSE3 ", "-", "-", "MONITOR ", "DS_CPL ",
+                        "VMX ", "-", "EST ", "TM2 ", "SSSE3 ", "CID ", 
+                        "-", "-", "CX16 ", "xTPR ", "-", "-",
+                        "-", "DCA "};
+char* edx_features_lower_case[] 
+                     = {"(fpu) ", "(vme) ", "(de) ", "(pse) ", "(tsc) ", "(msr) ", "(pae) ",
+                        "(mce) ", "(cx8) ", "(apic) ", "-", "(sep) ", "(mtrr) ", 
+                        "(pge) ", "(mca) ", "(cmov) ", "(pat) ", "(pse_36) ", "(psn) ",
+                        "(clfsh) ", "-", "(ds) ", "(acpi) ", "(mmx) ", "(fxsr) ", 
+                        "(sse) ", "(sse2) ", "(ss) ", "(htt) ", "(tm) ", "(ia64) ", "(pbe) "};
+char* ecx_features_lower_case[] 
+                     = {"(sse3) ", "-", "-", "(monitor) ", "(ds_cpl) ",
+                        "(vmx) ", "-", "(est) ", "(tm2) ", "(ssse3) ", "(cid) ", 
+                        "-", "-", "(cx16) ", "(xtpr) ", "-", "-",
+                        "-", "(dca) "};
+    
 void cpuid_check()
 {
     int original_flags,modified_flags,read_flags,cpuid_bit;
@@ -94,16 +94,16 @@ void cpuid_check()
         count = _ebx & 0xFF; _ebx >>= 8;
         apicID = _ebx & 0xFF; _ebx >>= 8;
         
-        for(int i = 0; i < 32; i++)
+        for(int i = 0; i < sizeof(edx_features)/sizeof(char*); i++)
             if(*edx_features[i] != '-')
             {
                 printf(((_edx & (1<<i))?edx_features:edx_features_lower_case)[i]);             
             }
         
-        for(int i = 0; i < 19; i++)
-            if((_ecx & (1<<i)) && ! *ecx_features[i] != '-')
+        for(int i = 0; i < sizeof(ecx_features)/sizeof(char*); i++)
+            if(*ecx_features[i] != '-')
             {
-                printf(((_edx & (1<<i))?ecx_features:ecx_features_lower_case)[i]);             
+                printf(((_ecx & (1<<i))?ecx_features:ecx_features_lower_case)[i]);             
             }
         printf("\n");
     }

@@ -24,12 +24,12 @@ extern "C" {
 
 #define EOI (char)0x20 /* end of interrupt, used in signaling the PIC after handling IRQ */
 
-#define INTERRUPT_PRESENT			(0x80)
-#define INTERRUPT_RING(n)			((n&0x3)<<5)
+#define INTERRUPT_PRESENT		(0x80)
+#define INTERRUPT_RING(n)		((n&0x3)<<5)
 #define INTERRUPT_OP_SIZE_32		(0x8)
-#define IDT_GATE_TYPE_TASK			(0x5)
+#define IDT_GATE_TYPE_TASK		(0x5)
 #define IDT_GATE_TYPE_INTERRUPT		(0x6)
-#define IDT_GATE_TYPE_TRAP			(0x7)
+#define IDT_GATE_TYPE_TRAP		(0x7)
 
 #define ISR_GATE ((unsigned char)( INTERRUPT_PRESENT | INTERRUPT_RING( 0 ) | INTERRUPT_OP_SIZE_32 | IDT_GATE_TYPE_INTERRUPT ))
 #define IRQ_GATE ( ISR_GATE ) /*0x8E:1 present, 00 ring 0, 0 , 1 32 bits, 110 interrupt	*/

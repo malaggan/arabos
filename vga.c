@@ -1,4 +1,4 @@
-/* Copyright (C) 2007  Mohammad Nabil 
+/* Copyright (C) 2007  Mohammad Nabil
 mohammad (dot) nabil (dot) h (at) gmail (dot) com
 
 This program is free software; you can redistribute it and/or
@@ -15,35 +15,6 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*/
 
-#ifndef PRINTF_H
-#define PRINTF_H
+//#include "vga.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-#include <sys.h>
-#include <console.h>
-#include <string.h>
-
-void printf (const char *format, ...);
-void printk (const char *format, ...);
-void panic (const char *format);
-
-// printk levels
-#define TRACE   "\310" // = 200 in decimal
-#define DEBUG   "\311"
-#define LOG     "\312"
-#define WARNING "\313"
-#define ERROR   "\314"
-#define SEVERE  "\315"
-#define LOG_ALL TRACE
-
-// current printk level
-#define PRINTK_LEVEL LOG_ALL
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /*PRINTF_H*/

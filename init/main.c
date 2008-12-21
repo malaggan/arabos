@@ -16,21 +16,21 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*/
 
 #include <multiboot.h>
-#include <printf.h>
+#include <lib.h>
 #include <console.h>
-#include <mem.h>
+#include <lib.h>
 #include <gdt.h>
 #include <idt.h>
 #include <timer.h>
 #include <kb.h>
 #include <mm.h>
-#include <cpp.h>
 /* Macros. */
 
 /* Check if the bit BIT in FLAGS is set. */
 #define CHECK_FLAG(flags,bit)	((flags) & (1 << (bit)))
 
 /* Forward declarations. */
+void enter_cpp();
 void cmain (unsigned long magic, unsigned long addr);
 
 void mem_check(unsigned long magic,unsigned long addr)
@@ -142,7 +142,7 @@ cmain (unsigned long magic, unsigned long addr)
 {
 	init_video(); 
     
-        int memCheck = 0;
+        int memCheck = 1;
         if(memCheck)
         {
                 mem_check(magic,addr);		
@@ -150,6 +150,6 @@ cmain (unsigned long magic, unsigned long addr)
         
         printk(DEBUG "Entering C++ main\n");
         enter_cpp();
-                
+        
         printk(LOG "exiting cmain\n");
 }

@@ -33,7 +33,9 @@ extern "C" {
 #define rcr4(cr4) ASM ( "movl %%cr4,%0" : "=a" (cr4));
 #define lcr4(cr4) ASM ( "movl %0,%%cr4" :: "a" (cr4));
 
-#define hlt() ASM("hlt")
+#define hlt() ASM("hlt"); while(1)
+
+#define sti() ASM("sti")
     
 // val must be 64 bits long
 #define rdtscll(val) ASM("rdtsc" : "=A" (val))

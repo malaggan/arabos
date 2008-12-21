@@ -37,7 +37,7 @@ LINT := SPLINT
 # -Wconversion -Wpacked
 # i substituted '-ffreestanding' for "-nostdinc -mno-stack-arg-probe -fno-builtin"
 CFLAGS := -Wall -Wextra -Wfloat-equal -Wshadow\
-	-Wpadded -Winline\
+	-Wpadded -Winline -nostdinc\
 	-Wunreachable-code -c -pedantic -Wno-unused-parameter\
 	-I$(INCLUDE) -std=c99 -ffreestanding -fno-stack-protector
 
@@ -46,7 +46,7 @@ CFLAGS := -Wall -Wextra -Wfloat-equal -Wshadow\
 # i think i should call it myself, since there is no main, that if the function returns w/out calling main
 CPPFLAGS := \
 	-I$(INCLUDE) -Wunreachable-code -c -pedantic -Wno-unused-parameter\
-	-Wall -Wextra -Wfloat-equal -Wshadow\
+	-Wall -Wextra -Wfloat-equal -Wshadow -nostdinc\
 	-Wpadded -Winline -fno-stack-protector\
 	-nostartfiles -nostdlib -fno-rtti -fno-exceptions
 #########################

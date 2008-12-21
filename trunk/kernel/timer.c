@@ -17,8 +17,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 
 #include <timer.h>
 #include <idt.h>
-#include <sys.h>
-#include <printf.h>
+#include <lib.h>
 
 /* This will keep track of how many ticks that the system
 *	has been running for */

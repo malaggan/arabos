@@ -18,8 +18,7 @@
 %macro irq_no_err_code 1
 	global _irq%1
 	_irq%1:
-	cli
-	push byte 0
+	push byte 0 
 	push byte %1
 	jmp irq_common_stub
 %endmacro
@@ -58,7 +57,10 @@ irq_common_stub:
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
+
+    ; the pointer to the stack-frame-based-img of the interrupt frame
 	mov eax, esp
+    sub eax, 4 ; FIXME, there is an extra parameter pushed on the stack !!, this is just a fix
 
 	push eax
 	mov eax, irq_handler

@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 *
 *	Notes: No warranty expressed or implied. Use at own risk. */
 #include <idt.h>
-#include <printf.h>
+#include <lib.h>
 #include <timer.h>
 #include <asm.h>
 

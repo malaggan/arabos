@@ -15,9 +15,17 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*/
 
+#include <ecma48.h>
 #include <console.h> // needed by panic()
-#include <printf.h>
+#include <lib.h>
 #include <timer.h> // needed by panic()
+#include <asm.h>
+
+// imbed attribute in char, given c is an int
+int MK_CH_ATT(unsigned char c,unsigned char a)
+{
+    return c|(a<<8);
+}
 
 int printed_chars = 0; // guard for MAX_CHARS
 
@@ -73,59 +81,59 @@ void print0 (char **format0, int ignore_first_char)
         format++;
     
     char **arg = format0;
-	int c;
-	char buf[20];
+    int c;
+    char buf[20];
 
-	printed_chars = 0;
+    printed_chars = 0;
 
-	arg++;
+    arg++;
+    unsigned char attribute = 0x07;
+    while (printed_chars < MAX_CHARS && (c = *format++) != 0)
+    {
+        if (c != '%' && c != 0x1B)
+        {
+            putchar (MK_CH_ATT(c,attribute));
+        }
+        /* meemo : ECMA-48 */
+        else if(c == 0x1B)
+        {
+            attribute = ECMA48(&(format));
+        }
+        /* meemo : ECMA-48 end*/
+        else // % specifier
+        {
+            char *p;
+            int print = 0;
 
-	while (printed_chars < MAX_CHARS && (c = *format++) != 0)
-	{
-		if (c != '%' && c != 0x1B)
-		{
-			putchar (c);
-		}
-		/* meemo : ECMA-48 */
-		else if(c == 0x1B)
-		{
-			ECMA48(&(format));
-		}
-		/* meemo : ECMA-48 end*/
-                else // % specifier
-		{
-			char *p;
-			int print = 0;
+            c = *format++;
+            switch (c)
+            {
+            case 'd':
+            case 'u':
+            case 'x':
+                itoa (buf, c, *((int *) arg++));
+                p = buf;
+                print = 1;
+                break;
+            case 's':
+                p = *arg++;
+                if (! p)
+                        p = "(null)";
+                print = 1;
+                break;
+            default:
+                putchar (MK_CH_ATT(*((int *) arg++),attribute));
+                break;
+            }
+            if(print)
+            {
+                while (*p)
+                    putchar (MK_CH_ATT(*p++,attribute));
+            }
+        }
+    }
 
-			c = *format++;
-			switch (c)
-			{
-			case 'd':
-			case 'u':
-			case 'x':
-				itoa (buf, c, *((int *) arg++));
-				p = buf;
-				print = 1;
-				break;
-			case 's':
-				p = *arg++;
-				if (! p)
-					p = "(null)";
-				print = 1;
-				break;
-			default:
-				putchar (*((int *) arg++));
-				break;
-			}
-			if(print)
-			{
-				while (*p)
-					putchar (*p++);
-			}
-		}
-	}
-        
-        flush_current_tty();
+    flush_current_tty();
 }
 
 __attribute__((noreturn)) void panic (const char *message) 
@@ -135,6 +143,5 @@ __attribute__((noreturn)) void panic (const char *message)
 	printf(			message);
 	printf("\"" NORMAL	"\nSYSTEM HALTED (tick %d; %d ms after timer start)\n"
 				"-------------",timer_ticks,timer_ticks*(1000/TICKS_PER_SEC));
-	ASM ( "hlt" );
-	while(1);
+	hlt();
 }

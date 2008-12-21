@@ -62,7 +62,7 @@ display_library: wx
 # now supported, but we still recommend to use the BIOS distributed with
 # Bochs. Now the start address can be calculated from image size.
 #=======================================================================
-romimage: file=/usr/share/bochs/BIOS-bochs-latest, address=0xf0000
+romimage: file=/usr/share/bochs/BIOS-bochs-latest
 #romimage: file=/usr/share/bochs/BIOS-bochs-2-processors, address=0xf0000
 #romimage: file=/usr/share/bochs/BIOS-bochs-4-processors, address=0xf0000
 #romimage: file=/usr/share/bochs/BIOS-bochs-8-processors, address=0xf0000

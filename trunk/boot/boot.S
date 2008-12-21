@@ -78,8 +78,8 @@ multiboot_entry:
 	popl	%eax
 	popl	%eax
 
-    hlt
 loop:
+    hlt
 	jmp	loop
 
 halt_message:

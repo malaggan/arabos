@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 * > When kernel exit I should call __cxa_finalize(NULL) to call all the global dtors
 */
 
-#include <printf.h>
+#include <lib.h>
 
 /* 1- Pure virtual functions */
 /* untested */

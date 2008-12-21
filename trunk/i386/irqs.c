@@ -16,8 +16,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*/
 
 #include <idt.h>
-#include <sys.h>
-#include <printf.h>
+#include <lib.h>
+#include <asm.h>
 
 /* These are own ISRs that point to our special IRQ handler
 *	instead of the regular 'fault_handler' function */
@@ -58,20 +58,17 @@ void irq_remap(void)
 	// u can save them, see the link below
 
 	// to do : io_wait ?
-
+       
 	outportb((unsigned short)0x20, (char)0x11); // init
-	outportb((unsigned short)0xA0, (char)0x11);
-
-	outportb((unsigned short)0x21, (char)0x20); // offset (v.) ( must be divisible by 8 )
-	outportb((unsigned short)0xA1, (char)0x28);
-
-	outportb((unsigned short)0x21, (char)0x04);
-	outportb((unsigned short)0xA1, (char)0x02);
-
-	outportb((unsigned short)0x21, (char)0x01); // 8086/88 (MCS-80/85) mode ( see http://www.mega-tokyo.com/osfaq/Can%20I%20remap%20the%20PIC%3F )
-	outportb((unsigned short)0xA1, (char)0x01);
-
-	outportb((unsigned short)0x21, (char)0x0);
+        outportb((unsigned short)0x21, (char)0x20); // offset (v.) ( must be divisible by 8 )
+        outportb((unsigned short)0x21, (char)0x04);
+        outportb((unsigned short)0x21, (char)0x01); // 8086/88 (MCS-80/85) mode ( see http://www.mega-tokyo.com/osfaq/Can%20I%20remap%20the%20PIC%3F )
+        outportb((unsigned short)0x21, (char)0x0);  // FIXME // ?? // old value 0x01  // unmask all interrupts
+        
+	outportb((unsigned short)0xA0, (char)0x11);	
+	outportb((unsigned short)0xA1, (char)0x28);	
+	outportb((unsigned short)0xA1, (char)0x02);	
+	outportb((unsigned short)0xA1, (char)0x01);	
 	outportb((unsigned short)0xA1, (char)0x0);
 }
 
@@ -86,11 +83,12 @@ void handle_coprocessor_math_fault(struct interrupt_frame *r)
 *	is just like installing the exception handlers */
 void irq_install()
 {
-	//ASM( "mov %cr0,%eax\r\n"
-	//	 "and $0xfffffff0,%eax\r\n"
-	//	 "or $4,%eax\r\n"
-	//	 "mov %eax,%cr0" ); // clear TS and sets EM in the cr0
-
+/*
+	ASM( "mov %cr0,%eax\r\n"
+		 "and $0xfffffff7,%eax\r\n"
+		 "or $4,%eax\r\n"
+		 "mov %eax,%cr0" ); // clear TS and sets EM in the cr0
+*/
 	irq_remap();
 
 	INSTALL_IRQ(0)	INSTALL_IRQ(1)	INSTALL_IRQ(2)	INSTALL_IRQ(3)	INSTALL_IRQ(4)	INSTALL_IRQ(5)	INSTALL_IRQ(6)	INSTALL_IRQ(7)
@@ -109,7 +107,7 @@ void irq_install()
 *	an EOI command to the first controller. If you don't send
 *	an EOI, you won't raise any more IRQs */
 void irq_handler(struct interrupt_frame *r)
-{
+{    
 	/* This is a blank function pointer */
 	interrupt_handler_t handler;
 
@@ -117,8 +115,13 @@ void irq_handler(struct interrupt_frame *r)
 	*	IRQ, and then finally, run it */
 	handler = irq_routines[r->int_no];
 
-	if(r->int_no > 1)
-		printf("IRQ %d\n",r->int_no);
+	if(r->int_no > 0)
+        {
+		//printf("IRQ %d\n",r->int_no);
+            //printf("IRQ %d(Ecode %d):\n",r->int_no,r->err_code);
+            //printf("At EIP:0x%x CS:0x%x\n",r->eip,r->cs);
+            //printf("DS:0x%x SS:0x%x\n",r->ds,r->ss);
+        }
 
 	if (handler)
 	{

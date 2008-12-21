@@ -16,8 +16,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*/
 
 #include <mm.h>
-#include <mem.h>
-#include <printf.h>
+#include <lib.h>
+#include <asm.h>
 
 extern int _end,_phys;
 extern int kernel_end_addr;
@@ -114,7 +114,7 @@ void turn_paging_on()
     lcr0(cr0);
 }
 
-inline void enable_paging()
+void enable_paging()
 {
 	lcr3(kernel_page_dir);
                 

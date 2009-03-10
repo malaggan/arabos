@@ -52,8 +52,7 @@ The run.c file is not a part of the OS nor a part of the build system. It's simp
   # Install Subversion module for Netbeans from the Update Center
   # Install the _C++ pack for Netbeans_
   # From the Subversion menu choose "Check out"
-  # Use the addresshttp://arabos.googlecode.com/svn/ specified in this page: http://code.google.com/p/arabos/source (Usually: 
-*http* ://arabos.googlecode.com/svn/, or *https* ://arabos.googlecode.com/svn/ if you are allowed to commit, if you use the latter you will be asked to provide a username and a password)
+  # Use the address http://arabos.googlecode.com/svn/ specified in this page: http://code.google.com/p/arabos/source (Usually: *http* ://arabos.googlecode.com/svn/, or *https* ://arabos.googlecode.com/svn/ if you are allowed to commit, if you use the latter you will be asked to provide a username and a password)
   # Press next, and browse and choose "trunk"
   # Press finish
   # It will ask you for a location to place the code, choose a location
@@ -66,8 +65,6 @@ The run.c file is not a part of the OS nor a part of the build system. It's simp
   # Then you can proceed with compiling (assuming you have followed the whole guide)
 
 Note: the Netbeans steps need revision to make sure of accuracy of ordering and that there is nothing missing.
-
-
 
 
 

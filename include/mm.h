@@ -149,48 +149,7 @@ public:
 } extern "C" {
 #endif // __cplusplus
 
-typedef union
-{
-    unsigned long value;
-    phys_addr_t pageBase;
-    struct {
-        unsigned :20;
-        unsigned extra:3;
-        unsigned global:1; // if 1 and PGE flag in CR4 is 1, this is sticky in the TLB
-        unsigned pat:1;
-        unsigned dirty:1;
-        unsigned accessed:1; 
-        unsigned cacheDisabled:1; // 0 -> caching-enabled (if it is enabled also in CR0). 1 -> disable chaching
-        unsigned writeThrough:1; // 0 -> write-back caching, 1 -> write-through
-        unsigned userSupervisor:1; // 0 -> supervisor, 1 -> user
-        unsigned readWrite:1; // 0 -> read only, 1 -> read/write
-        unsigned present:1; // 0 -> not present
-    } data ;
-} __attribute__((packed)) page_table_entry;
-
-typedef union
-{
-    unsigned long value;
-    phys_addr_t pageTableBase;
-    struct {
-        unsigned :20;
-        unsigned extra:3;
-        unsigned global:1; // ignored
-        unsigned pageSize:1; // 0 for 4K pages (not 4M pages)
-        unsigned reserved:1; // 0
-        unsigned accessed:1;
-        unsigned cacheDisabled:1; // 0 -> caching-enabled (if it is enabled also in CR0). 1 -> disable chaching
-        unsigned writeThrough:1; // 0 -> write-back caching, 1 -> write-through
-        unsigned userSupervisor:1; // 0 -> supervisor, 1 -> user
-        unsigned readWrite:1; // 0 -> read only, 1 -> read/write
-        unsigned present:1; // 0 -> not present
-    } data ;
-} __attribute__((packed)) page_directory_entry;
-
-//extern phys_addr_t kernel_page_dir;
-
 void init_paging();
-void enable_paging();
 
 #ifdef __cplusplus
 }

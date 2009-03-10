@@ -28,14 +28,169 @@ extern "C" {
 // page  dir entry
 // addr/avail to os/zero/page size/zero/accessed/page cache disable/pg write throuhg(1) back(0)/user,supervisor/write,read/present
 
-typedef unsigned long page_table_entry; // (physical address with flags) // can it be a bit-fielded struct ?
-typedef page_table_entry* /*[1024]*/ page_table_t;
-typedef page_table_t* /*[1024]*/ page_directory_t;
+typedef union
+{
+    unsigned long value;
+    struct {
+        unsigned ixPageTable:10;
+        unsigned ixPage:10;
+        unsigned offset:12;
+    } data ;
+} __attribute__((packed)) linear_addr_t;
 
-extern page_directory_t kernel_page_dir;
+typedef unsigned long phys_addr_t;
+
+void printk (const char *, ...);
+
+#ifdef __cplusplus
+} extern "C++" {
+inline int SET_BIT(const int x, const int b) {return (x|(1<<b)); }
+inline int CLR_BIT(const int x, const int b) {return (x&~(1<<b)); }
+inline int GET_BIT(const int x, const int b) {return (x&(1<<b))>0?1:0; }
+inline int SET_BIT(const int x, const int b, const int v) {return (v?SET_BIT(x,b):CLR_BIT(x,b)); }
+
+enum CacheMode {WriteBack = 0, WriteThrough};
+enum Privilage {Supervisor = 0, User};
+enum Access {ReadOnly=0, ReadWrite};
+enum PageSize {_4K=0, _4M};
+
+class PageTableEntry
+{
+    unsigned long value;
+public:
+    PageTableEntry():value(0){}
+    PageTableEntry(unsigned long aValue):value(aValue){}
+
+    unsigned long getValue() const {return value;}
+
+    phys_addr_t getPageBase() const { return value & ((~0)<<12); };
+    void setPageBase(phys_addr_t pageBase) { value = (value & ~((~0)<<12)) | (pageBase & ((~0)<<12)); };
+
+    unsigned int getExtra() const { return (value >> 9) & 0x7;};
+    void setExtra(unsigned int extra) { value = (value & ((~0)<<9)) | (extra & ((~0)>>3)); };
+
+    bool getGlobal() const { return GET_BIT(value,8); };
+    void setGlobal(bool global) { value=SET_BIT(value,8,global); };
+
+    bool getPat() const { return GET_BIT(value,7); };
+    void setPat(bool pat) { value=SET_BIT(value,7,pat); };
+
+    unsigned int getDirty() const { return GET_BIT(value,6); };
+    unsigned int getAccessed() const { return GET_BIT(value,5); };
+
+    bool getCahceEnabled() const { return !GET_BIT(value,4); };
+    void setCahceEnabled(bool enabled) { value=SET_BIT(value,4,!enabled); };
+
+    CacheMode getCacheMode() const { return (CacheMode)GET_BIT(value,3); };
+    void setCacheMode(CacheMode mode) { value=SET_BIT(value,3,mode); };
+
+    Privilage getPrivilage() const { return (Privilage)GET_BIT(value,2); };
+    void setPrivilage(Privilage mode) { value=SET_BIT(value,2,mode); };
+
+    Access getAccess() const { return (Access)GET_BIT(value,1); };
+    void setAccess(Access mode) { value=SET_BIT(value,1,mode); };
+
+    bool getPresent() const { return GET_BIT(value,0); };
+    void setPresent(bool present) { value=SET_BIT(value,0,present); };
+
+    void print() const
+    {
+        printk("PTE PB:0x%x, EX:0x%x, G:%d, PAT:%d, D:%d, A:%d, PCD:%d, PWT:%d, US:%d, RW:%d, P:%d\n",getPageBase(),getExtra(),getGlobal(),
+                getPat(), getDirty(), getAccessed(), !getCahceEnabled(), getCacheMode(), getPrivilage(), getAccess(),getPresent() );
+    }
+};
+
+class PageDirectoryEntry
+{
+    unsigned long value;
+public:
+    PageDirectoryEntry():value(0){}
+    PageDirectoryEntry(unsigned long aValue):value(aValue){}
+
+    unsigned long getValue() const {return value;}
+
+    phys_addr_t getPageTableBase() const { return value & ((~0)<<12); };
+    void setPageTableBase(phys_addr_t pageTableBase) { value = (value & ~((~0)<<12)) | (pageTableBase & ((~0)<<12)); };
+
+    unsigned int getExtra() const { return (value >> 9) & 0x7;};
+    void setExtra(unsigned int extra) { value = (value & ((~0)<<9)) | (extra & ((~0)>>3)); };
+
+    bool getGlobal() const { return GET_BIT(value,8); }; // ignored
+    void setGlobal(bool global) { value=SET_BIT(value,8,global); };
+
+    PageSize getPageSize() const { return (PageSize)GET_BIT(value,7); };
+    void setPageSize(PageSize pageSize) { value=SET_BIT(value,7,pageSize); };
+
+    //bit 6 reserved
+    
+    unsigned int getAccessed() const { return GET_BIT(value,5); };
+
+    bool getCahceEnabled() const { return !GET_BIT(value,4); };
+    void setCahceEnabled(bool enabled) { value=SET_BIT(value,4,!enabled); };
+
+    CacheMode getCacheMode() const { return (CacheMode)GET_BIT(value,3); };
+    void setCacheMode(CacheMode mode) { value=SET_BIT(value,3,mode); };
+
+    Privilage getPrivilage() const { return (Privilage)GET_BIT(value,2); };
+    void setPrivilage(Privilage mode) { value=SET_BIT(value,2,mode); };
+
+    Access getAccess() const { return (Access)GET_BIT(value,1); };
+    void setAccess(Access mode) { value=SET_BIT(value,1,mode); };
+
+    bool getPresent() const { return GET_BIT(value,0); };
+    void setPresent(bool present) { value=SET_BIT(value,0,present); };
+
+    void print() const
+    {
+        printk("PTE PB:0x%x, EX:0x%x, G:%d, PS:%d, A:%d, PCD:%d, PWT:%d, US:%d, RW:%d, P:%d\n",getPageTableBase(),getExtra(),getGlobal(),
+                getPageSize(), getAccessed(), !getCahceEnabled(), getCacheMode(), getPrivilage(), getAccess(),getPresent() );
+    }
+};
+} extern "C" {
+#endif // __cplusplus
+
+typedef union
+{
+    unsigned long value;
+    phys_addr_t pageBase;
+    struct {
+        unsigned :20;
+        unsigned extra:3;
+        unsigned global:1; // if 1 and PGE flag in CR4 is 1, this is sticky in the TLB
+        unsigned pat:1;
+        unsigned dirty:1;
+        unsigned accessed:1; 
+        unsigned cacheDisabled:1; // 0 -> caching-enabled (if it is enabled also in CR0). 1 -> disable chaching
+        unsigned writeThrough:1; // 0 -> write-back caching, 1 -> write-through
+        unsigned userSupervisor:1; // 0 -> supervisor, 1 -> user
+        unsigned readWrite:1; // 0 -> read only, 1 -> read/write
+        unsigned present:1; // 0 -> not present
+    } data ;
+} __attribute__((packed)) page_table_entry;
+
+typedef union
+{
+    unsigned long value;
+    phys_addr_t pageTableBase;
+    struct {
+        unsigned :20;
+        unsigned extra:3;
+        unsigned global:1; // ignored
+        unsigned pageSize:1; // 0 for 4K pages (not 4M pages)
+        unsigned reserved:1; // 0
+        unsigned accessed:1;
+        unsigned cacheDisabled:1; // 0 -> caching-enabled (if it is enabled also in CR0). 1 -> disable chaching
+        unsigned writeThrough:1; // 0 -> write-back caching, 1 -> write-through
+        unsigned userSupervisor:1; // 0 -> supervisor, 1 -> user
+        unsigned readWrite:1; // 0 -> read only, 1 -> read/write
+        unsigned present:1; // 0 -> not present
+    } data ;
+} __attribute__((packed)) page_directory_entry;
+
+//extern phys_addr_t kernel_page_dir;
 
 void init_paging();
-inline void enable_paging();
+void enable_paging();
 
 #ifdef __cplusplus
 }

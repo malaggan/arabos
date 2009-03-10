@@ -383,7 +383,8 @@ debug: action=ignore
 #=======================================================================
 #debugger_log: /dev/null
 #debugger_log: debugger.out
-debugger_log: -
+#debugger_log: -
+debugger_log: /dev/stdout
 
 #=======================================================================
 # COM1, COM2, COM3, COM4:
@@ -685,5 +686,5 @@ private_colormap: enabled=0
 # Enable GDB stub. See user documentation for details.
 # Default value is enabled=0.
 #=======================================================================
-#gdbstub: enabled=0, port=1234, text_base=0, data_base=0, bss_base=0
+#gdbstub: enabled=1, port=1234, text_base=0, data_base=0, bss_base=0
 

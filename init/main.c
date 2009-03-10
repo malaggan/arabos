@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #include <timer.h>
 #include <kb.h>
 #include <mm.h>
+#include <elf32.h>
 /* Macros. */
 
 /* Check if the bit BIT in FLAGS is set. */
@@ -90,6 +91,27 @@ void mem_check(unsigned long magic,unsigned long addr)
 		return;
 	}
 
+	/* Are mmap_* valid? */
+	if (CHECK_FLAG (mbi->flags, 6))
+	{
+		memory_map_t *mmap;
+
+		printk (LOG "mmap_addr = 0x%x, mmap_length = 0x%x\n",
+			(unsigned) mbi->mmap_addr, (unsigned) mbi->mmap_length);
+		for (mmap = (memory_map_t *) mbi->mmap_addr;
+			(unsigned long) mmap < mbi->mmap_addr + mbi->mmap_length;
+			mmap = (memory_map_t *) ((unsigned long) mmap
+			+ mmap->size + sizeof (mmap->size)))
+			printk (LOG " size = 0x%x, base_addr = 0x%x%x,"
+			" length = 0x%x%x, type = 0x%x\n",
+			(unsigned) mmap->size,
+			(unsigned) mmap->base_addr_high,
+			(unsigned) mmap->base_addr_low,
+			(unsigned) mmap->length_high,
+			(unsigned) mmap->length_low,
+			(unsigned) mmap->type); // type == 1 -> indicates available RAM, otherwise reserved http://www.gnu.org/software/grub/manual/multiboot/html_node/Boot-information-format.html
+	}
+
 	/* Is the symbol table of a.out valid? */
 	if (CHECK_FLAG (mbi->flags, 4))
 	{
@@ -110,28 +132,15 @@ void mem_check(unsigned long magic,unsigned long addr)
 		printk (DEBUG "elf_sec: num = %u, size = 0x%x,"
 			" addr = 0x%x, shndx = 0x%x\n",
 			(unsigned) elf_sec->num, (unsigned) elf_sec->size,
-			(unsigned) elf_sec->addr, (unsigned) elf_sec->shndx);
-	}
-
-	/* Are mmap_* valid? */
-	if (CHECK_FLAG (mbi->flags, 6))
-	{
-		memory_map_t *mmap;
-
-		printk (LOG "mmap_addr = 0x%x, mmap_length = 0x%x\n",
-			(unsigned) mbi->mmap_addr, (unsigned) mbi->mmap_length);
-		for (mmap = (memory_map_t *) mbi->mmap_addr;
-			(unsigned long) mmap < mbi->mmap_addr + mbi->mmap_length;
-			mmap = (memory_map_t *) ((unsigned long) mmap
-			+ mmap->size + sizeof (mmap->size)))
-			printk (LOG " size = 0x%x, base_addr = 0x%x%x,"
-			" length = 0x%x%x, type = 0x%x\n",
-			(unsigned) mmap->size,
-			(unsigned) mmap->base_addr_high,
-			(unsigned) mmap->base_addr_low,
-			(unsigned) mmap->length_high,
-			(unsigned) mmap->length_low,
-			(unsigned) mmap->type);
+			(unsigned) elf_sec->addr, (unsigned) elf_sec->shndx); // we can read the kernel symbols from here for a stack-walker
+                
+                Elf32_Shdr* sections = (Elf32_Shdr*)(elf_sec->addr);
+                for(int i = 0; i < elf_sec->num; i++)
+                {
+                    printf("Section %d : %s\n",
+                            i,
+                            (char*)(sections[elf_sec->shndx].sh_addr+sections[i].sh_name));
+                }
 	}
 }
 

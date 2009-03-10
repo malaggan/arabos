@@ -36,6 +36,8 @@ extern "C" {
 #define hlt() ASM("hlt"); while(1)
 
 #define sti() ASM("sti")
+
+#define invlpg(vaddr) ASM("invlpg %0" :: "m"(vaddr))
     
 // val must be 64 bits long
 #define rdtscll(val) ASM("rdtsc" : "=A" (val))

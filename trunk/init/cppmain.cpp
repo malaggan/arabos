@@ -38,7 +38,8 @@ void enter_cpp()
     printk(LOG "In C++ main\n");    
         
     cppmain();
-    
+
+    // destruct all static C++ objects.
     __cxa_finalize(/*unused*/ NULL);
 }
 
@@ -61,11 +62,14 @@ int kernel_end_addr=(int)(&__end),kernel_load_addr=(int)(&__phys); // the linker
 #define SHOW_STAT_OK(strWhat) SHOW_STAT(strWhat,STAT_OK("OK"),strlen("OK"))
 #define SHOW_STAT_FAILED(strWhat) SHOW_STAT(strWhat,STAT_FAILED(/*"FAILED"*/"NOT IMPLEMENTED YET"),strlen("NOT IMPLEMENTED YET"))
 
+// this function doesn't return unless when powering off the system
 void cppmain()
-{          
+{
+#if 0
     cpuid_check();
+#endif
     
-    printf(WHITE "Welcome to " REDB "ArOS" BLUEB " v 0.003_1!\n" NORMAL);	
+    printf(WHITE "Welcome to " REDB "ArOS" BLUEB " v 0.004!\n" NORMAL);
  
     printk(LOG "Kernel size is %d bytes (%d KB) [end= 0x%x,load= 0x%x]\n",
         (kernel_end_addr-kernel_load_addr),

@@ -213,6 +213,7 @@ cls (void)
     ttys[active_tty].xpos = 0;
     ttys[active_tty].ypos = 0;
     update_cursor();
+    flush_current_tty();
 }
 
 void update_cursor(void)

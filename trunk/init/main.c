@@ -38,9 +38,6 @@ void mem_check(unsigned long magic,unsigned long addr)
 {
 	multiboot_info_t *mbi;
 
-	/* Clear the screen. */
-	cls ();
-
 	/* Am I booted by a Multiboot-compliant boot loader? */
 	if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
 	{
@@ -98,6 +95,7 @@ void mem_check(unsigned long magic,unsigned long addr)
 
 		printk (LOG "mmap_addr = 0x%x, mmap_length = 0x%x\n",
 			(unsigned) mbi->mmap_addr, (unsigned) mbi->mmap_length);
+#if 0
 		for (mmap = (memory_map_t *) mbi->mmap_addr;
 			(unsigned long) mmap < mbi->mmap_addr + mbi->mmap_length;
 			mmap = (memory_map_t *) ((unsigned long) mmap
@@ -110,6 +108,7 @@ void mem_check(unsigned long magic,unsigned long addr)
 			(unsigned) mmap->length_high,
 			(unsigned) mmap->length_low,
 			(unsigned) mmap->type); // type == 1 -> indicates available RAM, otherwise reserved http://www.gnu.org/software/grub/manual/multiboot/html_node/Boot-information-format.html
+#endif
 	}
 
 	/* Is the symbol table of a.out valid? */
@@ -134,13 +133,15 @@ void mem_check(unsigned long magic,unsigned long addr)
 			(unsigned) elf_sec->num, (unsigned) elf_sec->size,
 			(unsigned) elf_sec->addr, (unsigned) elf_sec->shndx); // we can read the kernel symbols from here for a stack-walker
                 
+#if 0
                 Elf32_Shdr* sections = (Elf32_Shdr*)(elf_sec->addr);
                 for(int i = 0; i < elf_sec->num; i++)
                 {
-                    printf("Section %d : %s\n",
-                            i,
+                    printf("%s ",//"Section %d : %s\n",i,
                             (char*)(sections[elf_sec->shndx].sh_addr+sections[i].sh_name));
                 }
+                printf("\n");
+#endif
 	}
 }
 
@@ -149,12 +150,12 @@ pointed by ADDR. */
 void
 cmain (unsigned long magic, unsigned long addr)
 {
-	init_video(); 
-    
+	init_video();
+        
         int memCheck = 1;
         if(memCheck)
         {
-                mem_check(magic,addr);		
+                mem_check(magic,addr);
         }
         
         printk(DEBUG "Entering C++ main\n");

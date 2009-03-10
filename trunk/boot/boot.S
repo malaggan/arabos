@@ -77,10 +77,11 @@ multiboot_entry:
 	call	printf
 	popl	%eax
 	popl	%eax
-
+        
 loop:
+    pause
     hlt
-	jmp	loop
+    jmp	loop
 
 halt_message:
 	.asciz	"Halted at tick %d :).\n"

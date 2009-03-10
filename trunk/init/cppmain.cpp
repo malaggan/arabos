@@ -44,7 +44,7 @@ void enter_cpp()
 
 class Koko { public: Koko() {printf("koko\n");} ~Koko(){printf("~koko\n");}} kk;
 
-extern int __end,__phys;
+extern int __end,__phys; // filled by the linker script
 int kernel_end_addr=(int)(&__end),kernel_load_addr=(int)(&__phys); // the linker symbol have only an address (in the symbol table)
 
 #include <ecma48.h>
@@ -99,7 +99,7 @@ void cppmain()
     //SHOW_STAT_FAILED("Shell");
     
     
-    //while(1);        	
+    //while(1);
 }
 
 

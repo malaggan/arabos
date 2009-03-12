@@ -51,14 +51,20 @@ all: build install
 %.clean:
 	@cd $*; make clean_files --no-print-directory
 
-build: $(MODULES:%.$(MODULE_SUFFIX)=%.build) kernel.k
+# bochsNOGUI or bochsGUI depending if we want the output to go to the console
+# make sure we run it in a subshell so it doesn't get confused with the *.c \
+# rules in MakefileCommon
+runBochs: 
+	@echo building runBochs...
+	( gcc -DBOCHSRC=\"bochsNOGUI\" -Wno-format run.c -o runBochs )
+
+build: $(MODULES:%.$(MODULE_SUFFIX)=%.build) kernel.k runBochs
 
 kernel.k: $(wildcard $(MODULES:%.$(MODULE_SUFFIX)=%/*.o))
 	@echo
 	@echo linking
 	@ld $(MODULES:%.$(MODULE_SUFFIX)=%/*.o) -o kernel.k $(LDFLAGS)
 	@echo linking success
-	
 
 install:
 	@echo
@@ -73,5 +79,15 @@ install:
 	@echo
 	
 clean: $(MODULES:%.$(MODULE_SUFFIX)=%.clean)
+	rm runBochs
 	@echo
 	@echo dependecies files cleaned.
+
+
+# How to build the Bochs disk image ( from the MTI os lab )
+#$(OBJDIR)/kern/bochs.img: $(OBJDIR)/kern/kernel $(OBJDIR)/boot/boot
+#	@echo + mk $@
+#	$(V)dd if=/dev/zero of=$(OBJDIR)/kern/bochs.img~ count=10000 2>/dev/null
+#	$(V)dd if=$(OBJDIR)/boot/boot of=$(OBJDIR)/kern/bochs.img~ conv=notrunc 2>/dev/null
+#	$(V)dd if=$(OBJDIR)/kern/kernel of=$(OBJDIR)/kern/bochs.img~ seek=1 conv=notrunc 2>/dev/null
+#	$(V)mv $(OBJDIR)/kern/bochs.img~ $(OBJDIR)/kern/bochs.img

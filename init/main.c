@@ -95,7 +95,7 @@ void mem_check(unsigned long magic,unsigned long addr)
 
 		printk (LOG "mmap_addr = 0x%x, mmap_length = 0x%x\n",
 			(unsigned) mbi->mmap_addr, (unsigned) mbi->mmap_length);
-#if 0
+#if 1
 		for (mmap = (memory_map_t *) mbi->mmap_addr;
 			(unsigned long) mmap < mbi->mmap_addr + mbi->mmap_length;
 			mmap = (memory_map_t *) ((unsigned long) mmap
@@ -133,7 +133,7 @@ void mem_check(unsigned long magic,unsigned long addr)
 			(unsigned) elf_sec->num, (unsigned) elf_sec->size,
 			(unsigned) elf_sec->addr, (unsigned) elf_sec->shndx); // we can read the kernel symbols from here for a stack-walker
                 
-#if 0
+#if 1
                 Elf32_Shdr* sections = (Elf32_Shdr*)(elf_sec->addr);
                 for(int i = 0; i < elf_sec->num; i++)
                 {

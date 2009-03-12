@@ -55,12 +55,27 @@ void scroll(void)
 
 extern int printed_chars;
 
+// used to output to the bochs console (the host's console)
+lpt_putc(int c)
+{
+	int i;
+
+	for (i = 0; !(inportb(0x378+1) & 0x80) && i < 12800; i++)
+		__asm__("nop");
+	outportb(0x378+0, c);
+	outportb(0x378+2, 0x08|0x04|0x01);
+	outportb(0x378+2, 0x08);
+}
+
 /* Put the character C on the screen. */
 void
 putchar (int c)
 {
     int attribute = ((c>>8)& 0xff);
     c = c & 0xff;
+
+    lpt_putc(c);	
+
     if(0 == attribute)
         attribute = 0x07;
     printed_chars++;
@@ -147,6 +162,9 @@ unsigned char ECMA48(const char ** format)
     unsigned char attribute = 0x07;
     if(*fmt == '[')
     {
+#if VM_ECMA
+        lpt_putc(*fmt);
+#endif
         fmt++;
         while(*fmt != 'm')
         {
@@ -155,24 +173,39 @@ unsigned char ECMA48(const char ** format)
             case '3':
                 {
                     /*foreground color*/
+#if VM_ECMA
+                    lpt_putc(*fmt);
+#endif
                     fmt++;
                     attribute &= 0xf0;
                     attribute |= (*fmt-'0')&0xf;
+#if VM_ECMA
+                    lpt_putc(*fmt);
+#endif
                     fmt++;
                     break;
                 }
             case '4':
                 {
                     /*background color*/
+#if VM_ECMA
+                    lpt_putc(*fmt);
+#endif
                     fmt++;
                     attribute &= 0x0f;
                     attribute |= ((*fmt-'0')<<4)&0xf0;
+#if VM_ECMA
+                    lpt_putc(*fmt);
+#endif
                     fmt++;
                     break;
                 }
             case '0':
                 {
                     /*reset*/
+#if VM_ECMA
+                    lpt_putc(*fmt);
+#endif
                     fmt++;
                     attribute = 0x07;
                     break;
@@ -180,12 +213,18 @@ unsigned char ECMA48(const char ** format)
             case '1':
                 {
                     /*bright(bold)*/
+#if VM_ECMA
+                    lpt_putc(*fmt);
+#endif
                     fmt++;
                     attribute |= 0x08;
                     break;
                 }
             case ';':
                 {
+#if VM_ECMA
+                    lpt_putc(*fmt);
+#endif
                     fmt++;
                     break;
                 }
@@ -196,6 +235,9 @@ unsigned char ECMA48(const char ** format)
                 }
             }
         }
+#if VM_ECMA
+        lpt_putc(*fmt);
+#endif
         fmt++;
     }
     *format = fmt;

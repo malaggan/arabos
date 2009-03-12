@@ -65,7 +65,7 @@ int kernel_end_addr=(int)(&__end),kernel_load_addr=(int)(&__phys); // the linker
 // this function doesn't return unless when powering off the system
 void cppmain()
 {
-#if 0
+#if 1
     cpuid_check();
 #endif
     

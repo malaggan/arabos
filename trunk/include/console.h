@@ -24,6 +24,8 @@ extern "C" {
 
 #include <lib.h>
 
+#define VM_ECMA 0 // if we should print ECMA in the VM lpt output
+
 #define COLUMNS	80
 #define LINES	25
 

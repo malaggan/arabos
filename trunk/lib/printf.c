@@ -96,7 +96,12 @@ void print0 (char **format0, int ignore_first_char)
         }
         /* meemo : ECMA-48 */
         else if(c == 0x1B)
-        {
+        {	
+#if VM_ECMA
+            void lpt_putc(int c);
+            lpt_putc(c); // puts the ESC character only, cuz
+            // ECMA48 does not process it
+#endif
             attribute = ECMA48(&(format));
         }
         /* meemo : ECMA-48 end*/

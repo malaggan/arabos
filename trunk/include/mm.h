@@ -91,7 +91,7 @@ public:
     void setAccess(Access mode) { value=SET_BIT(value,1,mode); };
 
     bool getPresent() const { return GET_BIT(value,0); };
-    void setPresent(bool present) { value=SET_BIT(value,0,present); };
+    void setPresent(bool present) { if(!present) value=0; value=SET_BIT(value,0,present); };
 
     void print() const
     {
@@ -138,7 +138,7 @@ public:
     void setAccess(Access mode) { value=SET_BIT(value,1,mode); };
 
     bool getPresent() const { return GET_BIT(value,0); };
-    void setPresent(bool present) { value=SET_BIT(value,0,present); };
+    void setPresent(bool present) { if(!present) value=0; value=SET_BIT(value,0,present); };
 
     void print() const
     {

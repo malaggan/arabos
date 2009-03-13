@@ -46,44 +46,24 @@ PageDirectoryEntry* kernelPageDir;
 PageTableEntry* kernelImagePageTable;
 PageTableEntry* kernelHeapPageTable;
 
-//phys_addr_t page_table_of(linear_addr_t virt)
-//{
-//    int page_table_index = ((int)virt.value & 0xFFC00000) >> 22;
-//    return ((page_directory_entry*)(kernel_page_dir + sizeof(page_directory_entry) * page_table_index))->pageTableBase;
-//}
-//
-//phys_addr_t page_base_of(linear_addr_t virt)
-//{
-//    int page_index = ((int)virt.value & 0x003FF000) >> 12;
-//    return ((page_table_entry*)(page_table_of(virt) + sizeof(page_table_entry) * page_index))->pageBase;
-//}
-//
-//phys_addr_t virt2phys(linear_addr_t virt)
-//{
-//    return page_base_of(virt);
-//}
-//
-//// this function takes a virtual address, get its physical address and adds it back in the list
-//void unmap_page(int* virt)   //****
-//{
-//    // don't forget to check for overflows and undetflows
-//
-//    // this function unmaps a binding between a physical address and a virtual address,
-//    // adds the physical address to free list,and adds the virtual address to free list
-//    // and clears the present bit in the corresponding page table entry
-//
-//    // update free phys list
-//    // TODO check if last_free_frame = null
-//    linear_addr_t addr;
-//    addr.value = (unsigned long)virt;
-//    int phys = virt2phys(addr);
-//    *(int*)last_free_frame = phys;
-//    last_free_frame = phys;
-//
-//    // clear the present bit in the page table, then call INVLPG to flush it
-//    page_base_of(addr); // << clear the present bit in that ! ezay ma3rafsh !
-//}
-//
+void free_page(char* pageBase)
+{
+    int vaddr = (int)pageBase;
+    int ixPde = (vaddr>>22) & 0x3FF;
+    int ixPte = (vaddr>>12) & 0x3FF; // 10 bits
+
+    PageDirectoryEntry* pde = &kernelPageDir[ixPde];
+    PageTableEntry* pte = &(reinterpret_cast<PageTableEntry*>(pde->getPageTableBase())[ixPte]);    
+    phys_addr_t paddr = pte->getPageBase();
+    printf("freeing %d:%d:%d @ v:0x%x p:0x%x\n",ixPde,ixPte,vaddr&0xFFF, pageBase, paddr);
+
+    int frameIndex = paddr/PG_SIZE;
+    int byteIndex = frameIndex / 8;
+    int bitIndex = frameIndex % 8;
+
+    freeMem[byteIndex] = freeMem[byteIndex] & ~(1<<bitIndex);
+    pte->setPresent(false);
+}
 
 // this function returns the virtual address mapped to the specified physical address in the stack
 char* alloc_page()   //****
@@ -93,19 +73,22 @@ char* alloc_page()   //****
     for(int i = kernelPages/8; i < physPages/8; i ++) // don't look in the kernel pages, cuz they are always non-free
     {
         unsigned char pack = freeMem[i];
-        if(pack == 0xFF) // pack full
+        if(0xFF == pack) // pack full
             continue;
 
         // found an empty page, look for the first 0-bit
         for(int b = 0; b < 8; b ++)
-            if(~(pack & (1<b)))
+            if(!(pack & (1<<b)))
             {
                 freePageIndex = i*8 + b;
-                freeMem[i] = freeMem[i] | (1<b); // set as non-free
+                freeMem[i] = freeMem[i] | (1<<b); // set as non-free
+                break;
             }
 
         if(freePageIndex < 0)
             panic("BUG in alloc_page");
+        
+        break;
     }
     if(freePageIndex < 0)
     {
@@ -113,7 +96,7 @@ char* alloc_page()   //****
     }
 
     // now we've got the page index.
-    phys_addr_t paddr = freePageIndex*PG_SIZE;
+    phys_addr_t paddr = freePageIndex*PG_SIZE;    
 
     // now find an empty page in the table (vaddr)
     int emptyPte = -1;
@@ -137,6 +120,8 @@ char* alloc_page()   //****
     pte->setPresent(true);
 
     char* vaddr = reinterpret_cast<char*>((1<<22) | (emptyPte<<12));
+
+    printf("alloc_page : vaddr(0x%x)->paddr(0x%x) frameIndex(%d)\n",vaddr,paddr,freePageIndex);
 
     invlpg(vaddr);
         
@@ -217,14 +202,40 @@ void init_paging()
         
 	enable_paging();
 
-#if 1
+#if 0
         // test
-        for(int p = 0; p < 4; p ++) // we only have 1024 pages left,
+        //for(int p = 0; p < 4; p ++) // we only have 1024 pages left,
         {
-            char* newPage = alloc_page();
-            printf("allocated 0x%x\n",newPage);
+            char* newPage1 = alloc_page();
+            printf("allocated 0x%x\n",newPage1);
             for(int i = 0; i < 1024; i ++)
-                newPage[i] = 3;
+                newPage1[i] = 3;
+
+            char* newPage2 = alloc_page();
+            printf("allocated 0x%x\n",newPage2);
+            for(int i = 0; i < 1024; i ++)
+                newPage2[i] = 3;
+
+            char* newPage3 = alloc_page();
+            printf("allocated 0x%x\n",newPage3);
+            for(int i = 0; i < 1024; i ++)
+                newPage3[i] = 3;
+
+            char* newPage4 = alloc_page();
+            printf("allocated 0x%x\n",newPage4);
+            for(int i = 0; i < 1024; i ++)
+                newPage4[i] = 3;
+
+            free_page(newPage3);
+            free_page(newPage4);
+
+            newPage3 = alloc_page();
+            printf("allocated 0x%x\n",newPage3);
+            for(int i = 0; i < 1024; i ++)
+                newPage3[i] = 3;
+
+            free_page(newPage1);
+            free_page(newPage2);
         }
 #endif
 

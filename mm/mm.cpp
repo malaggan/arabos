@@ -182,7 +182,7 @@ void init_paging()
 	}
 
 	// map the first 4 MB ( identity mapping ) 
-	for(int i = 0; i < 1024; i++)
+	for(int i = 1; i < 1024; i++) // NOTE: i = 1, not i = 0, so as not to map PAGE 0 to disallow null pointers
 	{
             PageTableEntry pte;
             pte.setPageBase(i<<12); // the physical address
@@ -192,6 +192,7 @@ void init_paging()
 
             kernelImagePageTable[i] = pte;
 	}
+
 
         // set all pages as free
         for(int i = 0; i < ADDRESS_SPACE_PAGES/8 /*or can be physPages instead*/; i++)
@@ -238,7 +239,6 @@ void init_paging()
             free_page(newPage2);
         }
 #endif
-
 }
 
 #ifdef __cplusplus

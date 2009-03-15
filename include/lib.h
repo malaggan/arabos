@@ -32,8 +32,8 @@ unsigned char *memset(unsigned char *dest, char val, size_t count);
 unsigned short *memsetw(unsigned short *dest, unsigned short val, size_t count);
 
 void itoa (char *buf, int base, int d); // int to ascii
-int strlen(const char *str);
-int strcmp(const char *s1,const char* s2);
+int strnlen(const char *str, int max);
+int strncmp(const char *s1,const char* s2, int max);
 
 #define MAX_CHARS 1024
 

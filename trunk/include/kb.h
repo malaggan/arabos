@@ -24,13 +24,13 @@ extern "C" {
 
 // since the known characters in there are ascii, then it is safe to use
 // the range from 128 up for a special code for non-ascii keys
-enum KbSpecialKeys { VK_CTRL = 128, VK_LSHIFT, VK_RSHIFT, VK_ALT,
+enum KbSpecialKeys {VK_ESC=27, VK_CTRL = 128, VK_LSHIFT, VK_RSHIFT, VK_ALT,
 					 VK_CAPS_LOCK, VK_NUM_LOCK, VK_SCR_LOCK,
 					 VK_F1, VK_F2, VK_F3, VK_F4, VK_F5, VK_F6, 
 					 VK_F7, VK_F8, VK_F9, VK_F10, VK_F11, VK_F12,
 					 VK_HOME, VK_END, VK_PAGE_DOWN, VK_PAGE_UP,
 					 VK_INSERT, VK_DELETE, 
-					 VK_UP_ARROW, VK_LEFT_ARROW, VK_RIGHT_ARROW, VK_DOWN_ARROW,
+					 VK_UP, VK_LEFT, VK_RIGHT, VK_DOWN,
 					 VK_UNDEFINED = 0 };
 
 /* KBDUS means US Keyboard Layout. This is a scancode table

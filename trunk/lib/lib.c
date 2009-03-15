@@ -110,16 +110,16 @@ itoa (char *buf, int base, int d)
 	}
 }
 
-
-inline int strlen(const char *str)
+inline int strnlen(const char *str, int max)
 {
 	int c = 0;
 
-	while(*str++ && c < MAX_CHARS) c++;
+	while(*str++ && c < max) c++;
 
 	return c;
 }
 
+/*
 inline int strcmp(const char *s1,const char* s2)
 {
 	if(s1 == s2)
@@ -129,6 +129,18 @@ inline int strcmp(const char *s1,const char* s2)
 			return(0);
 	return(*s1 - s2[-1]);
 }
+*/
+
+inline int strncmp(const char *s1,const char* s2, int len)
+{
+	if(s1 == s2)
+		return(0);
+	while(*s1 == *s2++ && len--)
+		if(*s1++ == '\0')
+			return(0);
+	return(*s1 - s2[-1]);
+}
+
 /*
 void abort(int exit_code)
 {

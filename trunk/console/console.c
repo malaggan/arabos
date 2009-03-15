@@ -56,7 +56,7 @@ void scroll(void)
 extern int printed_chars;
 
 // used to output to the bochs console (the host's console)
-lpt_putc(int c)
+void lpt_putc(int c)
 {
 	int i;
 

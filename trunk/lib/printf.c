@@ -126,6 +126,9 @@ void print0 (char **format0, int ignore_first_char)
                         p = "(null)";
                 print = 1;
                 break;
+            case '%':
+                putchar (MK_CH_ATT('%',attribute));
+                break;
             default:
                 putchar (MK_CH_ATT(*((int *) arg++),attribute));
                 break;

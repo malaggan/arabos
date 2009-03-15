@@ -59,8 +59,8 @@ int kernel_end_addr=(int)(&__end),kernel_load_addr=(int)(&__phys); // the linker
 	printf(WHITE strWhat NORMAL);\
 	ttys[active_tty].xpos = COLUMNS - len - 2;\
 	printf(LBRACK strStat RBRACK)
-#define SHOW_STAT_OK(strWhat) SHOW_STAT(strWhat,STAT_OK("OK"),strlen("OK"))
-#define SHOW_STAT_FAILED(strWhat) SHOW_STAT(strWhat,STAT_FAILED(/*"FAILED"*/"NOT IMPLEMENTED YET"),strlen("NOT IMPLEMENTED YET"))
+#define SHOW_STAT_OK(strWhat) SHOW_STAT(strWhat,STAT_OK("OK"),2)
+#define SHOW_STAT_FAILED(strWhat) SHOW_STAT(strWhat,STAT_FAILED(/*"FAILED"*/"NOT IMPLEMENTED YET"),strnlen("NOT IMPLEMENTED YET",40))
 
 // this function doesn't return unless when powering off the system
 void cppmain()
@@ -94,6 +94,9 @@ void cppmain()
     init_kb();
 
     init_paging();
+
+    void monitor();
+    monitor();
     
     //SHOW_STAT_FAILED("Kernel memory allocator");
     //SHOW_STAT_FAILED("Process manager");
@@ -105,5 +108,38 @@ void cppmain()
     
     //while(1);
 }
+extern "C" void readline(char* buf, int max);
+extern "C" char* alloc_page();
+void print_monitor_help();
+void monitor()
+{
+    char cmd[100];
+    printf("The MONITOR ! - type h for help");
+    
+    for(;;)
+    {
+        printf("\n%% ");
+        *cmd=0;
+        readline(cmd,99);
 
+        
+        // handle the command
+        if(!strncmp(cmd,"alloc_page",10)) // TODO strncmp !
+            printf("0x%x\n",alloc_page());
+        else if(!strncmp(cmd,"h",1))
+            print_monitor_help();
+        else if(!strncmp(cmd,"quit",4))
+            return;
+        else
+            printf("unrecognized montior command\n");
+    }
+}
 
+void print_monitor_help()
+{
+    printf("This is the ArOS monitor shell.\n"
+            "Commands:\n"
+            "alloc_page - allocates a new page\n"
+            "h - shows this screen\n"
+            "quit - quits the monitor shell\n");
+}

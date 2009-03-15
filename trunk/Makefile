@@ -56,7 +56,7 @@ all: build install
 # rules in MakefileCommon
 runBochs: 
 	@echo building runBochs...
-	( gcc -DBOCHSRC=\"bochsNOGUI\" -Wno-format run.c -o runBochs )
+	( gcc -DBOCHSRC=\"bochsGUI\" -Wno-format run.c -o runBochs )
 
 build: $(MODULES:%.$(MODULE_SUFFIX)=%.build) kernel.k runBochs
 

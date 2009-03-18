@@ -7,9 +7,10 @@ extern "C" {
 
 #define ASM __asm__ __volatile__
 
+#define rebp(ebp) ASM ( "movl %%ebp,%0" : "=a" (ebp));
+
 #define lgdt(gdt_ptr) ASM("lgdt %0" :: "m" (gdt_ptr)) 
 #define lidt(idt_ptr) ASM("lidt %0" :: "m" (idt_ptr))
-
 
 #define lgs(gs) ASM("movw %%ax,%%gs" :: "a" (gs))
 #define lfs(fs) ASM("movw %%ax,%%fs" :: "a" (fs))

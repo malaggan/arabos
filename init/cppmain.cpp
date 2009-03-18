@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #include <kb.h>
 #include <mm.h>
 #include <asm.h>
+#include <debug.h>
 
 extern "C" void call_ctors();
 extern "C" void __cxa_finalize(void *d /*unused param*/);
@@ -46,7 +47,7 @@ void enter_cpp()
 class Koko { public: Koko() {printf("koko\n");} ~Koko(){printf("~koko\n");}} kk;
 
 extern int __end,__phys; // filled by the linker script
-int kernel_end_addr=(int)(&__end),kernel_load_addr=(int)(&__phys); // the linker symbol have only an address (in the symbol table)
+int kernel_end_addr=reinterpret_cast<int>(&__end),kernel_load_addr=reinterpret_cast<int>(&__phys); // the linker symbol have only an address (in the symbol table)
 
 #include <ecma48.h>
 #define LBRACK	WHITE "[" NORMAL
@@ -95,8 +96,11 @@ void cppmain()
 
     init_paging();
 
+    print_debug_info();    
+    print_stack_trace();
+
     void monitor();
-    monitor();
+    monitor();    
     
     //SHOW_STAT_FAILED("Kernel memory allocator");
     //SHOW_STAT_FAILED("Process manager");
@@ -143,3 +147,4 @@ void print_monitor_help()
             "h - shows this screen\n"
             "quit - quits the monitor shell\n");
 }
+

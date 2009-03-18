@@ -58,7 +58,7 @@ runBochs:
 	@echo building runBochs...
 	( gcc -DBOCHSRC=\"bochsGUI\" -Wno-format run.c -o runBochs )
 
-build: $(MODULES:%.$(MODULE_SUFFIX)=%.build) kernel.k runBochs
+build: $(MODULES:%.$(MODULE_SUFFIX)=%.build) kernel.k 
 
 kernel.k: $(wildcard $(MODULES:%.$(MODULE_SUFFIX)=%/*.o))
 	@echo
@@ -66,7 +66,7 @@ kernel.k: $(wildcard $(MODULES:%.$(MODULE_SUFFIX)=%/*.o))
 	@ld $(MODULES:%.$(MODULE_SUFFIX)=%/*.o) -o kernel.k $(LDFLAGS)
 	@echo linking success
 
-install:
+install: runBochs
 	@echo
 #	@tar -czf iso/kernel.tgz kernel.k 
 #	need to check if "iso" folder exists
@@ -79,7 +79,8 @@ install:
 	@echo
 	
 clean: $(MODULES:%.$(MODULE_SUFFIX)=%.clean)
-	rm runBochs
+	-rm kernel.k
+	-rm runBochs
 	@echo
 	@echo dependecies files cleaned.
 

@@ -81,13 +81,13 @@ public:
     bool getCahceEnabled() const { return !GET_BIT(value,4); };
     void setCahceEnabled(bool enabled) { value=SET_BIT(value,4,!enabled); };
 
-    CacheMode getCacheMode() const { return (CacheMode)GET_BIT(value,3); };
+    CacheMode getCacheMode() const { return static_cast<CacheMode>(GET_BIT(value,3)); };
     void setCacheMode(CacheMode mode) { value=SET_BIT(value,3,mode); };
 
-    Privilage getPrivilage() const { return (Privilage)GET_BIT(value,2); };
+    Privilage getPrivilage() const { return static_cast<Privilage>(GET_BIT(value,2)); };
     void setPrivilage(Privilage mode) { value=SET_BIT(value,2,mode); };
 
-    Access getAccess() const { return (Access)GET_BIT(value,1); };
+    Access getAccess() const { return static_cast<Access>(GET_BIT(value,1)); };
     void setAccess(Access mode) { value=SET_BIT(value,1,mode); };
 
     bool getPresent() const { return GET_BIT(value,0); };
@@ -118,7 +118,7 @@ public:
     bool getGlobal() const { return GET_BIT(value,8); }; // ignored
     void setGlobal(bool global) { value=SET_BIT(value,8,global); };
 
-    PageSize getPageSize() const { return (PageSize)GET_BIT(value,7); };
+    PageSize getPageSize() const { return static_cast<PageSize>(GET_BIT(value,7)); };
     void setPageSize(PageSize pageSize) { value=SET_BIT(value,7,pageSize); };
 
     //bit 6 reserved
@@ -128,13 +128,13 @@ public:
     bool getCahceEnabled() const { return !GET_BIT(value,4); };
     void setCahceEnabled(bool enabled) { value=SET_BIT(value,4,!enabled); };
 
-    CacheMode getCacheMode() const { return (CacheMode)GET_BIT(value,3); };
+    CacheMode getCacheMode() const { return static_cast<CacheMode>(GET_BIT(value,3)); };
     void setCacheMode(CacheMode mode) { value=SET_BIT(value,3,mode); };
 
-    Privilage getPrivilage() const { return (Privilage)GET_BIT(value,2); };
+    Privilage getPrivilage() const { return static_cast<Privilage>(GET_BIT(value,2)); };
     void setPrivilage(Privilage mode) { value=SET_BIT(value,2,mode); };
 
-    Access getAccess() const { return (Access)GET_BIT(value,1); };
+    Access getAccess() const { return static_cast<Access>(GET_BIT(value,1)); };
     void setAccess(Access mode) { value=SET_BIT(value,1,mode); };
 
     bool getPresent() const { return GET_BIT(value,0); };

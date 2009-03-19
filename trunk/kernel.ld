@@ -25,30 +25,39 @@ __phys = __physLow;
 SECTIONS
 {
   .text __physLow : AT(__phys) {
-    code = .;
-    *(.text)   
-
-    . = ALIGN(4096);
+    *(.text* .rodata*) /* rodata => read only data: string etc.*/  
+    SORT(CONSTRUCTORS)
   }
-  .data : AT(__phys + (data - code))
+  
+  .stab : {
+    PROVIDE(__stab_start = .);
+    *(.stab);
+    PROVIDE(__stab_end = .);
+    BYTE(0)		/* force the linker to allocate space for this section */
+  }
+
+  .stabstr : {
+    PROVIDE(__stabstr_start = .);
+    *(.stabstr);
+    PROVIDE(__stabstr_end = .);
+    BYTE(0)		/* force the linker to allocate space for this section */
+  } 
+	  
+  /* Adjust the address for the data segment to the next page */
+  . = ALIGN(0x1000);
+  
+  .data :
   {
-    data = .;
     *(.data)
 
-    ctors = .;
-    *(.ctors)
-
-    __end_data = .;
-    . = ALIGN(4096);
+    PROVIDE(ctors = .);
+    *(.ctors)    
   }
-  .bss : AT(__phys + (bss - code))
+
+  .bss :
   {
-    bss = .;
     *(.bss)
     *(COMMON)
-    __end_bss = .;    
-
-    . = ALIGN(4096);
   }
-  __end = .;
+  PROVIDE(__end = .);
 }

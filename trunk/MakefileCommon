@@ -64,16 +64,16 @@ build_$(MODULE_NAME): del_errs $(OBJS)
 
 ../obj/%.o: %.cpp
 	@echo + CPP $(DIR)/$<
-	@$(CPP) $< $(CPPFLAGS) -o ../obj/$@ 2>>error_log
+	@$(CPP) $< $(CPPFLAGS) -fdebug-prefix-map==$(DIR)/ -o ../obj/$@ 2>>error_log
 
 ../obj/%.o: %.c
 	@echo + CC $(DIR)/$<
-	@$(CC) $< $(CFLAGS) -o ../obj/$@ 2>>error_log
+	@$(CC) $< $(CFLAGS) -fdebug-prefix-map==$(DIR)/ -o ../obj/$@ 2>>error_log
 #	-@$(LINT) $< -I$(INCLUDE)
 
 ../obj/%.o: %.S
 	@echo + CC $(DIR)/$<
-	@$(CC) $< $(CFLAGS) -o ../obj/$@ 2>>error_log
+	@$(CC) $< $(CFLAGS) -fdebug-prefix-map==$(DIR)/ -o ../obj/$@ 2>>error_log
 
 # dependency files
 %.d: %.cpp

@@ -37,6 +37,7 @@ $(SUBDIRS) :
 
 # params
 ISO_FILE := grub.iso
+ISO_FLAGS := -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table
 KERN_BIN := kernel.k
 LINKER_SCRIPT := kernel.ld
 KERNEL_MAP := kernel.map
@@ -90,8 +91,8 @@ $(KERN_BIN): link
 
 install: $(KERN_BIN)
 #	@tar -czf iso/kernel.tgz $(KERN_BIN)
-	cp $(KERN_BIN) iso/kernel.tgz	
-	./makeiso $(ISO_FILE) 	
+	cp $(KERN_BIN) iso/kernel.tgz
+	mkisofs $(ISO_FLAGS) -o $(ISO_FILE) iso >/dev/null 2>&1
 	@echo
 	
 # bochsNOGUI or bochsGUI depending if we want the output to go to the console

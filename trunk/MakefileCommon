@@ -59,20 +59,20 @@ build_$(MODULE_NAME): del_errs $(OBJS)
 # implicit ruels
 
 ../obj/%.o: %.asm
-	@echo AS $(DIR)/$<
+	@echo + AS $(DIR)/$<
 	@$(AS) $< -o ../obj/$@ $(ASFLAGS) 2>>error_log
 
 ../obj/%.o: %.cpp
-	@echo CPP $(DIR)/$<
+	@echo + CPP $(DIR)/$<
 	@$(CPP) $< $(CPPFLAGS) -o ../obj/$@ 2>>error_log
 
 ../obj/%.o: %.c
-	@echo CC $(DIR)/$<
+	@echo + CC $(DIR)/$<
 	@$(CC) $< $(CFLAGS) -o ../obj/$@ 2>>error_log
 #	-@$(LINT) $< -I$(INCLUDE)
 
 ../obj/%.o: %.S
-	@echo CC $(DIR)/$<
+	@echo + CC $(DIR)/$<
 	@$(CC) $< $(CFLAGS) -o ../obj/$@ 2>>error_log
 
 # dependency files

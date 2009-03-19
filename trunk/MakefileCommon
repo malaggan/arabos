@@ -23,48 +23,7 @@
 
 default: all
 
-INCLUDE := ../include -I../include/c++ -I../include/c++/c++
-CC := gcc
-CPP := g++
-ifeq (0,${MAKELEVEL}) # disable compiling at root level (trunk/ dir)
-CC := echo
-CPP := echo
-endif
-LINT := SPLINT
-DBG := -gdwarf-2 -DDBG_DWARF2
-#DBG := -gstabs -DDBG_STABS
-#########################
-
-# !-ansi for __asm__
-# -mno-stack-arg-probe for alloca
-# -g for debug symbols, -O for optimization
-# i use pedantic to require gcc extensions to use __extenstion__ or use __ prefix to ease finding non-ansi stuff
-# -Wno-unused-parameter to temporarily stops warning about non-used params
-# -Wconversion -Wpacked
-# i substituted '-ffreestanding' for "-nostdinc -mno-stack-arg-probe -fno-builtin"
-CFLAGS := -Wall -Wextra -Wfloat-equal -Wshadow\
-	-Wpadded -Winline -nostdinc\
-	-Wunreachable-code -c -pedantic -Wno-unused-parameter\
-	-I$(INCLUDE) -std=c99 -ffreestanding -fno-stack-protector $(DBG)
-
-#-nostartfiles -nostdlib -fno-rtti -fno-exceptions
-# since i didn't specify -nostartfiles, a fucn called _init will be created to initiate construtors of global objs
-# i think i should call it myself, since there is no main, that if the function returns w/out calling main
-CPPFLAGS := \
-	-I$(INCLUDE) -Wunreachable-code -c -pedantic -Wno-unused-parameter\
-	-Wall -Wextra -Wfloat-equal -Wshadow -nostdinc\
-	-Wpadded -Winline -fno-stack-protector\
-	-nostartfiles -nostdlib -fno-rtti -fno-exceptions $(DBG) \
-	-Weffc++ -Wnon-virtual-dtor -Wold-style-cast 
-#########################
-
-AS := nasm
-ASFLAGS := -felf
-
-#########################
-
-# -s for strip all sybols, -x for discard local symbols
-LDFLAGS := --script kernel.ld -Map kernel.map
+RM := (ls FILE && rm FILE) > /dev/null 2>&1 || true
 
 #########################
 
@@ -80,30 +39,41 @@ $(SHELL) -ec '$(CPP) -M $(CPPFLAGS) $< \
 [ -s $@ ] || rm -f $@'
 endef
 
-SRCS = $(wildcard *.c) $(wildcard *.S) $(wildcard *.asm) $(wildcard *.cpp)
+SRCS := $(wildcard *.c) $(wildcard *.S) $(wildcard *.asm) $(wildcard *.cpp)
 
-list0 = $(SRCS:%.cpp=%.o)
-list1 = $(list0:%.asm=%.o)
-list2 = $(list1:%.S=%.o)
-OBJS = $(list2:%.c=%.o)
-
-build_$(MODULE_NAME): $(list2:%.c=%.o)
+list0 := $(SRCS:.cpp=.f)
+list1 := $(list0:.asm=.f)
+list2 := $(list1:.S=.f)
+list3 := $(list2:.c=.f)
+OBJS := $(list3:%.f=../obj/%.o)
+.PHONY: del_errs
+del_errs:
+	@$(subst FILE,error_log,$(RM))
+	@echo > error_log
+	@echo DIR $(DIR) errors : >> error_log
+	@echo =================== >>error_log
+build_$(MODULE_NAME): del_errs $(OBJS)
+	@bash -ce "if (( `wc -l error_log | awk '{print $$1}'` <= 3 )); then rm error_log; fi;"
 
 #########################
 # implicit ruels
 
-%.o: %.asm
-	@$(AS) $< -o $@ $(ASFLAGS)
+../obj/%.o: %.asm
+	@echo AS $(DIR)/$<
+	@$(AS) $< -o ../obj/$@ $(ASFLAGS) 2>>error_log
 
-%.o: %.cpp
-	@$(CPP) $< $(CPPFLAGS)
+../obj/%.o: %.cpp
+	@echo CPP $(DIR)/$<
+	@$(CPP) $< $(CPPFLAGS) -o ../obj/$@ 2>>error_log
 
-%.o: %.c
-	@$(CC) $< $(CFLAGS)
+../obj/%.o: %.c
+	@echo CC $(DIR)/$<
+	@$(CC) $< $(CFLAGS) -o ../obj/$@ 2>>error_log
 #	-@$(LINT) $< -I$(INCLUDE)
 
-%.o: %.S
-	@$(CC) $< $(CFLAGS) 
+../obj/%.o: %.S
+	@echo CC $(DIR)/$<
+	@$(CC) $< $(CFLAGS) -o ../obj/$@ 2>>error_log
 
 # dependency files
 %.d: %.cpp
@@ -120,10 +90,10 @@ build_$(MODULE_NAME): $(list2:%.c=%.o)
 
 #########################
 
-clean_files:
-	-rm *.o 
-	-rm *.d
+clean_files:    
+	@$(subst FILE,*.d,$(RM))
+	@$(subst FILE,error_log,$(RM))
 
 #########################
 
--include $(OBJS:%.o=%.d)
+-include $(list3:.f=.d)

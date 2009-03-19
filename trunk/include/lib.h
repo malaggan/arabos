@@ -22,9 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 extern "C" {
 #endif
 
-#define NULL (0)
-
-typedef unsigned int size_t;
+#include <types.h>
     
 unsigned char *memcpy(unsigned char *dest, const unsigned char *src, size_t count);
 unsigned short *memcpyw(unsigned short *dest, const unsigned short *src, size_t count);

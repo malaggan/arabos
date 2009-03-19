@@ -17,73 +17,101 @@
 
 #### REMEMBER TO USE SPLINT ####
 
-# this is left empty
-MODULE_NAME :=
+default: all
+.PHONY: all clean link install build
 
-# this too is left empty
-SRCS :=
+RM := (ls FILE && rm FILE) > /dev/null 2>&1 || true
 
-SHELL := /bin/bash
+SUBDIRS = boot console kernel lib mm init i386
 
-include MakefileCommon
+.PHONY: subdirs $(SUBDIRS) 
+subdirs: $(SUBDIRS) 
+	@echo
+	@$(subst FILE,errors_summary,$(RM))
+	@find -name error_log | xargs cat > errors_summary
+	@cat errors_summary
+	@echo
+$(SUBDIRS) :     
+	@( [ -d obj ] || mkdir obj )
+	@( export DIR=$@ ; $(MAKE) -C $@ build_$@ --no-print-directory --warn-undefined-variables )
 
-.PHONY: all clean
+# params
+ISO_FILE := grub.iso
+KERN_BIN := kernel.k
+LINKER_SCRIPT := kernel.ld
+KERNEL_MAP := kernel.map
 
-# can be anything
-MODULE_SUFFIX := mod
+# -s for strip all sybols, -x for discard local symbols
+LDFLAGS := -T$(LINKER_SCRIPT) -Map $(KERNEL_MAP)
+DBG := -gdwarf-2 -DDBG_DWARF2
+#DBG := -gstabs -DDBG_STABS
+INCLUDE := ../include -I../include/c++ -I../include/c++/c++
 
-MODULES := boot.$(MODULE_SUFFIX) \
-		console.$(MODULE_SUFFIX) \
-		kernel.$(MODULE_SUFFIX) \
-		lib.$(MODULE_SUFFIX) \
-		mm.$(MODULE_SUFFIX) \
-		init.$(MODULE_SUFFIX) \
-		i386.$(MODULE_SUFFIX)
+#####!!!!!!!!!!!!!!!############
 
-all: build install
+export CC := gcc
+export CPP := g++
+export LINT := SPLINT
+export AS := nasm
+export ASFLAGS := -felf
 
-%.build:	
-	@echo ================================================================
-	@echo -	building $*
-	@cd $* && make build_$* --no-print-directory
-	@echo -	compilation success
+# !-ansi for __asm__
+# -mno-stack-arg-probe for alloca
+# -g for debug symbols, -O for optimization
+# i use pedantic to require gcc extensions to use __extenstion__ or use __ prefix to ease finding non-ansi stuff
+# -Wno-unused-parameter to temporarily stops warning about non-used params
+# -Wconversion -Wpacked
+# i substituted '-ffreestanding' for "-nostdinc -mno-stack-arg-probe -fno-builtin"
+export CFLAGS := -Wall -Wextra -Wfloat-equal -Wshadow\
+	-Wpadded -Winline -nostdinc\
+	-Wunreachable-code -c -pedantic -Wno-unused-parameter\
+	-I$(INCLUDE) -std=c99 -ffreestanding -fno-stack-protector $(DBG)
+
+#-nostartfiles -nostdlib -fno-rtti -fno-exceptions
+# since i didn't specify -nostartfiles, a fucn called _init will be created to initiate construtors of global objs
+# i think i should call it myself, since there is no main, that if the function returns w/out calling main
+export CPPFLAGS := \
+	-I$(INCLUDE) -Wunreachable-code -c -pedantic -Wno-unused-parameter\
+	-Wall -Wextra -Wfloat-equal -Wshadow -nostdinc\
+	-Wpadded -Winline -fno-stack-protector\
+	-nostartfiles -nostdlib -fno-rtti -fno-exceptions $(DBG) \
+	-Weffc++ -Wnon-virtual-dtor -Wold-style-cast 
+
+#####!!!!!!!!!!!!!!!############
+
+all: subdirs link install runBochs
+
+link: $(SUBDIRS)
+	@echo linking
+	ld obj/*.o -o $(KERN_BIN) $(LDFLAGS)
+	@echo
+
+$(KERN_BIN): link
+
+install: $(KERN_BIN)
+#	@tar -czf iso/kernel.tgz $(KERN_BIN)
+	cp $(KERN_BIN) iso/kernel.tgz	
+	./makeiso $(ISO_FILE) 	
+	@echo
 	
-%.clean:
-	@cd $*; make clean_files --no-print-directory
-
 # bochsNOGUI or bochsGUI depending if we want the output to go to the console
 # make sure we run it in a subshell so it doesn't get confused with the *.c \
 # rules in MakefileCommon
 runBochs: 
 	@echo building runBochs...
 	( gcc -DBOCHSRC=\"bochsGUI\" -Wno-format run.c -o runBochs )
+	@echo
 
-build: $(MODULES:%.$(MODULE_SUFFIX)=%.build) kernel.k 
-
-kernel.k: $(wildcard $(MODULES:%.$(MODULE_SUFFIX)=%/*.o))
-	@echo
-	@echo linking
-	@ld $(MODULES:%.$(MODULE_SUFFIX)=%/*.o) -o kernel.k $(LDFLAGS)
-	@echo linking success
-
-install: runBochs
-	@echo
-#	@tar -czf iso/kernel.tgz kernel.k 
-#	need to check if "iso" folder exists
-	@cp kernel.k iso/kernel.tgz
-	@echo
-	@echo kernel was put in iso
-	@echo
-	@./makeiso
-	@echo iso made
+files := $(KERN_BIN) iso/kernel.tgz runBochs $(ISO_FILE) $(KERNEL_MAP)
+del := $(foreach file,$(files),$(subst FILE,$(file),$(RM));)
+clean: $(foreach DIR,$(SUBDIRS),$(DIR).clean)
+	@$(del)
+	@$(subst FILE,obj/*,$(RM))
+	@echo clean done
 	@echo
 	
-clean: $(MODULES:%.$(MODULE_SUFFIX)=%.clean)
-	-rm kernel.k
-	-rm runBochs
-	@echo
-	@echo dependecies files cleaned.
-
+%.clean:
+	@$(MAKE) -C $* clean_files --no-print-directory
 
 # How to build the Bochs disk image ( from the MTI os lab )
 #$(OBJDIR)/kern/bochs.img: $(OBJDIR)/kern/kernel $(OBJDIR)/boot/boot

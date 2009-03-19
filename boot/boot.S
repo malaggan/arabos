@@ -20,7 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 	.text
 
-	.globl	start, _start
+	.globl	start, _start,
 start:
 _start:
 	jmp	multiboot_entry
@@ -69,6 +69,9 @@ multiboot_entry:
 	pushl	%eax
 	.global asm_to_c
 	/* Now enter the C main function... */
+        pushl $0 /* to stop the back trace here, set ebp = NULL */
+        popl %ebp
+.stabs "asm_to_c:F1",36,0,0,asm_to_c      
 	asm_to_c: call	cmain
 
 	/* Halt. */

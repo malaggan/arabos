@@ -44,8 +44,8 @@ KERNEL_MAP := kernel.map
 
 # -s for strip all sybols, -x for discard local symbols
 LDFLAGS := -T$(LINKER_SCRIPT) -Map $(KERNEL_MAP)
-DBG := -gdwarf-2 -DDBG_DWARF2
-#DBG := -gstabs -DDBG_STABS
+#DBG := -gdwarf-2 -DDBG_DWARF2
+DBG := -gstabs -DDBG_STABS
 INCLUDE := ../include -I../include/c++ -I../include/c++/c++
 
 #####!!!!!!!!!!!!!!!############

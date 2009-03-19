@@ -44,7 +44,12 @@ void enter_cpp()
     __cxa_finalize(/*unused*/ NULL);
 }
 
-class Koko { public: Koko() {printf("koko\n");} ~Koko(){printf("~koko\n");}} kk;
+class Koko { public: Koko(); ~Koko();} kk;
+Koko::Koko()
+{printf("koko\n");}
+Koko::~Koko()
+{printf("~koko\n");}
+
 
 extern int __end,__phys; // filled by the linker script
 int kernel_end_addr=reinterpret_cast<int>(&__end),kernel_load_addr=reinterpret_cast<int>(&__phys); // the linker symbol have only an address (in the symbol table)
@@ -132,6 +137,8 @@ void monitor()
             printf("0x%x\n",alloc_page());
         else if(!strncmp(cmd,"h",1))
             print_monitor_help();
+        else if(!strncmp(cmd,"pst",3))
+            print_stack_trace();
         else if(!strncmp(cmd,"quit",4))
             return;
         else
@@ -145,6 +152,7 @@ void print_monitor_help()
             "Commands:\n"
             "alloc_page - allocates a new page\n"
             "h - shows this screen\n"
-            "quit - quits the monitor shell\n");
+            "quit - quits the monitor shell\n"
+            "pst - print stack trace (of the monitor itself)");
 }
 

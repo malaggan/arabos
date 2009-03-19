@@ -27,8 +27,11 @@ SECTIONS
   .text __physLow : AT(__phys) {
     *(.text* .rodata*) /* rodata => read only data: string etc.*/  
     SORT(CONSTRUCTORS)
-  }
   
+    PROVIDE(ctors = .); /* the static objects' constructors array */
+    *(.ctors)    
+  }
+    
   .stab : {
     PROVIDE(__stab_start = .);
     *(.stab);
@@ -49,9 +52,6 @@ SECTIONS
   .data :
   {
     *(.data)
-
-    PROVIDE(ctors = .);
-    *(.ctors)    
   }
 
   .bss :

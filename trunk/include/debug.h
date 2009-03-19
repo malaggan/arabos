@@ -8,11 +8,18 @@
 #ifndef _DEBUG_H
 #define	_DEBUG_H
 
+
+#if !defined(DBG_STABS) && !defined(DBG_DWARF2)
+#define DBG_STABS // for the IDE to colorize it
+#endif
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
 #ifdef DBG_STABS
+// WARNING, if you are going to use stabs, do NOT use C++ inline functions AT ALL !
+// cuz it renders the stabs unordered (puts the inline functions is a separate section)
 
 // http://sources.redhat.com/gdb/onlinedocs/stabs_toc.html
 // we use the N_SO, N_SOL, N_FUN, and N_SLINE types.
@@ -59,8 +66,7 @@ extern int __stabstr_start;
 extern int __stabstr_end;
 extern Stab* stabs;
 extern Stab* stabs_end;
-extern const int stab_cnt;
-extern const char* stabstr;
+extern char* stabstr;
 
 /* DBG_STABS */
 #elif DBG_DWARF2

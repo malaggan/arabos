@@ -44,10 +44,6 @@ void printk (const char *, ...);
 
 #ifdef __cplusplus
 } extern "C++" {
-inline int SET_BIT(const int x, const int b) {return (x|(1<<b)); }
-inline int CLR_BIT(const int x, const int b) {return (x&~(1<<b)); }
-inline int GET_BIT(const int x, const int b) {return (x&(1<<b))>0?1:0; }
-inline int SET_BIT(const int x, const int b, const int v) {return (v?SET_BIT(x,b):CLR_BIT(x,b)); }
 
 enum CacheMode {WriteBack = 0, WriteThrough};
 enum Privilage {Supervisor = 0, User};
@@ -58,93 +54,85 @@ class PageTableEntry
 {
     unsigned long value;
 public:
-    PageTableEntry():value(0){}
-    PageTableEntry(unsigned long aValue):value(aValue){}
+    PageTableEntry();
+    PageTableEntry(unsigned long aValue);
 
-    unsigned long getValue() const {return value;}
+    unsigned long getValue() const;
 
-    phys_addr_t getPageBase() const { return value & ((~0)<<12); };
-    void setPageBase(phys_addr_t pageBase) { value = (value & ~((~0)<<12)) | (pageBase & ((~0)<<12)); };
+    phys_addr_t getPageBase() const;
+    void setPageBase(phys_addr_t pageBase);
 
-    unsigned int getExtra() const { return (value >> 9) & 0x7;};
-    void setExtra(unsigned int extra) { value = (value & ((~0)<<9)) | (extra & ((~0)>>3)); };
+    unsigned int getExtra() const;
+    void setExtra(unsigned int extra);
 
-    bool getGlobal() const { return GET_BIT(value,8); };
-    void setGlobal(bool global) { value=SET_BIT(value,8,global); };
+    bool getGlobal() const;
+    void setGlobal(bool global);
 
-    bool getPat() const { return GET_BIT(value,7); };
-    void setPat(bool pat) { value=SET_BIT(value,7,pat); };
+    bool getPat() const;
+    void setPat(bool pat);
 
-    unsigned int getDirty() const { return GET_BIT(value,6); };
-    unsigned int getAccessed() const { return GET_BIT(value,5); };
+    unsigned int getDirty() const;
+    unsigned int getAccessed() const;
 
-    bool getCahceEnabled() const { return !GET_BIT(value,4); };
-    void setCahceEnabled(bool enabled) { value=SET_BIT(value,4,!enabled); };
+    bool getCahceEnabled() const;
+    void setCahceEnabled(bool enabled);
 
-    CacheMode getCacheMode() const { return static_cast<CacheMode>(GET_BIT(value,3)); };
-    void setCacheMode(CacheMode mode) { value=SET_BIT(value,3,mode); };
+    CacheMode getCacheMode() const;
+    void setCacheMode(CacheMode mode);
 
-    Privilage getPrivilage() const { return static_cast<Privilage>(GET_BIT(value,2)); };
-    void setPrivilage(Privilage mode) { value=SET_BIT(value,2,mode); };
+    Privilage getPrivilage() const;
+    void setPrivilage(Privilage mode);
 
-    Access getAccess() const { return static_cast<Access>(GET_BIT(value,1)); };
-    void setAccess(Access mode) { value=SET_BIT(value,1,mode); };
+    Access getAccess() const;
+    void setAccess(Access mode);
 
-    bool getPresent() const { return GET_BIT(value,0); };
-    void setPresent(bool present) { if(!present) value=0; value=SET_BIT(value,0,present); };
+    bool getPresent() const;
+    void setPresent(bool present);
 
-    void print() const
-    {
-        printk("PTE PB:0x%x, EX:0x%x, G:%d, PAT:%d, D:%d, A:%d, PCD:%d, PWT:%d, US:%d, RW:%d, P:%d\n",getPageBase(),getExtra(),getGlobal(),
-                getPat(), getDirty(), getAccessed(), !getCahceEnabled(), getCacheMode(), getPrivilage(), getAccess(),getPresent() );
-    }
+    void print() const;
 };
 
 class PageDirectoryEntry
 {
     unsigned long value;
 public:
-    PageDirectoryEntry():value(0){}
-    PageDirectoryEntry(unsigned long aValue):value(aValue){}
+    PageDirectoryEntry();
+    PageDirectoryEntry(unsigned long aValue);
 
-    unsigned long getValue() const {return value;}
+    unsigned long getValue() const;
 
-    phys_addr_t getPageTableBase() const { return value & ((~0)<<12); };
-    void setPageTableBase(phys_addr_t pageTableBase) { value = (value & ~((~0)<<12)) | (pageTableBase & ((~0)<<12)); };
+    phys_addr_t getPageTableBase() const;
+    void setPageTableBase(phys_addr_t pageTableBase);
 
-    unsigned int getExtra() const { return (value >> 9) & 0x7;};
-    void setExtra(unsigned int extra) { value = (value & ((~0)<<9)) | (extra & ((~0)>>3)); };
+    unsigned int getExtra() const;
+    void setExtra(unsigned int extra);
 
-    bool getGlobal() const { return GET_BIT(value,8); }; // ignored
-    void setGlobal(bool global) { value=SET_BIT(value,8,global); };
+    bool getGlobal() const;
+    void setGlobal(bool global);
 
-    PageSize getPageSize() const { return static_cast<PageSize>(GET_BIT(value,7)); };
-    void setPageSize(PageSize pageSize) { value=SET_BIT(value,7,pageSize); };
+    PageSize getPageSize() const;
+    void setPageSize(PageSize pageSize);
 
     //bit 6 reserved
     
-    unsigned int getAccessed() const { return GET_BIT(value,5); };
+    unsigned int getAccessed() const;
 
-    bool getCahceEnabled() const { return !GET_BIT(value,4); };
-    void setCahceEnabled(bool enabled) { value=SET_BIT(value,4,!enabled); };
+    bool getCahceEnabled() const;
+    void setCahceEnabled(bool enabled);
 
-    CacheMode getCacheMode() const { return static_cast<CacheMode>(GET_BIT(value,3)); };
-    void setCacheMode(CacheMode mode) { value=SET_BIT(value,3,mode); };
+    CacheMode getCacheMode() const;
+    void setCacheMode(CacheMode mode);
 
-    Privilage getPrivilage() const { return static_cast<Privilage>(GET_BIT(value,2)); };
-    void setPrivilage(Privilage mode) { value=SET_BIT(value,2,mode); };
+    Privilage getPrivilage() const;
+    void setPrivilage(Privilage mode);
 
-    Access getAccess() const { return static_cast<Access>(GET_BIT(value,1)); };
-    void setAccess(Access mode) { value=SET_BIT(value,1,mode); };
+    Access getAccess() const;
+    void setAccess(Access mode);
 
-    bool getPresent() const { return GET_BIT(value,0); };
-    void setPresent(bool present) { if(!present) value=0; value=SET_BIT(value,0,present); };
+    bool getPresent() const;
+    void setPresent(bool present);
 
-    void print() const
-    {
-        printk("PTE PB:0x%x, EX:0x%x, G:%d, PS:%d, A:%d, PCD:%d, PWT:%d, US:%d, RW:%d, P:%d\n",getPageTableBase(),getExtra(),getGlobal(),
-                getPageSize(), getAccessed(), !getCahceEnabled(), getCacheMode(), getPrivilage(), getAccess(),getPresent() );
-    }
+    void print() const;
 };
 } extern "C" {
 #endif // __cplusplus

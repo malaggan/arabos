@@ -46,14 +46,14 @@ KERNEL_MAP := kernel.map
 LDFLAGS := -T$(LINKER_SCRIPT) -Map $(KERNEL_MAP)
 #DBG := -gdwarf-2 -DDBG_DWARF2
 DBG := -gstabs -DDBG_STABS
-INCLUDE := ../include -I../include/c++ -I../include/c++/c++
+INCLUDE := include -I../include -I../include/c++ -I../include/c++/c++
 
 #####!!!!!!!!!!!!!!!############
 
 export CC := gcc
+export AS := as
 export CPP := g++
 export LINT := SPLINT
-export AS := nasm
 export ASFLAGS := -felf
 
 # !-ansi for __asm__

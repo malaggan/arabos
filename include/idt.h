@@ -44,13 +44,13 @@ extern "C" {
 
 #define INSTALL_IRQ(n) idt_set_gate(n+32,	\
 						(unsigned)_irq##n,	\
-						0x08,				\
+						(unsigned short)0x08,				\
 						IRQ_GATE);
 
 /* This defines what the stack looks like after when ISR/IRQ handler is called */
 struct interrupt_frame
 {
-	unsigned int gs, fs, es, ds, ss;		/* we pushed the segs last */
+	unsigned int gs, fs, es, ds;		/* we pushed the segs last */
 
 	unsigned int edi, esi, ebp, esp,
 				 ebx, edx, ecx, eax;	/* pushed by 'pushad' */

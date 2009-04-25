@@ -106,8 +106,9 @@ void irq_install()
 *	interrupt at BOTH controllers, otherwise, you only send
 *	an EOI command to the first controller. If you don't send
 *	an EOI, you won't raise any more IRQs */
+#include <debug.h>
 void irq_handler(struct interrupt_frame *r)
-{    
+{
 	/* This is a blank function pointer */
 	interrupt_handler_t handler;
 
@@ -117,10 +118,10 @@ void irq_handler(struct interrupt_frame *r)
 
 	if(r->int_no > 0)
         {
-		//printf("IRQ %d\n",r->int_no);
+            //printf("IRQ %d\n",r->int_no);
             //printf("IRQ %d(Ecode %d):\n",r->int_no,r->err_code);
             //printf("At EIP:0x%x CS:0x%x\n",r->eip,r->cs);
-            //printf("DS:0x%x SS:0x%x\n",r->ds,r->ss);
+            //printf("DS:0x%x\n",r->ds);
         }
 
 	if (handler)

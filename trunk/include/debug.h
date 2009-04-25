@@ -64,8 +64,8 @@ extern int __stab_start;
 extern int __stab_end;
 extern int __stabstr_start;
 extern int __stabstr_end;
-extern Stab* stabs;
-extern Stab* stabs_end;
+extern struct Stab* stabs;
+extern struct Stab* stabs_end;
 extern char* stabstr;
 
 /* DBG_STABS */
@@ -73,8 +73,8 @@ extern char* stabstr;
 
 #endif /* DBG_* */
 
-extern "C" void print_stack_trace();
-extern "C" void print_debug_info();
+void print_stack_trace();
+void print_debug_info();
 
 #ifdef	__cplusplus
 }

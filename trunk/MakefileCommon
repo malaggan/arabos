@@ -58,9 +58,9 @@ build_$(MODULE_NAME): del_errs $(OBJS)
 #########################
 # implicit ruels
 
-../obj/%.o: %.asm
-	@echo + AS $(DIR)/$<
-	@$(AS) $< -o ../obj/$@ $(ASFLAGS) 2>>error_log
+#../obj/%.o: %.asm
+#	@echo + AS $(DIR)/$<
+#	@$(AS) $< -o ../obj/$@ $(ASFLAGS) 2>>error_log
 
 ../obj/%.o: %.cpp
 	@echo + CPP $(DIR)/$<
@@ -73,7 +73,7 @@ build_$(MODULE_NAME): del_errs $(OBJS)
 
 ../obj/%.o: %.S
 	@echo + CC $(DIR)/$<
-	@$(CC) $< $(CFLAGS) -fdebug-prefix-map==$(DIR)/ -o ../obj/$@ 2>>error_log
+	@( cd .. ; $(CC) $(DIR)/$< $(CFLAGS) -o obj/$@ 2>>$(DIR)/error_log )
 
 # dependency files
 %.d: %.cpp

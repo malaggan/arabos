@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #include <mm.h>
 #include <asm.h>
 #include <debug.h>
+#include <fork.h>
 
 extern "C" void call_ctors();
 extern "C" void __cxa_finalize(void *d /*unused param*/);
@@ -68,6 +69,11 @@ int kernel_end_addr=reinterpret_cast<int>(&__end),kernel_load_addr=reinterpret_c
 #define SHOW_STAT_OK(strWhat) SHOW_STAT(strWhat,STAT_OK("OK"),2)
 #define SHOW_STAT_FAILED(strWhat) SHOW_STAT(strWhat,STAT_FAILED(/*"FAILED"*/"NOT IMPLEMENTED YET"),strnlen("NOT IMPLEMENTED YET",40))
 
+void fork_handler(struct interrupt_frame *r)
+{
+    printk("FORK HANDLER");
+}
+
 // this function doesn't return unless when powering off the system
 void cppmain()
 {
@@ -104,7 +110,18 @@ void cppmain()
     print_debug_info();    
     print_stack_trace();
 
+    //IRQ(16)
+    //idt_set_gate (16+32,(unsigned)_irq16, 0x08, IRQ_GATE);
+
+    //irq_install_custom_handler(16+32,fork_handler);
+
+
+    fork();
+
+
+
     void monitor();
+
     monitor();    
     
     //SHOW_STAT_FAILED("Kernel memory allocator");

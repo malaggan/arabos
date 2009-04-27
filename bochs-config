@@ -1,0 +1,1 @@
+./configure --with-wx --with-nogui --enable-all-optimizations --enable-cpu-level=4 --enable-gdb-stub

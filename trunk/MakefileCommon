@@ -63,16 +63,20 @@ build_$(MODULE_NAME): del_errs $(OBJS)
 #	@$(AS) $< -o ../obj/$@ $(ASFLAGS) 2>>error_log
 
 ../obj/%.o: %.cpp
-	@echo + CPP $(DIR)/$<
-	@$(CPP) $< $(CPPFLAGS) -fdebug-prefix-map==$(DIR)/ -o ../obj/$@ 2>>error_log
+	@echo '+ CPP $(DIR)/$<'
+	@echo '+ CPP $(DIR)/$<' >>error_log 
+	@( cd .. ; $(CPP) $(DIR)/$< $(CPPFLAGS) -o obj/$@ 2>>$(DIR)/error_log )
+#-fdebug-prefix-map==$(DIR)/ # no used cuz not supported on older compilers
 
 ../obj/%.o: %.c
-	@echo + CC $(DIR)/$<
-	@$(CC) $< $(CFLAGS) -fdebug-prefix-map==$(DIR)/ -o ../obj/$@ 2>>error_log
+	@echo '+ CC $(DIR)/$<'
+	@echo '+ CC $(DIR)/$<' >>error_log 
+	@( cd .. ; $(CC) $(DIR)/$< $(CFLAGS) -o obj/$@ 2>>$(DIR)/error_log )
 #	-@$(LINT) $< -I$(INCLUDE)
 
 ../obj/%.o: %.S
-	@echo + CC $(DIR)/$<
+	@echo '+ CC(AS) $(DIR)/$<'
+	@echo '+ CC(AS) $(DIR)/$<' >>error_log 
 	@( cd .. ; $(CC) $(DIR)/$< $(CFLAGS) -o obj/$@ 2>>$(DIR)/error_log )
 
 # dependency files

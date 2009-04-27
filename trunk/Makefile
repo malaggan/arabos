@@ -21,11 +21,13 @@ default: all
 .PHONY: all clean link install build
 
 RM := (ls FILE && rm FILE) > /dev/null 2>&1 || true
+JOBS := 4
 
 SUBDIRS = boot console kernel lib mm init i386
 
 .PHONY: subdirs $(SUBDIRS) 
-subdirs: $(SUBDIRS) 
+subdirs: 
+	-@$(MAKE) --jobs=$(JOBS) --keep-going --load-average=0.75 --no-print-directory $(SUBDIRS) 2>&1 | grep -iv 'make\[2\]' | sed 's/make\[1\]: \*\*\* //'
 	@echo
 	@$(subst FILE,errors_summary,$(RM))
 	@find -name error_log | xargs cat > errors_summary

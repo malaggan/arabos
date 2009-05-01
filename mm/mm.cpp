@@ -120,16 +120,16 @@ extern int kernel_end_addr; // calculated in booting
 #define FIRST_PAGE_AFTER_KERNEL() kernel_end_addr+(PG_SIZE-kernel_end_addr%PG_SIZE)
 
 // TODO needs to get the size of the physical memory and discard the used frames from the multi-boot info
-// now assuming flat, 8MB physical memory
-#define ADDRESS_SPACE_PAGES (1024*1024)
-int physPages = 8*1024*1024/*mem size*/ / PG_SIZE;
-int kernelPages = 4*1024*1024/*kernel hard-coded boot-strap memory*/ / PG_SIZE;
+// now assuming flat, 32MB physical memory
+#define MEM_IN_BYTES (8*1024*1024)
+int physPages = MEM_IN_BYTES / PG_SIZE;
+int kernelPages = 4*1024*1024 / PG_SIZE; /*kernel hard-coded boot-strap memory: $ MB*/
+
 // max pages = 4GB/PG_SIZE = 1048576 pages = (1024*1024) = 1 << 20
 // if we gonna make a bit map, we need (1 << 20) / 8 bytes = 131072 = 128 KB of memory = 32 pages
-unsigned char freeMem[ADDRESS_SPACE_PAGES] = {0};
+unsigned char freeMem[MEM_IN_BYTES/8] = {0};
 
 PageDirectoryEntry* kernelPageDir;
-PageTableEntry* kernelImagePageTable;
 PageTableEntry* kernelHeapPageTable;
 
 void free_page(char* pageBase)
@@ -141,7 +141,7 @@ void free_page(char* pageBase)
     PageDirectoryEntry* pde = &kernelPageDir[ixPde];
     PageTableEntry* pte = &(reinterpret_cast<PageTableEntry*>(pde->getPageTableBase())[ixPte]);    
     phys_addr_t paddr = pte->getPageBase();
-    printf("freeing %d:%d:%d @ v:0x%x p:0x%x\n",ixPde,ixPte,vaddr&0xFFF, pageBase, paddr);
+    printk(TRACE "freeing %d:%d:%d @ v:0x%x p:0x%x\n",ixPde,ixPte,vaddr&0xFFF, pageBase, paddr);
 
     int frameIndex = paddr/PG_SIZE;
     int byteIndex = frameIndex / 8;
@@ -178,7 +178,7 @@ char* alloc_page()   //****
     }
     if(freePageIndex < 0)
     {
-    panic("OUT OF MEMORY");
+        panic("OUT OF MEMORY");
     }
 
     // now we've got the page index.
@@ -207,7 +207,7 @@ char* alloc_page()   //****
 
     char* vaddr = reinterpret_cast<char*>((1<<22) | (emptyPte<<12));
 
-    printf("alloc_page : vaddr(0x%x)->paddr(0x%x) frameIndex(%d)\n",vaddr,paddr,freePageIndex);
+    printk(TRACE "alloc_page : vaddr(0x%x)->paddr(0x%x) frameIndex(%d)\n",vaddr,paddr,freePageIndex);
 
     invlpg(vaddr);
 
@@ -238,11 +238,11 @@ static void enable_paging()
 void init_paging()
 {
     kernelPageDir    = reinterpret_cast<PageDirectoryEntry*>(FIRST_PAGE_AFTER_KERNEL());
-    kernelImagePageTable = reinterpret_cast<PageTableEntry*>(FIRST_PAGE_AFTER_KERNEL()+  PG_SIZE); // leave a space for the page dir it self
+    PageTableEntry* kernelImagePageTable = reinterpret_cast<PageTableEntry*>(FIRST_PAGE_AFTER_KERNEL()+  PG_SIZE); // leave a space for the page dir it self    
     kernelHeapPageTable  = reinterpret_cast<PageTableEntry*>(FIRST_PAGE_AFTER_KERNEL()+2*PG_SIZE); // leave a space for the previous page table ( a page table takes 1 page frame in memory)
 
     memset((unsigned char *)kernelPageDir,    0,PG_SIZE);
-    memset((unsigned char *)kernelImagePageTable,0,PG_SIZE);
+    memset((unsigned char *)kernelImagePageTable, 0,PG_SIZE);
     memset((unsigned char *)kernelHeapPageTable, 0,PG_SIZE);
 
     // the first page table
@@ -251,7 +251,7 @@ void init_paging()
     pde0.setPrivilage(Supervisor);
     pde0.setAccess(ReadWrite);
     pde0.setPresent(true);
-
+    
     PageDirectoryEntry pde1;
     pde1.setPageTableBase(reinterpret_cast<phys_addr_t>(kernelHeapPageTable));
     pde1.setPrivilage(Supervisor);
@@ -259,7 +259,7 @@ void init_paging()
     pde1.setPresent(true);
 
     kernelPageDir[0]=pde0;
-    kernelPageDir[1]=pde1;
+    kernelPageDir[1]=pde1;    
 
     // we be sure that the previously allocated pages for the page tables are not exceeding 4 MB
     if((FIRST_PAGE_AFTER_KERNEL()+3*PG_SIZE) > 1024*1024*4)
@@ -281,9 +281,9 @@ void init_paging()
 
 
     // set all pages as free
-    for(int i = 0; i < ADDRESS_SPACE_PAGES/8 /*or can be physPages instead*/; i++)
+    for(int i = 0; i < MEM_IN_BYTES/8 ; i++)
         freeMem[i] = 0;
-    // mark the first 4MB as non-free
+    // mark the first 4MB (1024 pages) as non-free
     for(int i = 0; i < 1024/8; i++)
         freeMem[i] = 0xFF;
 

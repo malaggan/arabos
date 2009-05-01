@@ -23,12 +23,12 @@ unsigned int active_tty;
 
 void flush_current_tty()
 {
-    flush_video(ttys[active_tty]);
+    flush_video(&ttys[active_tty]);
 }
 
-void flush_video(struct tty_t tty)
+void flush_video(struct tty_t *tty)
 {
-    memcpyw(VIDEO,tty.data,COLUMNS*LINES);
+    memcpyw(VIDEO,tty->data,COLUMNS*LINES);
 }
 
 void scroll(void)

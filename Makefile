@@ -70,6 +70,7 @@ export CFLAGS := -Wall -Wextra -Wfloat-equal -Wshadow\
 	-Wunreachable-code -c -pedantic -Wno-unused-parameter\
 	-I$(INCLUDE) -std=c99 -ffreestanding -fno-stack-protector $(DBG)
 
+#WARN: do not use inline impl of classes in header files as it creates sections that breaks the stabs lookup
 #-nostartfiles -nostdlib -fno-rtti -fno-exceptions
 # since i didn't specify -nostartfiles, a fucn called _init will be created to initiate construtors of global objs
 # i think i should call it myself, since there is no main, that if the function returns w/out calling main

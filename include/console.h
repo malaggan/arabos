@@ -46,7 +46,7 @@ void cls (void);
 void putchar (int c);
 void update_cursor(void);
 void init_video(void);
-void flush_video(struct tty_t tty);
+void flush_video(struct tty_t* tty);
 void flush_current_tty();
 
 #ifdef __cplusplus

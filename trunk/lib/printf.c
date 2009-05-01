@@ -27,7 +27,7 @@ int MK_CH_ATT(unsigned char c,unsigned char a)
     return c|(a<<8);
 }
 
-int printed_chars = 0; // guard for MAX_CHARS
+int printed_chars = 0; // guard for MAX_CHARS // TODO non-re-entrant !!
 
 void print0 (char **format0, int ignore_first_char);
 
@@ -42,7 +42,8 @@ printf (const char *format, ...)
 // first character is a printk level code 
 void
 printk (const char *format, ...)
-{    
+{
+    //block_timer();
     char level = format[0];
     
     if(level < *TRACE || level > *SEVERE) // no printk level specified
@@ -71,6 +72,7 @@ printk (const char *format, ...)
         print0((char**)&format, 1);
         printf(NORMAL);
     }
+    //unmask_timer();
 }
 
 // a non-variable arg list version

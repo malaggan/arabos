@@ -95,11 +95,11 @@ void readline_handler(unsigned char c)
 }
 
 // keyboard controller ref from: http://sardes.inrialpes.fr/~jphilipp/edu/cse07/doc/keyboard/Keyboard%20Reference.htm
-void keyboard_handler(struct interrupt_frame * r/*unused*/)
+int keyboard_handler(struct interrupt_frame * r/*unused*/)
 {
     unsigned char status = inportb((unsigned short)0x64);
     if(!(status&0x1)) // has data ?
-        return;
+        return 0;
     unsigned char scancode = inportb((unsigned short)0x60);
     
     if (scancode & 0x80) // released

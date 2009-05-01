@@ -50,10 +50,10 @@ extern "C" {
 /* This defines what the stack looks like after when ISR/IRQ handler is called */
 struct interrupt_frame
 {
-	unsigned int gs, fs, es, ds;		/* we pushed the segs last */
+	unsigned int ss, gs, fs, es, ds;		/* we pushed the segs last */
 
 	unsigned int edi, esi, ebp, esp,
-				 ebx, edx, ecx, eax;	/* pushed by 'pushad' */
+				 ebx, edx, ecx, eax;	/* pushed by 'pusha' */
 
 	unsigned int int_no,err_code;
         /* our 'push byte #' and error codes do this */
@@ -81,7 +81,7 @@ struct tag_idt_ptr
 	unsigned int base;
 } __attribute__((packed));
 
-typedef void (*interrupt_handler_t)(struct interrupt_frame *r);
+typedef int (*interrupt_handler_t)(struct interrupt_frame *r);
 
 /* This exists in 'start.asm', and is used to load our IDT */
 extern void idt_load();
@@ -90,7 +90,7 @@ void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel, uns
 void idt_install();
 void isr_install();
 void irq_install();
-void irq_install_custom_handler(int irq,interrupt_handler_t handler);
+interrupt_handler_t irq_install_custom_handler(int irq,interrupt_handler_t handler);
 void irq_uninstall_custom_handler(int irq);
 
 #ifdef __cplusplus

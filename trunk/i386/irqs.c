@@ -26,16 +26,18 @@ IRQ(8)	IRQ(9)	IRQ(10)	IRQ(11)	IRQ(12)	IRQ(13)	IRQ(14)	IRQ(15)
 
 /* This array is actually an array of function pointers. We use
 *	this to handle custom IRQ handlers for a given IRQ */
-interrupt_handler_t irq_routines[16] =
+interrupt_handler_t irq_routines[160] =
 {
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0
 };
 
 /* This installs a custom IRQ handler for the given IRQ */
-void irq_install_custom_handler(int irq, interrupt_handler_t handler)
+interrupt_handler_t irq_install_custom_handler(int irq, interrupt_handler_t handler)
 {
-	irq_routines[irq] = handler;
+    interrupt_handler_t old = irq_routines[irq];
+    irq_routines[irq] = handler;
+    return old;
 }
 
 /* This clears the handler for a given IRQ */
@@ -72,10 +74,11 @@ void irq_remap(void)
 	outportb((unsigned short)0xA1, (char)0x0);
 }
 
-void handle_coprocessor_math_fault(struct interrupt_frame *r)
+int handle_coprocessor_math_fault(struct interrupt_frame *r)
 {
 	ASM (" fnclex "); // clear the exception existance
 	printf("fnclex done\n");
+        return 0;
 }
 
 /* We first remap the interrupt controllers, and then we install
@@ -118,19 +121,19 @@ void irq_handler(struct interrupt_frame *r)
 
 	if(r->int_no > 0)
         {
-            //printf("IRQ %d\n",r->int_no);
+            //printf("\nIRQ %d\n",r->int_no);
             //printf("IRQ %d(Ecode %d):\n",r->int_no,r->err_code);
             //printf("At EIP:0x%x CS:0x%x\n",r->eip,r->cs);
-            //printf("DS:0x%x\n",r->ds);
+            //printf("DS:0x%x SS:0x%x\n",r->ds,r->ss);
         }
-
+        
 	if (handler)
 	{
 		handler(r);
 	}
 	else
 	{
-		printf("No custom handler exists for IRQ%d\n",r->int_no);
+		//printf("No custom handler exists for IRQ%d\n",r->int_no);
 	}
 
 	/* If the IDT entry that was invoked was greater than 40

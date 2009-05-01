@@ -18,6 +18,12 @@ extern "C" {
 #define lds(ds) ASM("movw %%ax,%%ds" :: "a" (ds))
 #define lss(ss) ASM("movw %%ax,%%ss" :: "a" (ss))
 #define lcs(cs) ASM("ljmp %0,$1f\n 1:\n" :: "i" (cs))
+
+#define resp(esp) ASM("movl %%esp,%0" : "=a" (esp))
+#define lesp(esp) ASM("movl %0,%%esp" :: "a" (esp))
+
+#define reax(eax) ASM("movl %%eax,%0" : "=a" (eax))
+#define leax(eax) ASM("movl %0,%%eax" :: "a" (eax))
     
 #define rcr0(cr0) ASM ( "movl %%cr0,%0" : "=a" (cr0));
 #define lcr0(cr0) ASM ( "movl %0,%%cr0" :: "a" (cr0));
@@ -36,12 +42,28 @@ extern "C" {
 
 #define hlt() ASM("hlt"); while(1)
 
+#define cli() ASM("cli")
 #define sti() ASM("sti")
 
 #define invlpg(vaddr) ASM("invlpg %0" :: "m"(vaddr))
     
 // val must be 64 bits long
 #define rdtscll(val) ASM("rdtsc" : "=A" (val))
+
+#define block_timer() \
+    ASM("outb %0,$0x20\n"::"a"((char)0x11)); \
+    ASM("outb %0,$0x21\n"::"a"((char)0x20)); \
+    ASM("outb %0,$0x21\n"::"a"((char)0x04)); \
+    ASM("outb %0,$0x21\n"::"a"((char)0x01)); \
+    ASM("outb %0,$0x21\n"::"a"((char)0x01));
+
+#define unmask_timer() \
+    ASM("outb %0,$0x20\n"::"a"((char)0x11)); \
+    ASM("outb %0,$0x21\n"::"a"((char)0x20)); \
+    ASM("outb %0,$0x21\n"::"a"((char)0x04)); \
+    ASM("outb %0,$0x21\n"::"a"((char)0x01)); \
+    ASM("outb %0,$0x21\n"::"a"((char)0x00));
+
     
 void cpuid_check();
     

@@ -18,11 +18,26 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #ifndef TIMER_H
 #define TIMER_H
 
+#include "idt.h"
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+struct ProcessData
+{
+    struct interrupt_frame frame;
+    int valid;
+};
+
+extern int currentProcess;
+#define MAX_PROCESSES 8
+extern struct ProcessData processes[MAX_PROCESSES];
+
 extern volatile unsigned int timer_ticks;
+extern volatile unsigned int scheduling_started;
+int schedule(struct interrupt_frame *r);
 
 // 100 hz = 10 ms, so 20 hz is 50ms, and 10 hz = 100ms, 50 hz = 20ms , 200 hz = 5ms
 #define TICKS_PER_SEC 200

@@ -76,7 +76,7 @@ static void seek(int type, int addr, int &low, int &high)
             while(tmp <= high && stabs[tmp].n_type != type)
                 tmp++;
 
-            if(tmp <= high && addr > reinterpret_cast<int>(stabs[tmp].n_value))
+            if(tmp <= high && addr >= reinterpret_cast<int>(stabs[tmp].n_value))
             {
                 low = tmp;
                 continue;
@@ -95,7 +95,7 @@ static void seek(int type, int addr, int &low, int &high)
             while(tmp >= low && stabs[tmp].n_type != type)
                 tmp--;
 
-            if(tmp >= low && addr < reinterpret_cast<int>(stabs[tmp].n_value))
+            if(tmp >= low && addr <= reinterpret_cast<int>(stabs[tmp].n_value))
             {
                 high = tmp;
                 continue;
@@ -149,7 +149,7 @@ static void seek(int type, int addr, int &low, int &high)
 #endif
 }
 
-static void stab_data(int eip)
+extern "C" void stab_data(int eip)
 {
     int debug = D;
     int stab_cnt = stabs_end-stabs;
@@ -198,6 +198,7 @@ static void stab_data(int eip)
     if(debug) printf("%d lline %d hline %d\n",line_no, lline, hline);
 
     // search for a nested N_SOL in the N_SO, in case it was an inlined file
+    lline+=2; // this line is a hack, dunno why it works or if it will work everytime
     while((lline > lfile && stabs[lline].n_type != N_SO && stabs[lline].n_type != N_SOL) || stabs[lline].n_value == 0)
         lline --;
     const char* inlinedFileName = NULL;

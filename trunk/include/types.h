@@ -17,8 +17,8 @@ typedef          long long int64_t;
 
 typedef uint32_t size_t;
 
-typedef unsigned int* uint_ptr;
-typedef unsigned int phys_addr_t;
+typedef uint32_t* uintptr_t;
+typedef uint32_t phys_addr_t;
 
 #define NULL (0)
 

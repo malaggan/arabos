@@ -116,6 +116,7 @@ void print0 (char **format0, int ignore_first_char)
             switch (c)
             {
             case 'd':
+            case 'i':
             case 'u':
             case 'x':
                 itoa (buf, c, *((int *) arg++));
@@ -126,6 +127,12 @@ void print0 (char **format0, int ignore_first_char)
                 p = *arg++;
                 if (! p)
                         p = "(null)";
+                print = 1;
+                break;
+            case 'c':
+                buf[0] = *((char*)arg++);
+                buf[1] = 0;
+                p = buf;                
                 print = 1;
                 break;
             case '%':

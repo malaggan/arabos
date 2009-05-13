@@ -23,6 +23,7 @@ extern "C" {
 #endif
 
 #include <types.h>
+#include <liballoc.h>
 
 // page table entry format :
 // addr/avail to os/zero/zero/dirty/accessed/page cache disable/pg write throuhg(1) back(0)/user,supervisor/write,read/present
@@ -44,6 +45,12 @@ void printk (const char *, ...);
 
 #ifdef __cplusplus
 } extern "C++" {
+
+void* operator new(unsigned int size);
+void* operator new[](unsigned int size);
+void operator delete(void * ptr);
+void operator delete[](void * ptr);
+
 
 enum CacheMode {WriteBack = 0, WriteThrough};
 enum Privilage {Supervisor = 0, User};

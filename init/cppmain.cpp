@@ -35,10 +35,10 @@ void cppmain();
 extern "C"
 void enter_cpp()
 {   
-    //call_ctors(); // TODO fix it
+    call_ctors();
     
-    printk(LOG "In C++ main\n");    
-        
+    printk(LOG "In C++ main\n");
+    
     cppmain();
 
     // destruct all static C++ objects.
@@ -69,52 +69,40 @@ int kernel_end_addr=reinterpret_cast<int>(&__end),kernel_load_addr=reinterpret_c
 #define SHOW_STAT_OK(strWhat) SHOW_STAT(strWhat,STAT_OK("OK"),2)
 #define SHOW_STAT_FAILED(strWhat) SHOW_STAT(strWhat,STAT_FAILED(/*"FAILED"*/"NOT IMPLEMENTED YET"),strnlen("NOT IMPLEMENTED YET",40))
 
-int zzz=10000;
 int esp = 0;
+
+#include <semaphore.h>
+
+volatile semaphore_t sem = 1;
 // the init process
 void init()
 {    
-    printk("in init now :)\n");    
-    //print_debug_info();
-    //print_stack_trace();
-
+    printk("in init now :)\n");
+    
     int x = 80*6;
 
     printk("Forking: \n");
     int proc = fork();
+
     if(!proc)
     {
-        //void monitor();
-        //monitor();
         while(x--)
-        {
             printk(REDB "A" NORMAL);
-            zzz=10000;while(--zzz>=0);
-        }
     }
     else
     {
         proc = fork();
+
         if(!proc)
-        {
             while(x--)
-            {
                 printk(GREENB "B" NORMAL);
-                zzz=10000;while(--zzz>=0);
-            }
-        }
         else
         {
             while(x--)
-            {
                 printk(BLUEB "C" NORMAL);
-                zzz=10000;while(--zzz>=0);
-            }
         }
     }
-
-    //SHOW_STAT_FAILED("Kernel memory allocator");
-    //SHOW_STAT_FAILED("Process manager");
+    
     //SHOW_STAT_FAILED("Discovering devices");
     //SHOW_STAT_FAILED("Filesystem");
     //SHOW_STAT_FAILED("Networking");
@@ -154,6 +142,8 @@ void cppmain()
 
     init_paging();
 
+    SHOW_STAT_OK("Memory Manager");
+
     /* setup process management */
     idt_set_gate (16+32,(unsigned)_irq16, 0x08, IRQ_GATE);
     irq_install_custom_handler(16,fork_handler);
@@ -163,12 +153,11 @@ void cppmain()
 
     memset(reinterpret_cast<unsigned char*>(processes),0,MAX_PROCESSES*sizeof(ProcessData));
 
-    // disable scheduling (timer)
-    interrupt_handler_t old = irq_install_custom_handler(0,0);
     int i = spawn(init);
     printk("\nspawn returned: %d\n",i);
-    //print_stack_trace();
-    irq_install_custom_handler(0,old);
+    scheduling_started = 1;
+
+    SHOW_STAT_OK("Process Manager");
     
     while(1); // will only get here till one time slice ends and never again
 }

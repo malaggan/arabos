@@ -31,9 +31,12 @@ volatile unsigned int timer_ticks = 0;
 *    been smoking something funky */
 int timer_handler(struct interrupt_frame *r)
 {
-
-    block_timer();
-
+    // all we can do is to hope these 5 lines is executed atomically
+    ASM("outb %0,$0x20\n"::"a"((char)0x11)); 
+    ASM("outb %0,$0x21\n"::"a"((char)0x20)); 
+    ASM("outb %0,$0x21\n"::"a"((char)0x04)); 
+    ASM("outb %0,$0x21\n"::"a"((char)0x01)); 
+    ASM("outb %0,$0x21\n"::"a"((char)0x01));
 
     /* Increment our 'tick count' */
     timer_ticks++;
@@ -52,7 +55,11 @@ int timer_handler(struct interrupt_frame *r)
         schedule(r);
     }
 
-    unmask_timer();
+    ASM("outb %0,$0x20\n"::"a"((char)0x11));
+    ASM("outb %0,$0x21\n"::"a"((char)0x20));
+    ASM("outb %0,$0x21\n"::"a"((char)0x04));
+    ASM("outb %0,$0x21\n"::"a"((char)0x01));
+    ASM("outb %0,$0x21\n"::"a"((char)0x00));
 
     return ret;
 }

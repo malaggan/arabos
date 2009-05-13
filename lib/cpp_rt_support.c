@@ -49,7 +49,7 @@ void call_ctors()
         return;
     }    
     printk(TRACE "+enter call_ctors()\n");    
-    ctors();
+    //ctors();
     printk(DEBUG "Called ctors (0x%x)\n",ctors);    
     printk(TRACE "-exit call_ctors()\n");    
 }

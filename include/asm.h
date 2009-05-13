@@ -1,6 +1,8 @@
 #ifndef _ASM_H
 #define	_ASM_H
 
+#include "timer.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -50,20 +52,9 @@ extern "C" {
 // val must be 64 bits long
 #define rdtscll(val) ASM("rdtsc" : "=A" (val))
 
-#define block_timer() \
-    ASM("outb %0,$0x20\n"::"a"((char)0x11)); \
-    ASM("outb %0,$0x21\n"::"a"((char)0x20)); \
-    ASM("outb %0,$0x21\n"::"a"((char)0x04)); \
-    ASM("outb %0,$0x21\n"::"a"((char)0x01)); \
-    ASM("outb %0,$0x21\n"::"a"((char)0x01));
+#define block_timer() scheduling_started = 0
 
-#define unmask_timer() \
-    ASM("outb %0,$0x20\n"::"a"((char)0x11)); \
-    ASM("outb %0,$0x21\n"::"a"((char)0x20)); \
-    ASM("outb %0,$0x21\n"::"a"((char)0x04)); \
-    ASM("outb %0,$0x21\n"::"a"((char)0x01)); \
-    ASM("outb %0,$0x21\n"::"a"((char)0x00));
-
+#define unmask_timer() scheduling_started = 1
     
 void cpuid_check();
     

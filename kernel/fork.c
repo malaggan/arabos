@@ -151,7 +151,11 @@ int schedule(struct interrupt_frame *r)
             "a"((char)0x20)
             );
 
-    unmask_timer();
+    ASM("outb %0,$0x20\n"::"a"((char)0x11));
+    ASM("outb %0,$0x21\n"::"a"((char)0x20));
+    ASM("outb %0,$0x21\n"::"a"((char)0x04));
+    ASM("outb %0,$0x21\n"::"a"((char)0x01));
+    ASM("outb %0,$0x21\n"::"a"((char)0x00));
 
     ASM(
             "popfl\n"
@@ -223,41 +227,10 @@ int spawn_handler(struct interrupt_frame *r)
     if debug printf("\nspawn:parent stack:\n");
     if debug stack_trace((int*)r->ebp, (int*)r->esp, (int*)r->eip);
 
-/*
-    //=========== update all ebp's (before truncating the stack chain)
-    int old_ebp_offset = (int*)r->ebp - (int*)r->esp;
-    do{
-        int next_ebp_offset =  (int*)stack[old_ebp_offset] - (int*)r->esp;
-        stack[old_ebp_offset] = stack + next_ebp_offset;
-        old_ebp_offset = next_ebp_offset;
-    }
-    while(stack[old_ebp_offset] != 0);
-    //===========
-*/
-
-
-    //old_ebp_offset = (int*)r->ebp - (int*)r->esp;
     processes[procIndex].frame.esp = stack; // TODO also alloc a new stack segment in GDT
     processes[procIndex].frame.ebp = 0;//stack+5;//+old_ebp_offset;
-    processes[procIndex].frame.eax = procIndex; // ret val
+    processes[procIndex].frame.eax = procIndex+1; // ret val (+1, so it never gets a Zero, which is reserved for the parent process
     processes[procIndex].frame.eip = proc;
-    // also put it in the stack ret address !!
-    //stack[2] = proc;
-
-/*
-    if debug printf("\nspawn:child stack before truncation:\n");
-    if debug stack_trace((int*)processes[procIndex].frame.ebp, (int*)processes[procIndex].frame.esp, (int*)processes[procIndex].frame.eip);
-*/
-
-/*
-    old_ebp_offset = (int*)r->ebp - (int*)r->esp;
-*/
-    //old_ebp_offset = (int*)stack[old_ebp_offset] - stack;
-/*
-    if debug printk("older ebp found at stack[%d]\n",old_ebp_offset);
-    stack[old_ebp_offset + 1] = taskend;
-    stack[old_ebp_offset] = 0;
-*/
 
     if debug printf("\nspawn:child stack after truncation:\n");
     if debug stack_trace((int*)processes[procIndex].frame.ebp, (int*)processes[procIndex].frame.esp, (int*)processes[procIndex].frame.eip);
@@ -308,7 +281,7 @@ int fork_handler(struct interrupt_frame *r)
     old_ebp_offset = (int*)r->ebp - (int*)r->esp;
     processes[procIndex].frame.esp = stack; // TODO also alloc a new stack segment in GDT
     processes[procIndex].frame.ebp = stack+old_ebp_offset;
-    processes[procIndex].frame.eax = procIndex; // ret val
+    processes[procIndex].frame.eax = procIndex+1;  // ret val (+1, so it never gets a Zero, which is reserved for the parent process
 
     if debug printf("\nfork:child stack:\n");
     if debug stack_trace((int*)processes[procIndex].frame.ebp, (int*)processes[procIndex].frame.esp, (int*)processes[procIndex].frame.eip);
@@ -332,12 +305,6 @@ int spawn(void (*proc)(void))
     if debug printf("\nspawn stack before @ 0x%x: \n", esp);
     if debug print_stack_trace();
 
-/*
-    int proc_addr = proc;
-    proc_addr += 1;
-    proc = proc_addr;
-*/
-    proc;// += 3; // skip function epilog
     ASM("movl %0,%%ebx\n"
         "int $49"::"m"(proc));
     int ret;

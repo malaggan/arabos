@@ -76,7 +76,7 @@ itoa (char *buf, int base, int d)
 	int divisor = 10;
 
 	/* If %d is specified and D is minus, put `-' in the head. */
-	if (base == 'd' && d < 0)
+	if ((base == 'i' || base == 'd') && d < 0)
 	{
 		*p++ = '-';
 		buf++;

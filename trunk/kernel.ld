@@ -28,6 +28,7 @@ SECTIONS
     *(.text* .rodata*) /* rodata => read only data: string etc.*/  
     SORT(CONSTRUCTORS)
   
+    . = ALIGN(0x4);
     PROVIDE(ctors = .); /* the static objects' constructors array */
     *(.ctors)    
   }

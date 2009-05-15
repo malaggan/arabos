@@ -52,9 +52,10 @@ extern "C" {
 // val must be 64 bits long
 #define rdtscll(val) ASM("rdtsc" : "=A" (val))
 
-#define block_timer() scheduling_started = 0
-
-#define unmask_timer() scheduling_started = 1
+//;printk("\n--:%i\n",scheduling_started)
+#define block_timer() --scheduling_started 
+//;printk("\n++:%i\n",scheduling_started)
+#define unmask_timer() ++scheduling_started 
     
 void cpuid_check();
     

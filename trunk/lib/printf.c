@@ -43,7 +43,6 @@ printf (const char *format, ...)
 void
 printk (const char *format, ...)
 {
-    //block_timer();
     char level = format[0];
     
     if(level < *TRACE || level > *SEVERE) // no printk level specified
@@ -72,12 +71,13 @@ printk (const char *format, ...)
         print0((char**)&format, 1);
         printf(NORMAL);
     }
-    //unmask_timer();
 }
 
 // a non-variable arg list version
 void print0 (char **format0, int ignore_first_char)
 {
+    block_timer();
+
     const char * format = (const char *)*format0;
     if(ignore_first_char)
         format++;
@@ -151,6 +151,7 @@ void print0 (char **format0, int ignore_first_char)
     }
 
     flush_current_tty();
+    unmask_timer();
 }
 
 __attribute__((noreturn)) void panic (const char *message) 

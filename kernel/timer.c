@@ -31,7 +31,7 @@ volatile unsigned int timer_ticks = 0;
 *    been smoking something funky */
 int timer_handler(struct interrupt_frame *r)
 {
-    // all we can do is to hope these 5 lines is executed atomically
+    // all we can do is to hope those 5 lines is executed atomically
     ASM("outb %0,$0x20\n"::"a"((char)0x11)); 
     ASM("outb %0,$0x21\n"::"a"((char)0x20)); 
     ASM("outb %0,$0x21\n"::"a"((char)0x04)); 
@@ -50,7 +50,7 @@ int timer_handler(struct interrupt_frame *r)
 
     int ret = 0;
 
-    if(scheduling_started)
+    if(scheduling_started == 1)
     {
         schedule(r);
     }

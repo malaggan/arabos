@@ -86,20 +86,37 @@ void init()
 
     if(!proc)
     {
+        wait(&sem);
         while(x--)
+        {
             printk(REDB "A" NORMAL);
+            for(int i = 0; i < 0xFFF; i++);
+        }
+        signal(&sem);
     }
     else
     {
         proc = fork();
 
         if(!proc)
+        {
+            wait(&sem);
             while(x--)
+            {
                 printk(GREENB "B" NORMAL);
+                for(int i = 0; i < 0xFFF; i++);
+            }
+            signal(&sem);
+        }
         else
         {
+            wait(&sem);
             while(x--)
+            {
                 printk(BLUEB "C" NORMAL);
+                for(int i = 0; i < 0xFFF; i++);
+            }
+            signal(&sem);
         }
     }
     

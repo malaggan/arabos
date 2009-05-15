@@ -3,23 +3,29 @@
 
 void wait(volatile semaphore_t* sem)
 {
-    int lock = 0;
-    while(!lock)
+    while(1)
     {
         block_timer();
         if(*sem > 0)
         {
             (*sem)--;
-            
-            lock = 1;
+
+            //printk("\nlock obtained\n");
+            unmask_timer();
+            return;
         }
-        unmask_timer();
+        else
+        {
+            unmask_timer();
+        }
     }
+    //printk("\nlock obtained ILLEGALLY\n");
 }
 
 void signal(volatile semaphore_t* sem)
 {
     block_timer();
     (*sem)++;
+    //printk("\nlock released\n");
     unmask_timer();
 }

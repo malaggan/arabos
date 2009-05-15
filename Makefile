@@ -116,6 +116,9 @@ clean: $(foreach DIR,$(SUBDIRS),$(DIR).clean)
 	
 %.clean:
 	@$(MAKE) -C $* clean_files --no-print-directory
+	
+debug:
+	gdbtui kernel.k -x gdbscript
 
 # How to build the Bochs disk image ( from the MTI os lab )
 #$(OBJDIR)/kern/bochs.img: $(OBJDIR)/kern/kernel $(OBJDIR)/boot/boot

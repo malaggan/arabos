@@ -93,7 +93,7 @@ int schedule(struct interrupt_frame *r)
 
     if(currentProcess != nextProcess)
     {        
-        if debug2 printk("\n%d^%d\n", currentProcess, nextProcess);
+        if debug2 printk(" ( %d^%d ) ", currentProcess, nextProcess);
 /*
         printk("from stack@ 0x%x, eip = ",r->esp);
         stab_data(r->eip);

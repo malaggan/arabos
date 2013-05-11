@@ -151,6 +151,8 @@ int schedule(struct interrupt_frame *r)
             "a"((char)0x20)
             );
 
+    /* outb val,port */
+    /* inb port, val */ // is this end of interrupt EOI? 
     ASM("outb %0,$0x20\n"::"a"((char)0x11));
     ASM("outb %0,$0x21\n"::"a"((char)0x20));
     ASM("outb %0,$0x21\n"::"a"((char)0x04));
@@ -306,7 +308,7 @@ int spawn(void (*proc)(void))
     if debug print_stack_trace();
 
     ASM("movl %0,%%ebx\n"
-        "int $49"::"m"(proc));
+        "int $49"::"m"(proc)); // call spawn_handler
     int ret;
     reax(ret);
     scheduling_started = 1;

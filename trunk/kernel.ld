@@ -29,8 +29,9 @@ SECTIONS
     SORT(CONSTRUCTORS)
   
     . = ALIGN(0x4);
-    PROVIDE(ctors = .); /* the static objects' constructors array */
-    *(.ctors)    
+    PROVIDE(ctors = .); /* the static objects' constructors array */ /*PROVIDE_HIDDEN?*/
+    /* note: must include libgcc in the gcc compilation for it to generate .ctors */
+    *(.ctors)    /*should it be KEEP(*(.ctors)) as in http://gcc.gnu.org/bugzilla/show_bug.cgi?id=46770 ?*/
   }
     
   .stab : {

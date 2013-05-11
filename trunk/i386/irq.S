@@ -40,7 +40,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 
 	pushl %eax // param
 	movl $irq_handler, %eax
-	call %eax
+	call *%eax
 	popl %eax // return value is returned through popa, not here
 
         popl %ss

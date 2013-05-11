@@ -74,51 +74,82 @@ int esp = 0;
 #include <semaphore.h>
 
 volatile semaphore_t sem = 1;
+volatile int owner = 0; // this is to force owner change, to test semaphors, instead of looping a constant number of times
+void monitor();
 // the init process
 void init()
 {    
     printk("in init now :)\n");
+
+    int x = 5*6;
+    monitor();
     
-    int x = 80*6;
-
     printk("Forking: \n");
-    int proc = fork();
-
-    if(!proc)
-    {
-        wait(&sem);
-        while(x--)
-        {
-            printk(REDB "A" NORMAL);
-            for(int i = 0; i < 0xFFF; i++);
-        }
-        signal(&sem);
-    }
-    else
-    {
-        proc = fork();
-
-        if(!proc)
-        {
-            wait(&sem);
-            while(x--)
-            {
-                printk(GREENB "B" NORMAL);
-                for(int i = 0; i < 0xFFF; i++);
-            }
-            signal(&sem);
-        }
-        else
-        {
-            wait(&sem);
-            while(x--)
-            {
-                printk(BLUEB "C" NORMAL);
-                for(int i = 0; i < 0xFFF; i++);
-            }
-            signal(&sem);
-        }
-    }
+    int proc = fork();    
+    printk(TRACE "this is process %i\n",proc);
+    // if(!proc)
+    // {
+    //     wait(&sem);
+    // 	owner = 0;
+    //     while(x--)
+    //     {
+    // 	    if(x%6==0)
+    // 	    {
+    // 		signal(&sem);
+    // 		// test semaphor: at no cost break printing 'A' except every 6 A's printed
+    // 		while(owner == 0)
+    // 		    ;
+    // 		wait(&sem);
+    // 		owner = 0;
+    // 	    }
+    //         printk(REDB "A" NORMAL);
+    //         for(int i = 0; i < 0xFFF; i++);
+    //     }
+    //     signal(&sem);
+    // }
+    // else
+    // {
+    //     proc = fork();
+	
+    //     if(!proc)
+    //     {
+    // 	    wait(&sem);
+    // 	    owner = 1;
+    // 	    while(x--)
+    //         {
+    // 		if(x%6==0)
+    // 		{
+    // 		    signal(&sem);
+    // 		    while(owner == 1)
+    // 			;
+    // 		    wait(&sem);
+    // 		    owner = 1;
+    // 		}
+    // 		printk(GREENB "B" NORMAL);
+    // 		for(int i = 0; i < 0xFFF; i++);
+    //         }
+    // 	    signal(&sem);
+    //     }
+    //     else
+    // 	{
+    //         wait(&sem);
+    // 	    owner = 3;
+    //         while(x--)
+    // 	    {
+    // 		if(x%6==0)
+    // 		{
+    // 		    signal(&sem);
+    // 		    while(owner == 3)
+    // 			;
+    // 		    wait(&sem);
+    // 		    owner = 3;
+    // 		}
+    //             printk(BLUEB "C" NORMAL);
+    //             for(int i = 0; i < 0xFFF; i++);
+    //         }
+    //         signal(&sem);
+    //     }
+    // }
     
     //SHOW_STAT_FAILED("Discovering devices");
     //SHOW_STAT_FAILED("Filesystem");
@@ -134,7 +165,7 @@ void cppmain()
 #endif
     
     printf(WHITE "Welcome to " REDB "ArOS" BLUEB " v 0.005!\n" NORMAL);
- 
+    
     printk(LOG "Kernel size is %d bytes (%d KB) [end= 0x%x,load= 0x%x]\n",
         (kernel_end_addr-kernel_load_addr),
         (kernel_end_addr-kernel_load_addr)>>10,
@@ -162,10 +193,10 @@ void cppmain()
     SHOW_STAT_OK("Memory Manager");
 
     /* setup process management */
-    idt_set_gate (16+32,(unsigned)_irq16, 0x08, IRQ_GATE);
+    idt_set_gate (16+32,reinterpret_cast<unsigned>(_irq16), 0x08, IRQ_GATE);
     irq_install_custom_handler(16,fork_handler);
 
-    idt_set_gate (17+32,(unsigned)_irq17, 0x08, IRQ_GATE);
+    idt_set_gate (17+32,reinterpret_cast<unsigned>(_irq17), 0x08, IRQ_GATE);
     irq_install_custom_handler(17,spawn_handler);
 
     memset(reinterpret_cast<unsigned char*>(processes),0,MAX_PROCESSES*sizeof(ProcessData));

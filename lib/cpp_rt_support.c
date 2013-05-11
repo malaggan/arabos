@@ -64,7 +64,7 @@ struct dtor
 {
         void (*func)(void*);
         void *arg;  
-} dtors[MAX_DTORS] = {{0,0}}; 
+} destructors[MAX_DTORS] = {{0,0}}; 
 unsigned int cDtors = 0;
 
 /* 
@@ -73,11 +73,11 @@ unsigned int cDtors = 0;
  */
 int __cxa_atexit(void (*func)(void *), void *arg, void /*unused*/ *dso_handle)
 {
-    printk(TRACE "In __cxa_atexit() dtors registered till now = %d\n",cDtors);
+    printk(TRACE "In __cxa_atexit() destructors registered till now = %d\n",cDtors);
     if (cDtors >= MAX_DTORS) 
         return -1;
-    dtors[cDtors].func = func;
-    dtors[cDtors].arg = arg;
+    destructors[cDtors].func = func;
+    destructors[cDtors].arg = arg;
     ++cDtors;
     return 0;
 }
@@ -98,7 +98,7 @@ void __cxa_finalize(void /* unsed */ *dso_handle)
     while(cDtors)
     {
         cDtors --;
-        dtors[cDtors].func(dtors[cDtors].arg);
+        destructors[cDtors].func(destructors[cDtors].arg);
     }
     printk(TRACE "-exit __cxa_finalize()\n");
 }

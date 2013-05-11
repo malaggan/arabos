@@ -54,7 +54,7 @@ void outportb (unsigned short _port, char _data);
 #define IO_WAIT() ASM("nop"); ASM("nop"); ASM("nop"); ASM("nop");
 
 // current printk level
-#define PRINTK_LEVEL DEBUG
+#define PRINTK_LEVEL LOG_ALL
 
 #ifdef	__cplusplus
 }

@@ -67,7 +67,7 @@ void readline(char* buf, int max)
 
         if(newline_read)
             break;
-         if(cnt_read == max)
+        if(cnt_read == max)
             freeze=1;
     }
     *input++=0;

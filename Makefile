@@ -1,11 +1,11 @@
-# Copyright (C) 2007  Mohammad Nabil 
+# Copyright (C) 2007  Mohammad Nabil
 # mohammad (dot) nabil (dot) h (at) gmail (dot) com
-# 
+#
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
 # of the License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -17,6 +17,42 @@
 
 #### REMEMBER TO USE SPLINT ####
 
+
+## The following is the configuration for building GCC cross compiler (given that binutils are in prefix/target/bin)
+# http://gcc.gnu.org/install/configure.html
+# Notes: i786 is pentium 4 until core i7
+
+## necessary on Mac
+#export CC=/usr/bin/gcc-4.2
+#export CXX=/usr/bin/g++-4.2
+#export CPP=/usr/bin/cpp-4.2
+#export LD=/usr/bin/gcc-4.2
+#export PREFIX=/Users/malaggan/Desktop/arabos/cross
+#export TARGET=i386-elf
+## NEVER set PATH until all is compiled: #export PATH=$PREFIX/i386-elf/bin/:$PATH
+## make install will install to $PREFIX/bin, $PREFIX/lib,...
+#  --prefix=PREFIX         install in PREFIX
+## binutils  
+#  --target=$TARGET --prefix=$PREFIX --disable-nls --enable-lto  && make && make install # Installs the file to $PREFIX
+##unused: --enable-gold --enable-plugins
+## gcc
+# ./configure --prefix=$PREFIX --target=$TARGET --disable-nls --enable-languages=c,c++ --without-headers --enable-lto && make all-gcc && make install-gcc
+# for .ctors (if i don't include libgcc .ctors don't get generated): make all-target-libgcc && make install-target-libgcc
+##unused: --with-stabs --disable-threads --enable-__cxa_atexit --enable-initfini-array --disable-libssp --disable-libgomp --disable-shared 
+## cp cc1 and ccplus1
+## GDB
+# ../gdb-7.4.1/configure --prefix=$PREFIX --target=$TARGET && make all-gdb && make install-gdb
+## Bochs
+## using RFB (VNC viewer) solves all the problems:
+#../bochs-svn/configure --prefix=$PREFIX --enable-sb16 --enable-all-optimizations --enable-cpu-level=6 --enable-gdb-stub --with-rfb --with-nogui # don't forget to export CC,CXX,CPP,LD from above, and to add -arch i386 to $(CC) line in the Makefile generated
+## before finding out about RFB i used .conf.macosx, which didn' work
+#  CXXFLAGS="-arch i386" CFLAGS="-arch i386" ../bochs-svn/configure --prefix=$PREFIX --with-wx --enable-all-optimizations --enable-cpu-level=6 --enable-gdb-stub --DEBUG?? --enable-plugins && make -j 8 all && make install
+## I also need to edit the generated Makefile and put -arch i386 in $(CC) and $(CXX) lines, I also need to remove -lldtl and that that follows from the goal 'bochs'
+## run:
+# ../bochs-2.5.1/bochs 
+# ../cross/bin/i386-elf-gdbtui kernel.k -x gdbscript -d /Users/malaggan/Desktop/arabos/trunk/
+export PATH:=../cross/i386-elf/bin/:$(PATH)
+
 default: all
 .PHONY: all clean link install build
 
@@ -25,15 +61,15 @@ JOBS := 4
 
 SUBDIRS = boot console kernel lib mm init i386
 
-.PHONY: subdirs $(SUBDIRS) 
-subdirs: 
+.PHONY: subdirs $(SUBDIRS)
+subdirs:
 	-@$(MAKE) --jobs=$(JOBS) --keep-going --load-average=0.75 --no-print-directory $(SUBDIRS) 2>&1 | grep -iv 'make\[2\]' | sed 's/make\[1\]: \*\*\* //'
 	@echo
 	@$(subst FILE,errors_summary,$(RM))
-	@find -name error_log | xargs cat > errors_summary
+	@$(FIND) -name error_log | xargs cat > errors_summary
 	@cat errors_summary
 	@echo
-$(SUBDIRS) :     
+$(SUBDIRS) :
 	@( [ -d obj ] || mkdir obj )
 	@( export DIR=$@ ; $(MAKE) -C $@ build_$@ --no-print-directory --warn-undefined-variables )
 
@@ -50,13 +86,13 @@ LDFLAGS := -T$(LINKER_SCRIPT) -Map $(KERNEL_MAP)
 DBG := -gstabs -DDBG_STABS
 INCLUDE := include -I../include -I../include/c++ -I../include/c++/c++
 
-#####!!!!!!!!!!!!!!!############
-
+#####!!!!!!!!!!!!!!!############d
 export CC := gcc
-export AS := as
+#export AS := nasm #as
 export CPP := g++
 export LINT := SPLINT
-export ASFLAGS := -felf
+#export ASFLAGS := -felf
+export FIND := /opt/local/libexec/gnubin/find
 
 # !-ansi for __asm__
 # -mno-stack-arg-probe for alloca
@@ -79,11 +115,11 @@ export CPPFLAGS := \
 	-Wall -Wextra -Wfloat-equal -Wshadow -nostdinc\
 	-Wpadded -Winline -fno-stack-protector\
 	-nostartfiles -nostdlib -fno-rtti -fno-exceptions $(DBG) \
-	-Weffc++ -Wnon-virtual-dtor -Wold-style-cast 
+	-Weffc++ -Wnon-virtual-dtor -Wold-style-cast
 
 #####!!!!!!!!!!!!!!!############
 
-all: subdirs link install runBochs
+all: subdirs link install #runBochs
 
 link: $(SUBDIRS)
 	@echo linking
@@ -97,11 +133,11 @@ install: $(KERN_BIN)
 	cp $(KERN_BIN) iso/kernel.tgz
 	mkisofs $(ISO_FLAGS) -o $(ISO_FILE) iso >/dev/null 2>&1
 	@echo
-	
+
 # bochsNOGUI or bochsGUI depending if we want the output to go to the console
 # make sure we run it in a subshell so it doesn't get confused with the *.c \
 # rules in MakefileCommon
-runBochs: 
+runBochs:
 	@echo building runBochs...
 	( gcc -DBOCHSRC=\"bochsGUI\" -Wno-format run.c -o runBochs )
 	@echo
@@ -113,10 +149,10 @@ clean: $(foreach DIR,$(SUBDIRS),$(DIR).clean)
 	@$(subst FILE,obj/*,$(RM))
 	@echo clean done
 	@echo
-	
+
 %.clean:
 	@$(MAKE) -C $* clean_files --no-print-directory
-	
+
 debug:
 	gdbtui kernel.k -x gdbscript
 

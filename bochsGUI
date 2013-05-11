@@ -17,7 +17,7 @@
 # the "wx" display library.
 #=======================================================================
 #config_interface: textconfig
-config_interface: wx
+config_interface: textconfig
 
 #=======================================================================
 # DISPLAY_LIBRARY
@@ -47,7 +47,7 @@ config_interface: wx
 #display_library: nogui
 #display_library: sdl, options="fullscreen" # startup in fullscreen mode
 #display_library: term
-display_library: wx
+display_library: rfb
 #display_library: x
 
 #=======================================================================
@@ -62,7 +62,7 @@ display_library: wx
 # now supported, but we still recommend to use the BIOS distributed with
 # Bochs. Now the start address can be calculated from image size.
 #=======================================================================
-romimage: file=/usr/share/bochs/BIOS-bochs-latest
+romimage: file=/Users/malaggan/Desktop/arabos/cross/share/bochs/BIOS-bochs-latest
 #romimage: file=/usr/share/bochs/BIOS-bochs-2-processors, address=0xf0000
 #romimage: file=/usr/share/bochs/BIOS-bochs-4-processors, address=0xf0000
 #romimage: file=/usr/share/bochs/BIOS-bochs-8-processors, address=0xf0000
@@ -108,7 +108,7 @@ megs: 32
 # VGAROMIMAGE
 # You now need to load a VGA ROM BIOS into C0000.
 #=======================================================================
-vgaromimage: file=/usr/share/vgabios/vgabios.bin
+vgaromimage: file=/Users/malaggan/Desktop/arabos/cross/share/bochs/VGABIOS-lgpl-latest
 #vgaromimage: file=/usr/share/vgabios/vgabios.debug.bin
 
 #=======================================================================
@@ -269,7 +269,7 @@ boot: cdrom
 # 200Mhz Pentium with Linux 2.x                   approx 0.5 Mips
 #
 #=======================================================================
-ips: 100000000
+#ips: 100000000
 
 #=======================================================================
 # CLOCK:
@@ -409,7 +409,7 @@ debugger_log: /dev/stdout
 #   com3: enabled=1, mode=raw, dev=com1
 #   com3: enabled=1, mode=socket, dev=localhost:8888
 #=======================================================================
-com1: enabled=1, mode=term, dev=/dev/ttyS0
+com1: enabled=1, mode=null
 
 
 #=======================================================================
@@ -462,7 +462,7 @@ com1: enabled=1, mode=term, dev=/dev/ttyS0
 # For an example look at the next line:
 #=======================================================================
 
-sb16: midimode=1, midi=/dev/midi00, wavemode=1, wave=/dev/dsp, loglevel=2, log=/dev/stdout, dmatimer=600000
+#sb16: midimode=1, midi=/dev/midi00, wavemode=1, wave=/dev/dsp, loglevel=2, log=/dev/stdout, dmatimer=600000
 
 #=======================================================================
 # VGA_UPDATE_INTERVAL:
@@ -686,5 +686,5 @@ private_colormap: enabled=0
 # Enable GDB stub. See user documentation for details.
 # Default value is enabled=0.
 #=======================================================================
-#gdbstub: enabled=1, port=1234, text_base=0, data_base=0, bss_base=0
+gdbstub: enabled=1, port=1234, text_base=0, data_base=0, bss_base=0
 

@@ -87,12 +87,12 @@ DBG := -gstabs -DDBG_STABS
 INCLUDE := include -I../include -I../include/c++ -I../include/c++/c++
 
 #####!!!!!!!!!!!!!!!############d
-export CC := gcc
+export CC := gcc -m32
 #export AS := nasm #as
-export CPP := g++
+export CPP := g++ -m32
 export LINT := SPLINT
 #export ASFLAGS := -felf
-export FIND := /opt/local/libexec/gnubin/find
+export FIND := find
 
 # !-ansi for __asm__
 # -mno-stack-arg-probe for alloca
@@ -123,7 +123,7 @@ all: subdirs link install #runBochs
 
 link: $(SUBDIRS)
 	@echo linking
-	ld obj/*.o -o $(KERN_BIN) $(LDFLAGS)
+	ld -melf_i386 obj/*.o -o $(KERN_BIN) $(LDFLAGS)
 	@echo
 
 $(KERN_BIN): link

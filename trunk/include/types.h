@@ -15,7 +15,7 @@ typedef unsigned long long uint64_t;
 typedef          long long int64_t;
 #endif
 
-typedef uint32_t size_t;
+typedef __SIZE_TYPE__ size_t;
 
 typedef uint32_t* uintptr_t;
 typedef uint32_t phys_addr_t;

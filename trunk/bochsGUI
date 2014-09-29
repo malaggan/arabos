@@ -47,8 +47,8 @@ config_interface: textconfig
 #display_library: nogui
 #display_library: sdl, options="fullscreen" # startup in fullscreen mode
 #display_library: term
-display_library: rfb
-#display_library: x
+#display_library: rfb
+display_library: x
 
 #=======================================================================
 # ROMIMAGE:
@@ -62,7 +62,7 @@ display_library: rfb
 # now supported, but we still recommend to use the BIOS distributed with
 # Bochs. Now the start address can be calculated from image size.
 #=======================================================================
-romimage: file=/Users/malaggan/Desktop/arabos/cross/share/bochs/BIOS-bochs-latest
+romimage: file=/usr/share/bochs/BIOS-bochs-latest
 #romimage: file=/usr/share/bochs/BIOS-bochs-2-processors, address=0xf0000
 #romimage: file=/usr/share/bochs/BIOS-bochs-4-processors, address=0xf0000
 #romimage: file=/usr/share/bochs/BIOS-bochs-8-processors, address=0xf0000
@@ -108,7 +108,7 @@ megs: 32
 # VGAROMIMAGE
 # You now need to load a VGA ROM BIOS into C0000.
 #=======================================================================
-vgaromimage: file=/Users/malaggan/Desktop/arabos/cross/share/bochs/VGABIOS-lgpl-latest
+vgaromimage: file=/usr/share/bochs/VGABIOS-lgpl-latest
 #vgaromimage: file=/usr/share/vgabios/vgabios.debug.bin
 
 #=======================================================================
@@ -475,7 +475,7 @@ com1: enabled=1, mode=null
 # Examples:
 #   vga_update_interval: 250000
 #=======================================================================
-vga_update_interval: 300000
+#vga: 300000
 #vga_update_interval: 1
 
 # using for Winstone '98 tests
@@ -686,5 +686,5 @@ private_colormap: enabled=0
 # Enable GDB stub. See user documentation for details.
 # Default value is enabled=0.
 #=======================================================================
-gdbstub: enabled=1, port=1234, text_base=0, data_base=0, bss_base=0
+#gdbstub: enabled=1, port=1234, text_base=0, data_base=0, bss_base=0
 

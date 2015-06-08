@@ -73,18 +73,6 @@ printk (const char *format, ...)
     }
 }
 
-#define PORT 0x3f8   /* COM1 */
- 
-int is_transmit_empty() {
-   return inportb(PORT + 5) & 0x20;
-}
- 
-void write_serial(char a) {
-   while (is_transmit_empty() == 0);
- 
-   outportb(PORT,a);
-}
-
 // a non-variable arg list version
 void print0 (char **format0, int ignore_first_char)
 {
@@ -111,7 +99,8 @@ void print0 (char **format0, int ignore_first_char)
         }
         /* meemo : ECMA-48 */
         else if(c == 0x1B)
-        {	
+        {
+	    write_serial(c); // to colorize COM1 output. somehow, we should allow to disable this if the terminal reading COM1 does not support colors
 #if VM_ECMA
             void lpt_putc(int c);
             lpt_putc(c); // puts the ESC character only, cuz
@@ -158,7 +147,10 @@ void print0 (char **format0, int ignore_first_char)
             if(print)
             {
                 while (*p)
-                    write_serial(*p),putchar (MK_CH_ATT(*p++,attribute));
+		{
+                    write_serial(*p);
+		    putchar (MK_CH_ATT(*p++,attribute));
+		}
             }
         }
     }

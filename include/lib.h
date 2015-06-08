@@ -33,6 +33,10 @@ void itoa (char *buf, int base, int d); // int to ascii
 int strnlen(const char *str, int max);
 int strncmp(const char *s1,const char* s2, int max);
 
+#define COM1_PORT 0x3f8   /* COM1 */
+void init_serial(); // COM1 serial port
+void write_serial(char);
+    
 #define MAX_CHARS 1024
 
 void printf (const char *format, ...);

@@ -57,16 +57,25 @@ int kernel_end_addr=reinterpret_cast<int>(&__end),kernel_load_addr=reinterpret_c
 #include <ecma48.h>
 #define LBRACK	WHITE "[" NORMAL
 #define RBRACK	WHITE "]" NORMAL
-#define STAT_OK(str)	GREENB str NORMAL
-#define STAT_FAILED(str)	REDB str NORMAL
 #define PREFILL(ch)	memsetw(ttys[active_tty].data+ttys[active_tty].ypos*COLUMNS,ch|(0x0700)/*|(ATTRIBUTE<<8)*/,COLUMNS);
-#define SHOW_STAT(strWhat,strStat,len)	\
-	PREFILL('.');\
-	printf(WHITE strWhat NORMAL);\
-	ttys[active_tty].xpos = COLUMNS - len - 2;\
-	printf(LBRACK strStat RBRACK)
-#define SHOW_STAT_OK(strWhat) SHOW_STAT(strWhat,STAT_OK("OK"),2)
-#define SHOW_STAT_FAILED(strWhat) SHOW_STAT(strWhat,STAT_FAILED(/*"FAILED"*/"NOT IMPLEMENTED YET"),strnlen("NOT IMPLEMENTED YET",40))
+
+extern "C" void write_serial(char);
+
+void SHOW_STAT(char const * strWhat, char const * strStat, int len) {
+    // PREFILL('.');
+    // printf(WHITE strWhat NORMAL);
+    // ttys[active_tty].xpos = COLUMNS - len - 2;
+    // printf(LBRACK strStat RBRACK);
+    printf(WHITE "%s" NORMAL, strWhat);
+    for(int i = strnlen(strWhat,COLUMNS); i < COLUMNS - len - 2; i++) printf(".");
+    
+    if(len == 2) // hack because printf only considers ECMA48 if hardcoded in the format string, and not through %s.
+    { printf(LBRACK GREENB "%s" NORMAL RBRACK, strStat); write_serial('\n'); } // COM1 needs \n but printf doesn't, since the line auto wraps 
+    else
+    { printf(LBRACK REDB "%s" NORMAL RBRACK, strStat); write_serial('\n'); }
+}
+void SHOW_STAT_OK(char const * strWhat) {SHOW_STAT(strWhat,"OK",2);}
+void SHOW_STAT_FAILED(char const * strWhat) {SHOW_STAT(strWhat,/*"FAILED"*/"NOT IMPLEMENTED YET",strnlen("NOT IMPLEMENTED YET",40));}
 
 int esp = 0;
 

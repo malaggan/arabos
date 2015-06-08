@@ -76,7 +76,7 @@ config_interface: textconfig
 #display_library: vncsrv
 #display_library: win32
 #display_library: wx
-display_library: x
+display_library: x #, options="gui_debug"
 
 
 #=======================================================================
@@ -790,8 +790,9 @@ debugger_log: /dev/stdout
 #   com3: enabled=1, mode=socket-server, dev=localhost:8888
 #   com4: enabled=1, mode=pipe-client, dev=\\.\pipe\mypipe
 #   com4: enabled=1, mode=pipe-server, dev=\\.\pipe\mypipe
+#   com1: enabled=1, mode=term, dev=/dev/ttyp9
 #=======================================================================
-#com1: enabled=1, mode=term, dev=/dev/ttyp9
+com1: enabled=1, mode=file, dev=serial.out
 
 
 #=======================================================================

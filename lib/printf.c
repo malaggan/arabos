@@ -73,6 +73,18 @@ printk (const char *format, ...)
     }
 }
 
+#define PORT 0x3f8   /* COM1 */
+ 
+int is_transmit_empty() {
+   return inportb(PORT + 5) & 0x20;
+}
+ 
+void write_serial(char a) {
+   while (is_transmit_empty() == 0);
+ 
+   outportb(PORT,a);
+}
+
 // a non-variable arg list version
 void print0 (char **format0, int ignore_first_char)
 {
@@ -95,6 +107,7 @@ void print0 (char **format0, int ignore_first_char)
         if (c != '%' && c != 0x1B)
         {
             putchar (MK_CH_ATT(c,attribute));
+	    write_serial(c);
         }
         /* meemo : ECMA-48 */
         else if(c == 0x1B)
@@ -145,7 +158,7 @@ void print0 (char **format0, int ignore_first_char)
             if(print)
             {
                 while (*p)
-                    putchar (MK_CH_ATT(*p++,attribute));
+                    write_serial(*p),putchar (MK_CH_ATT(*p++,attribute));
             }
         }
     }

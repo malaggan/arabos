@@ -200,7 +200,7 @@ void cppmain()
 
     memset(reinterpret_cast<unsigned char*>(processes),0,MAX_PROCESSES*sizeof(ProcessData));
 
-    call_ctors();
+    //call_ctors();
     
     int i = spawn(init);
     printk("\nspawn returned: %d\n",i);

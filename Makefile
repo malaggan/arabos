@@ -51,7 +51,7 @@
 ## run:
 # ../bochs-2.5.1/bochs 
 # ../cross/bin/i386-elf-gdbtui kernel.k -x gdbscript -d /Users/malaggan/Desktop/arabos/trunk/
-export PATH:=../cross/i386-elf/bin/:$(PATH)
+#export PATH:=../cross/i386-elf/bin/:$(PATH)
 
 default: all
 .PHONY: all clean link install build
@@ -87,9 +87,9 @@ DBG := -gstabs -DDBG_STABS
 INCLUDE := include -I../include -I../include/c++ -I../include/c++/c++
 
 #####!!!!!!!!!!!!!!!############d
-export CC := gcc -m32
+export CC := gcc
 #export AS := nasm #as
-export CPP := g++ -m32
+export CXX := g++ -m32
 export LINT := SPLINT
 #export ASFLAGS := -felf
 export FIND := find
@@ -101,16 +101,17 @@ export FIND := find
 # -Wno-unused-parameter to temporarily stops warning about non-used params
 # -Wconversion -Wpacked
 # i substituted '-ffreestanding' for "-nostdinc -mno-stack-arg-probe -fno-builtin"
-export CFLAGS := -Wall -Wextra -Wfloat-equal -Wshadow\
+export CFLAGS := -m32 -std=c11 -Wc99-c11-compat\
+	-Wall -Wextra -Wfloat-equal -Wshadow\
 	-Wpadded -Winline -nostdinc\
 	-Wunreachable-code -c -pedantic -Wno-unused-parameter\
-	-I$(INCLUDE) -std=c99 -ffreestanding -fno-stack-protector $(DBG)
+	-I$(INCLUDE) -ffreestanding -fno-stack-protector $(DBG)
 
 #WARN: do not use inline impl of classes in header files as it creates sections that breaks the stabs lookup
 #-nostartfiles -nostdlib -fno-rtti -fno-exceptions
 # since i didn't specify -nostartfiles, a fucn called _init will be created to initiate construtors of global objs
 # i think i should call it myself, since there is no main, that if the function returns w/out calling main
-export CPPFLAGS := \
+export CXXFLAGS :=  -m32 -std=c++14 -Wc++14-compat\
 	-I$(INCLUDE) -Wunreachable-code -c -pedantic -Wno-unused-parameter\
 	-Wall -Wextra -Wfloat-equal -Wshadow -nostdinc\
 	-Wpadded -Winline -fno-stack-protector\

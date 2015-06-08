@@ -17,7 +17,10 @@
 
 
 default: all
-.PHONY: all clean link install build
+.PHONY: all clean link install build TAGS
+
+TAGS:
+	etags include/*.h boot/*.S console/*.c kernel/*.c lib/*.c lib/*.cpp mm/*.c mm/*.cpp init/*.c init/*.cpp i386/*.c 
 
 RM := (ls FILE && rm FILE) > /dev/null 2>&1 || true
 JOBS := 4
@@ -80,12 +83,24 @@ export CXXFLAGS := -c -m32 -std=c++14 -Wc++14-compat\
 
 #####!!!!!!!!!!!!!!!############
 
-all: subdirs link install #runBochs
+all: TAGS subdirs link install #runBochs
 
+
+## http://wiki.osdev.org/Calling_Global_Constructors
+#CRTI_OBJ=obj/crti.o
+#CRTBEGIN_OBJ:=$(shell $(CC) $(CFLAGS) -print-file-name=crtbegin.o) # for this to work, i need 32bit gcc (and since i have 64bit system, i need a cross compiler) . otherwise, make my kernel 64 bits !
+#CRTEND_OBJ:=$(shell $(CC) $(CFLAGS) -print-file-name=crtend.o)
+#CRTN_OBJ=obj/crtn.o
+#OBJ_LINK_LIST:=$(CRTI_OBJ) $(CRTBEGIN_OBJ) $(filter-out $(CRTI_OBJ) $(CRTN_OBJ),$(wildcard obj/*.o)) $(CRTEND_OBJ) $(CRTN_OBJ)
+#myos.kernel: $(OBJ_LINK_LIST)
+#	$(CC) -o myos.kernel $(OBJ_LINK_LIST) -nostdlib -lgcc
+##
+OBJ_LINK_LIST:=obj/*.o
 link: $(SUBDIRS)
 	@echo linking
-	ld -melf_i386 obj/*.o -o $(KERN_BIN) $(LDFLAGS)
+	ld -melf_i386 $(OBJ_LINK_LIST) -o $(KERN_BIN) $(LDFLAGS)
 	@echo
+#$(CC) -m32 $(OBJ_LINK_LIST) -o $(KERN_BIN) $(LDFLAGS)
 
 $(KERN_BIN): link
 

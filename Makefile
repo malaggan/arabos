@@ -15,43 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#### REMEMBER TO USE SPLINT ####
-
-
-## The following is the configuration for building GCC cross compiler (given that binutils are in prefix/target/bin)
-# http://gcc.gnu.org/install/configure.html
-# Notes: i786 is pentium 4 until core i7
-
-## necessary on Mac
-#export CC=/usr/bin/gcc-4.2
-#export CXX=/usr/bin/g++-4.2
-#export CPP=/usr/bin/cpp-4.2
-#export LD=/usr/bin/gcc-4.2
-#export PREFIX=/Users/malaggan/Desktop/arabos/cross
-#export TARGET=i386-elf
-## NEVER set PATH until all is compiled: #export PATH=$PREFIX/i386-elf/bin/:$PATH
-## make install will install to $PREFIX/bin, $PREFIX/lib,...
-#  --prefix=PREFIX         install in PREFIX
-## binutils  
-#  --target=$TARGET --prefix=$PREFIX --disable-nls --enable-lto  && make && make install # Installs the file to $PREFIX
-##unused: --enable-gold --enable-plugins
-## gcc
-# ./configure --prefix=$PREFIX --target=$TARGET --disable-nls --enable-languages=c,c++ --without-headers --enable-lto && make all-gcc && make install-gcc
-# for .ctors (if i don't include libgcc .ctors don't get generated): make all-target-libgcc && make install-target-libgcc
-##unused: --with-stabs --disable-threads --enable-__cxa_atexit --enable-initfini-array --disable-libssp --disable-libgomp --disable-shared 
-## cp cc1 and ccplus1
-## GDB
-# ../gdb-7.4.1/configure --prefix=$PREFIX --target=$TARGET && make all-gdb && make install-gdb
-## Bochs
-## using RFB (VNC viewer) solves all the problems:
-#../bochs-svn/configure --prefix=$PREFIX --enable-sb16 --enable-all-optimizations --enable-cpu-level=6 --enable-gdb-stub --with-rfb --with-nogui # don't forget to export CC,CXX,CPP,LD from above, and to add -arch i386 to $(CC) line in the Makefile generated
-## before finding out about RFB i used .conf.macosx, which didn' work
-#  CXXFLAGS="-arch i386" CFLAGS="-arch i386" ../bochs-svn/configure --prefix=$PREFIX --with-wx --enable-all-optimizations --enable-cpu-level=6 --enable-gdb-stub --DEBUG?? --enable-plugins && make -j 8 all && make install
-## I also need to edit the generated Makefile and put -arch i386 in $(CC) and $(CXX) lines, I also need to remove -lldtl and that that follows from the goal 'bochs'
-## run:
-# ../bochs-2.5.1/bochs 
-# ../cross/bin/i386-elf-gdbtui kernel.k -x gdbscript -d /Users/malaggan/Desktop/arabos/trunk/
-#export PATH:=../cross/i386-elf/bin/:$(PATH)
 
 default: all
 .PHONY: all clean link install build
@@ -96,26 +59,23 @@ export FIND := find
 
 # !-ansi for __asm__
 # -mno-stack-arg-probe for alloca
-# -g for debug symbols, -O for optimization
 # i use pedantic to require gcc extensions to use __extenstion__ or use __ prefix to ease finding non-ansi stuff
 # -Wno-unused-parameter to temporarily stops warning about non-used params
 # -Wconversion -Wpacked
 # i substituted '-ffreestanding' for "-nostdinc -mno-stack-arg-probe -fno-builtin"
-export CFLAGS := -m32 -std=c11 -Wc99-c11-compat\
-	-Wall -Wextra -Wfloat-equal -Wshadow\
-	-Wpadded -Winline -nostdinc\
-	-Wunreachable-code -c -pedantic -Wno-unused-parameter\
-	-I$(INCLUDE) -ffreestanding -fno-stack-protector $(DBG)
+export CFLAGS := -c -m32 -std=c11 -Wc99-c11-compat\
+	-nostdinc -ffreestanding -I$(INCLUDE) $(DBG) -fno-stack-protector\
+	-Wall -Wextra -pedantic -Wfloat-equal -Wshadow -Wpadded -Winline\
+	-Wunreachable-code -Wno-unused-parameter
 
 #WARN: do not use inline impl of classes in header files as it creates sections that breaks the stabs lookup
 #-nostartfiles -nostdlib -fno-rtti -fno-exceptions
 # since i didn't specify -nostartfiles, a fucn called _init will be created to initiate construtors of global objs
 # i think i should call it myself, since there is no main, that if the function returns w/out calling main
-export CXXFLAGS :=  -m32 -std=c++14 -Wc++14-compat\
-	-I$(INCLUDE) -Wunreachable-code -c -pedantic -Wno-unused-parameter\
-	-Wall -Wextra -Wfloat-equal -Wshadow -nostdinc\
-	-Wpadded -Winline -fno-stack-protector\
-	-nostartfiles -nostdlib -fno-rtti -fno-exceptions $(DBG) \
+export CXXFLAGS := -c -m32 -std=c++14 -Wc++14-compat\
+	-nostdinc -nostartfiles -nostdlib -fno-rtti -fno-exceptions -I$(INCLUDE) $(DBG)\
+	-Wall -Wextra -pedantic -Wunreachable-code -Wno-unused-parameter\
+	-Wfloat-equal -Wshadow -Wpadded -Winline -fno-stack-protector\
 	-Weffc++ -Wnon-virtual-dtor -Wold-style-cast
 
 #####!!!!!!!!!!!!!!!############

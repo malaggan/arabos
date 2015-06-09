@@ -27,8 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #include <debug.h>
 #include <fork.h>
 
-extern "C" void call_ctors();
-extern "C" void __cxa_finalize(void *d /*unused param*/);
+
 
 void cppmain();
 
@@ -40,8 +39,8 @@ void enter_cpp()
     
     cppmain();
 
-    // destruct all static C++ objects.
-    __cxa_finalize(/*unused*/ NULL);
+    // this should never return.
+    // TODO: panic here.
 }
 
 class Koko { public: Koko(); ~Koko();} kk;
@@ -85,7 +84,7 @@ volatile semaphore_t sem = 1;
 volatile int owner = 0; // this is to force owner change, to test semaphors, instead of looping a constant number of times
 void monitor();
 // the init process
-void init()
+void init_process()
 {    
     printk("in init now :)\n");
 
@@ -166,6 +165,7 @@ void init()
 }
 
 // this function doesn't return unless when powering off the system
+extern "C" void _init();
 void cppmain()
 {
 #if 1
@@ -209,9 +209,9 @@ void cppmain()
 
     memset(reinterpret_cast<unsigned char*>(processes),0,MAX_PROCESSES*sizeof(ProcessData));
 
-    //call_ctors();
+    _init();
     
-    int i = spawn(init);
+    int i = spawn(init_process);
     printk("\nspawn returned: %d\n",i);
     scheduling_started = 1;
 

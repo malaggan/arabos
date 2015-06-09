@@ -131,7 +131,7 @@ int schedule(struct interrupt_frame *r)
         if debug stack_trace((int*)processes[nextProcess].frame.ebp,(int*)processes[nextProcess].frame.esp,processes[nextProcess].frame.eip);
     }
     else
-        return;
+	return;
 
     memcpy((unsigned char*)r,(unsigned char*)&processes[nextProcess].frame,sizeof(struct interrupt_frame));
 
@@ -178,12 +178,18 @@ int schedule(struct interrupt_frame *r)
     panic("schedule end line was reached !");
     return 0;
 }
-
+extern void _fini();
 void taskend()
 {
     //if debug
     printk(TRACE "\ntask %d ended\n", currentProcess);
-    processes[currentProcess].valid = 0;    
+    processes[currentProcess].valid = 0;
+    if(currentProcess == 0)
+    {
+	printk("Process 0 died. Calling _fini.\n");
+	_fini(); // fini does not call __cxa_finalize, although it should! 
+	//__cxa_finalize(/*unused*/ NULL);
+    }
     while(1); // consume the rest of the time slice, till the schedule is invoked again (there's better methods)
     // do some scheduling ??
 }

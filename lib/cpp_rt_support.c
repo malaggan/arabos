@@ -37,22 +37,6 @@ void __cxa_pure_virtual()
 }
 
 /* 2- Global objects */
-extern void (*ctors)(void); // function impl provided by GCC
-
-// Note: I probably should call the constructors after
-// enabling new and delete, cuz if they needed them.
-void call_ctors()
-{
-    if(ctors == 0) // can this be true ?
-    {
-        printk(DEBUG "No ctors to call ( void (*ctors)(void) == 0 )\n");
-        return;
-    }    
-    printk(TRACE "+enter call_ctors()\n");    
-    ctors();
-    printk(DEBUG "Called ctors (0x%x)\n",ctors);    
-    printk(TRACE "-exit call_ctors()\n");    
-}
 
 // Why 32 ? This means that the number of global
 // dtors I can have is only 32.
@@ -73,12 +57,12 @@ unsigned int cDtors = 0;
  */
 int __cxa_atexit(void (*func)(void *), void *arg, void /*unused*/ *dso_handle)
 {
-    printk(TRACE "In __cxa_atexit() destructors registered till now = %d\n",cDtors);
     if (cDtors >= MAX_DTORS) 
         return -1;
     destructors[cDtors].func = func;
     destructors[cDtors].arg = arg;
     ++cDtors;
+    printk(TRACE "In __cxa_atexit(%x) destructors registered till now = %d\n",func,cDtors);
     return 0;
 }
 

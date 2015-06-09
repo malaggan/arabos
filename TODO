@@ -1,0 +1,1 @@
+create crt0.o, which does stuff like zeroing the bss. (-nostartfiles removed it)

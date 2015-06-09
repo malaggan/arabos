@@ -76,9 +76,9 @@ build_$(MODULE_NAME): del_errs $(OBJS)
 #	-@$(LINT) $< -I$(INCLUDE)
 
 ../obj/%.o: %.S
-	@echo '+ CC(AS) $(DIR)/$<'
-	@echo '+ CC(AS) $(DIR)/$<' >>error_log 
-	( cd .. ; $(CC) $(DIR)/$< $(CFLAGS) -o obj/$@ 2>>$(DIR)/error_log )
+	@echo '+ AS $(DIR)/$<'
+	@echo '+ AS $(DIR)/$<' >>error_log
+	( cd .. ; $(AS) $(DIR)/$< $(ASFLAGS) -o obj/$@ 2>>$(DIR)/error_log )
 
 # dependency files
 %.d: %.cpp

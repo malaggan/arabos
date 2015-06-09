@@ -24,7 +24,10 @@ __physLow   = 0x00100000;
 __phys = __physLow;
 SECTIONS
 {
-  .text __physLow : AT(__phys) {
+  . = 1M;
+
+  .text __physLow : AT(__phys) ALIGN(4k) {
+    *(.__mbHeader)
     *(.text* .rodata*) /* rodata => read only data: string etc.*/  
     SORT(CONSTRUCTORS)
   

@@ -58,7 +58,7 @@ void call_ctors()
 // dtors I can have is only 32.
 #define MAX_DTORS 32
 
-void *__dso_handle; // only the address of this symbol is taken by GCC
+// void *__dso_handle; // only the address of this symbol is taken by GCC
 
 struct dtor
 {

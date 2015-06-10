@@ -187,8 +187,8 @@ void taskend()
     if(currentProcess == 0)
     {
 	printk("Process 0 died. Calling _fini.\n");
-	_fini(); // fini does not call __cxa_finalize, although it should! 
-	//__cxa_finalize(/*unused*/ NULL);
+	_fini(); // TODO: fini does not call __cxa_finalize, although it should! 
+	__cxa_finalize(/*unused*/ NULL);
     }
     while(1); // consume the rest of the time slice, till the schedule is invoked again (there's better methods)
     // do some scheduling ??

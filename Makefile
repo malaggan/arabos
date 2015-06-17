@@ -20,12 +20,12 @@ default: all
 .PHONY: all clean link install build TAGS
 
 TAGS:
-	etags include/*.h boot/*.S console/*.c kernel/*.c lib/*.c lib/*.cpp mm/*.c mm/*.cpp init/*.c init/*.cpp i386/*.c 
+	etags include/*.h boot/*.S console/*.c kernel/*.c lib/*.c lib/*.cpp mm/*.c mm/*.cpp init/*.c init/*.cpp i386/*.c fs/*.cpp
 
 RM := (ls FILE && rm FILE) > /dev/null 2>&1 || true
 JOBS := 4
 
-SUBDIRS = boot console kernel lib mm init i386
+SUBDIRS = boot console kernel lib mm init i386 fs
 
 .PHONY: subdirs $(SUBDIRS)
 subdirs:

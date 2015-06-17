@@ -1,12 +1,11 @@
 #include <file_t.h>
-#include <fuse.h>
-#include <syslog.h>
-#include <libgen.h>
-#include <algorithm>
+
+// #include <libgen.h>
+// #include <algorithm>
 
 int sfs_rmdir(const char *path)
 {
-    syslog(LOG_DEBUG, "In RMDIR\n");
+    printk(DEBUG  "In RMDIR\n");
     char *pathd = strdup (path);
     char *dir_path = dirname (pathd);
 
@@ -20,16 +19,16 @@ int sfs_rmdir(const char *path)
 
     
     else
-      {
-      hd.blocks[hd.blocks[dir].get<file_t>().inode].get<inode_t>().index_file.erase(hd.blocks[hd.blocks[dir].get<file_t>().inode].get<inode_t>().index_file.begin(),hd.blocks[hd.blocks[dir].get<file_t>().inode].get<inode_t>().index_file.end());
+    {
+	hd.blocks[hd.blocks[dir].get<file_t>().inode].get<inode_t>().index_file.erase(hd.blocks[hd.blocks[dir].get<file_t>().inode].get<inode_t>().index_file.begin(),hd.blocks[hd.blocks[dir].get<file_t>().inode].get<inode_t>().index_file.end());
       
       
-      hd.blocks[hd.blocks[parent].get<file_t>().inode].get<inode_t>().index_file.erase(std::find( hd.blocks[hd.blocks[parent].get<file_t>().inode].get<inode_t>().index_file.begin(), hd.blocks[hd.blocks[parent].get<file_t>().inode].get<inode_t>().index_file.end(),dir));
-      //hd.blocks[dir].tag=block_type::free;
+	hd.blocks[hd.blocks[parent].get<file_t>().inode].get<inode_t>().index_file.erase(aos::find( hd.blocks[hd.blocks[parent].get<file_t>().inode].get<inode_t>().index_file.begin(), hd.blocks[hd.blocks[parent].get<file_t>().inode].get<inode_t>().index_file.end(),dir));
+	//hd.blocks[dir].tag=block_type::free;
       
-      // hd.blocks[hd.blocks[dir].get<file_t>().inode].get<inode_t>].tag=block_type::free;
-      syslog(LOG_DEBUG,"END OF UNLINK\n");
-      }
+	// hd.blocks[hd.blocks[dir].get<file_t>().inode].get<inode_t>].tag=block_type::free;
+	printk(DEBUG "END OF UNLINK\n");
+    }
     
     return 0;
 

@@ -1,67 +1,65 @@
 #include <file_t.h>
-#include <fuse.h>
-#include <syslog.h>
-#include <iterator>
-#include <cstring>
-#include <boost/container/static_vector.hpp>
-#include <algorithm>
 
+// #include <iterator>
+// #include <cstring>
+// #include <algorithm>
 
-int sfs_write (const char UNUSED *path, const char  *buf, size_t  size, off_t  offset, struct fuse_file_info *f)
+int sfs_write (const char UNUSED *path, const char  *buf, size_t  size, off_t  offset,
+	       int file_handle) // NOTE file_handle was f->fh , and f was fuse_file_info
 {
-    std::string temp;
-    if(!f)
-			return -1;
- 
-    int file=f->fh;
+    aos::string temp;
+
+    int file= file_handle;
     
     if(file==-1)
-			return -ENOENT;
+	return -ENOENT;
  
     {
-	std::unique_lock<std::mutex> lk(hd.blocks[file].get<file_t>().mutex);
-	hd.blocks[file].get<file_t>().cond.wait(lk,[&]{return ! (hd.blocks[hd.blocks[file].get<file_t>().inode].get<inode_t>().readcount > 0 &&
-								 hd.blocks[hd.blocks[file].get<file_t>().inode].get<inode_t>().writecount > 0);}); 
+	//aos::unique_lock<aos::mutex> lk(hd.blocks[file].get<file_t>().mutex);
+	// hd.blocks[file].get<file_t>().cond.wait(lk,[&]{return ! (hd.blocks[hd.blocks[file].get<file_t>().inode].get<inode_t>().readcount > 0 &&
+	//							 hd.blocks[hd.blocks[file].get<file_t>().inode].get<inode_t>().writecount > 0);}); 
     }
-      hd.blocks[hd.blocks[file].get<file_t>().inode].get<inode_t>().writecount++;
-      hd.blocks[hd.blocks[file].get<file_t>().inode].get<inode_t>().mtime = std::chrono::system_clock::now();
+    hd.blocks[hd.blocks[file].get<file_t>().inode].get<inode_t>().writecount++;
+    hd.blocks[hd.blocks[file].get<file_t>().inode].get<inode_t>().mtime = aos::now();
       
-      std::list<unsigned int> free_index=hd.search(size);
+    aos::list<uint32_t> free_index=hd.search(size);
     //the file is empty
       
-      if (hd.blocks[hd.blocks[file].get<file_t>().inode].get<inode_t>().index_file.empty())
-      {
-				temp=buf;
-				for(unsigned int i=0;i<free_index.size();i++)
-	  		{
-					hd.blocks[*free_index.begin()++].change_type<data_t>();
-					std::copy_n(temp.begin()+i*490,size,std::back_inserter(hd.blocks[*(free_index.begin()++)].get<data_t>().data));
-					};
-					hd.blocks[file].get<file_t>().add(free_index);
+    if (hd.blocks[hd.blocks[file].get<file_t>().inode].get<inode_t>().index_file.empty())
+    {
+	temp=buf;
+	for(unsigned int i=0;i<free_index.size();i++)
+	{
+	    hd.blocks[*free_index.begin()].change_type<data_t>(); // WARN: was "free_index.begin()++", but that doesn't make sense
+	    auto index = *(free_index.begin()); // WARN: was "*(free_index.begin()++)", but that doesn't make sense
+	    auto target = hd.blocks[index].get<data_t>().data;
+	    aos::copy_n(temp.begin()+i*490,size,aos::back_inserter(target));
+	};
+	hd.blocks[file].get<file_t>().add(free_index);
         hd.blocks[hd.blocks[file].get<file_t>().inode].get<inode_t>().size=size;
-      }
+    }
       
-     else
-      {
-				std::vector<char>  data;
+    else
+    {
+	aos::vector<char>  data;
 				 
-				hd.blocks[hd.blocks[file].get<file_t>().inode].get<inode_t>().index_file.clear();
-				data.insert(data.end(), buf, buf+size);
-				std::list<unsigned int> free_index_2=hd.search(data.size());
-				auto free_ind=free_index_2.begin();
-				unsigned int free_index_size=free_index_2.size();
-				for(unsigned int i=0;i<free_index_size;i++)
-							{
-						 hd.blocks[*free_ind].change_type<data_t>();
-						 std::copy(data.begin()+(i*496),data.begin()+((i+1)*496),std::back_inserter(hd.blocks[*(free_ind++)].get<data_t>().data)); 
-							}
-							hd.blocks[file].get<file_t>().add(free_index_2);
-						  hd.blocks[hd.blocks[file].get<file_t>().inode].get<inode_t>().size=size;
-			}
-				{	
-						std::lock_guard<std::mutex> guard{hd.blocks[file].get<file_t>().mutex};
-						hd.blocks[hd.blocks[file].get<file_t>().inode].get<inode_t>().writecount--;
-				}
+	hd.blocks[hd.blocks[file].get<file_t>().inode].get<inode_t>().index_file.clear();
+	data.insert(data.end(), buf, buf+size);
+	aos::list<uint32_t> free_index_2=hd.search(data.size());
+	auto free_ind=free_index_2.begin();
+	unsigned int free_index_size=free_index_2.size();
+	for(unsigned int i=0;i<free_index_size;i++)
+	{
+	    hd.blocks[*free_ind].change_type<data_t>();
+	    aos::copy(data.begin()+(i*496),data.begin()+((i+1)*496),aos::back_inserter(hd.blocks[*(free_ind++)].get<data_t>().data)); 
+	}
+	hd.blocks[file].get<file_t>().add(free_index_2);
+	hd.blocks[hd.blocks[file].get<file_t>().inode].get<inode_t>().size=size;
+    }
+    {	
+	//aos::lock_guard<aos::mutex> guard{hd.blocks[file].get<file_t>().mutex};
+	hd.blocks[hd.blocks[file].get<file_t>().inode].get<inode_t>().writecount--;
+    }
 
     return size;
 }

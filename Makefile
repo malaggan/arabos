@@ -17,7 +17,7 @@
 
 
 default: all
-.PHONY: all clean link install build TAGS
+.PHONY: all clean link install build #TAGS
 
 TAGS:
 	etags include/*.h boot/*.S console/*.c kernel/*.c lib/*.c lib/*.cpp mm/*.c mm/*.cpp init/*.c init/*.cpp i386/*.c fs/*.cpp
@@ -69,7 +69,8 @@ export ASFLAGS := -gstabs -c -m32 -I$(INCLUDE)
 # -Wno-unused-parameter to temporarily stops warning about non-used params
 # -Wconversion -Wpacked
 # i substituted '-ffreestanding' for "-nostdinc -mno-stack-arg-probe -fno-builtin"
-export CFLAGS := -c -m32 -std=c11 -Wc99-c11-compat\
+# why -fpack-struct? for filesystem structs to fit in sectors (more: http://stackoverflow.com/a/26999882/397405). Results in suboptimal code and all objects must be compiled with it.
+export CFLAGS := -c -m32 -std=c11 -Wc99-c11-compat -fpack-struct\
 	$(UNHOSTED) -I$(INCLUDE) $(DBG) -fno-stack-protector\
 	-Wall -Wextra -pedantic -Wfloat-equal -Wshadow -Wpadded -Winline\
 	-Wunreachable-code -Wno-unused-parameter
@@ -78,7 +79,7 @@ export CFLAGS := -c -m32 -std=c11 -Wc99-c11-compat\
 #-nostartfiles -nostdlib -fno-rtti -fno-exceptions
 # since i didn't specify -nostartfiles, a fucn called _init will be created to initiate construtors of global objs
 # i think i should call it myself, since there is no main, that if the function returns w/out calling main
-export CXXFLAGS := -c -m32 -std=c++14 -Wc++14-compat\
+export CXXFLAGS := -c -m32 -std=c++14 -Wc++14-compat -fpack-struct\
 	$(UNHOSTED) -fno-rtti -fno-exceptions -I$(INCLUDE) $(DBG)\
 	-Wall -Wextra -pedantic -Wunreachable-code -Wno-unused-parameter\
 	-Wfloat-equal -Wshadow -Wpadded -Winline -fno-stack-protector\

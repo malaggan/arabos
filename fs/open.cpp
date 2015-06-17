@@ -1,10 +1,8 @@
 #include <file_t.h>
-#include <fuse.h>
-#include <syslog.h>
 
-int sfs_open (const char *path, struct fuse_file_info *f)
+int sfs_open (const char *path, int /*out*/ *file_handle)//struct fuse_file_info *f)
 {
-    syslog(LOG_DEBUG,"In OPEN \n");
+    printk(DEBUG "In OPEN \n");
     int file= ROOT.find(path);
     if(file==-1 )
 	return -ENOENT;
@@ -17,8 +15,8 @@ int sfs_open (const char *path, struct fuse_file_info *f)
     if(! ( ( hd.blocks[file].file.mode & S_IRUSR) || ( hd.blocks[file].file.mode && S_IRGRP ) || ( hd.blocks[file].file.mode & S_IROTH) ) ) {
 	return -EACCES;
     }
-    f->fh =file;
+    /*f->fh*/ *file_handle =file;
     hd.blocks[hd.blocks[file].file.inode].inode.usecount++;
-    syslog(LOG_DEBUG,"In OPEN END\n");
+    printk(DEBUG "In OPEN END\n");
     return 0;
 }

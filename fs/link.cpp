@@ -1,7 +1,6 @@
 #include <file_t.h>
-#include <fuse.h>
-#include <syslog.h>
-#include <libgen.h>
+
+// #include <libgen.h>
 
 
 int sfs_link (const char *oldpath, const char *newpath)
@@ -9,9 +8,9 @@ int sfs_link (const char *oldpath, const char *newpath)
     int file=ROOT.find(oldpath);
     if(file==-1)
 	return -ENOENT;
-    std::list<unsigned int> free_index=hd.search(sizeof(block_t));
+    aos::list<uint32_t> free_index=hd.search(sizeof(block_t));
     if(free_index.size() !=1)
-      return -EEXIST;
+	return -EEXIST;
     if(ROOT.find(newpath)>=0)
 	return EEXIST;
     char *newname=basename(strdup(newpath));
@@ -21,4 +20,4 @@ int sfs_link (const char *oldpath, const char *newpath)
     hd.blocks[parent].get<file_t>().add(free_index.front());
     return 0;
 
-    }
+}

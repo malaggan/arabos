@@ -34,3 +34,6 @@ kernel.map
 *.exe
 *.out
 *.app
+
+TAGS
+*error_log

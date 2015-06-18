@@ -17,10 +17,14 @@
 
 
 default: all
-.PHONY: all clean link install build #TAGS
+.PHONY: all clean link install build TAGS
 
 TAGS:
-	etags include/*.h boot/*.S console/*.c kernel/*.c lib/*.c lib/*.cpp mm/*.c mm/*.cpp init/*.c init/*.cpp i386/*.c fs/*.cpp
+	find . -name "*.h"	\
+	-or -name "*.hh"	\
+	-or -name "*.c"		\
+	-or -name "*.cpp"	\
+	-or -name "*.S"         | xargs etags
 
 RM := (ls FILE && rm FILE) > /dev/null 2>&1 || true
 JOBS := 4
@@ -51,12 +55,12 @@ UNHOSTED := -nostartfiles -nostdinc -nostdlib -ffreestanding
 LDFLAGS := $(UNHOSTED) -Wl,-T$(LINKER_SCRIPT) -Wl,-Map -Wl,$(KERNEL_MAP)
 #DBG := -gdwarf-2 -DDBG_DWARF2
 DBG := -gstabs -DDBG_STABS
-INCLUDE := include -I../include -I../include/c++ -I../include/c++/c++
+INCLUDE := include -I../include -I../include/stl -I../include/c++ -I../include/c++/c++
 
 #####!!!!!!!!!!!!!!!############d
-export CC := ~/opt/bin/i386-elf-gcc
-export AS := ~/opt/bin/i386-elf-gcc
-export CXX := ~/opt/bin/i386-elf-g++
+export CC := gcc # ~/opt/bin/i386-elf-gcc
+export AS := gcc # ~/opt/bin/i386-elf-gcc
+export CXX := g++ # ~/opt/bin/i386-elf-g++
 export LINT := SPLINT
 #export ASFLAGS := -felf
 export FIND := find

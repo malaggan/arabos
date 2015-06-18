@@ -161,6 +161,29 @@ void write_serial(char c) {
    outportb(COM1_PORT,c);
 }
 
+char * strdup (const char *s) {
+    size_t len = strlen (s) + 1;
+    void *new = malloc (len);
+    
+    if (new == NULL)
+	return NULL;
+    
+    return (char *) memcpy (new, s, len);
+}
+
+char * strndup (const char *s, size_t at_most) {
+    size_t len = strlen (s) + 1;
+    if(len > at_most)
+	len = at_most;
+    void *new = malloc (len);
+    
+    if (new == NULL)
+	return NULL;
+    
+    return (char *) memcpy (new, s, len);
+}
+
+
 /*
 void abort(int exit_code)
 {

@@ -1,5 +1,15 @@
 #pragma once
 namespace aos {
+    template<typename T, typename Distance = ptrdiff_t,
+	     typename Pointer = T*, typename Reference = T&>
+    struct iterator
+    {
+      typedef T        value_type;
+      typedef Distance  difference_type;
+      typedef Pointer   pointer;
+      typedef Reference reference;
+    };
+    
     // std::chrono::system_clock::now()
     // std::begin
     template< class C >
@@ -38,59 +48,19 @@ namespace aos {
     int ceil(double); // TODO: implement
     // std::chrono::system_clock::to_time_t(hd.blocks[hd.blocks[file_inode].get<file_t>().inode].get<inode_t>().ctime);
     // std::make_shared
-    // std::vector
     // std::unique_lock<std::mutex>
     // std::lock_guard<std::mutex>
-    // std::copy
-    template<class InputIt, class OutputIt>
-    OutputIt copy(InputIt first, InputIt last,
-		  OutputIt d_first)
-    {
-	while (first != last) {
-	    *d_first++ = *first++;
-	}
-	return d_first;
-    }
-
-    template<class InputIt, class OutputIt, class UnaryPredicate>
-    OutputIt copy_if(InputIt first, InputIt last,
-		     OutputIt d_first, UnaryPredicate pred)
-    {
-	while (first != last) {
-	    if (pred(*first))
-		*d_first++ = *first;
-	    first++;
-	}
-	return d_first;
-    }
-    // std::copy_n
-    template< class InputIt, class Size, class OutputIt>
-    OutputIt copy_n(InputIt first, Size count, OutputIt result)
-    {
-	if (count > 0) {
-	    *result++ = *first;
-	    for (Size i = 1; i < count; ++i) {
-		*result++ = *++first;
-	    }
-	}
-	return result;
-    }
-    // std::find
-    template<class InputIt, class T>
-    InputIt find(InputIt first, InputIt last, const T& value)
-    {
-	for (; first != last; ++first) {
-	    if (*first == value) {
-		return first;
-	    }
-	}
-	return last;
-    }
+#include <bits/copy.hh>
+#include <bits/copy_if.hh>
+#include <bits/copy_n.hh>
+#include <bits/find.hh>
+    
     // std::move
     template<typename _Tp>
     constexpr remove_reference_t<_Tp>&&
     move(_Tp&& __t) noexcept
     { return static_cast<remove_reference_t<_Tp>&&>(__t); }
+    
     // std::back_inserter
     // back_insert_iterator is an OutputIterator that appends to a container for which it was constructed. The container's push_back() member function is called whenever the iterator (whether dereferenced or not) is assigned to. Incrementing the std::back_insert_iterator is a no-op.
     template< class Container >

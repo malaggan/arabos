@@ -55,12 +55,12 @@ UNHOSTED := -nostartfiles -nostdinc -nostdlib -ffreestanding
 LDFLAGS := $(UNHOSTED) -Wl,-T$(LINKER_SCRIPT) -Wl,-Map -Wl,$(KERNEL_MAP)
 #DBG := -gdwarf-2 -DDBG_DWARF2
 DBG := -gstabs -DDBG_STABS
-INCLUDE := include -I../include -I../include/stl -I../include/c++ -I../include/c++/c++
+INCLUDE := include -I../include -Iinclude/stl -I../include/stl -I../include/c++ -I../include/c++/c++
 
 #####!!!!!!!!!!!!!!!############d
-export CC := gcc # ~/opt/bin/i386-elf-gcc
-export AS := gcc # ~/opt/bin/i386-elf-gcc
-export CXX := g++ # ~/opt/bin/i386-elf-g++
+export CC := ~/opt/bin/i386-elf-gcc
+export AS := ~/opt/bin/i386-elf-gcc
+export CXX := ~/opt/bin/i386-elf-g++
 export LINT := SPLINT
 #export ASFLAGS := -felf
 export FIND := find

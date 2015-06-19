@@ -1,43 +1,118 @@
-# -*- mode: Makefile; -*-
-# The following is the configuration for building GCC cross compiler (given that binutils are in prefix/target/bin)
-# http://gcc.gnu.org/install/configure.html
-# Notes: i786 is pentium 4 until core i7
+#!/usr/bin/env bash
 
-# ftp://ftp.irisa.fr/pub/mirrors/gcc.gnu.org/gcc/releases/gcc-5.1.0/gcc-5.1.0.tar.bz2
-# ftp://ftp.irisa.fr/pub/mirrors/gcc.gnu.org/binutils/releases/binutils-2.25.tar.bz2
-# ftp://ftp.irisa.fr/pub/mirrors/gcc.gnu.org/gdb/releases/gdb-7.9.tar.xz
+mydir="$(mktemp -dt arabos-download-gcc.XXXXXXXX)"
+pushd "$mydir"
 
-# necessary on Mac
-export CC=/usr/bin/gcc-4.2
-export CXX=/usr/bin/g++-4.2
-export CPP=/usr/bin/cpp-4.2
-export LD=/usr/bin/gcc-4.2
-export PREFIX=/Users/malaggan/Desktop/arabos/cross
-export TARGET=i386-elf
-# NEVER set PATH until all is compiled: #export PATH=$PREFIX/i386-elf/bin/:$PATH
-# make install will install to $PREFIX/bin, $PREFIX/lib,...
-  --prefix=PREFIX         install in PREFIX
+GCC_VERSION=5.1.0
+BINUTILS_VERSION=2.25
+GDB_VERSION=7.9.1
 
-# binutils
-  --target=$TARGET --prefix=$PREFIX --disable-nls --enable-lto  && make && make install # Installs the file to $PREFIX
-#unused: --enable-gold --enable-plugins
+PREFIX="/home/${USER}/opt"
+TARGET="i386-elf"
 
-# gcc
- ./configure --prefix=$PREFIX --target=$TARGET --disable-nls --enable-languages=c,c++ --without-headers --enable-lto && make all-gcc && make install-gcc
- for .ctors (if i don't include libgcc .ctors don't get generated): make all-target-libgcc && make install-target-libgcc
-#unused: --with-stabs --disable-threads --enable-__cxa_atexit --enable-initfini-array --disable-libssp --disable-libgomp --disable-shared 
-# cp cc1 and ccplus1
+GCC_URL="ftp://gcc.gnu.org/pub/gcc/releases/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.bz2"
+GCC_SUM="ftp://gcc.gnu.org/pub/gcc/releases/gcc-${GCC_VERSION}/sha512.sum"
 
-# GDB
- ../gdb-7.4.1/configure --prefix=$PREFIX --target=$TARGET && make all-gdb && make install-gdb
+BINUTILS_URL="ftp://gcc.gnu.org/pub/binutils/releases/binutils-${BINUTILS_VERSION}.tar.bz2"
+BINUTILS_SUM="ftp://gcc.gnu.org/pub/binutils/releases/sha512.sum"
 
-# Bochs
-# using RFB (VNC viewer) solves all the problems:
-../bochs-svn/configure --prefix=$PREFIX --enable-sb16 --enable-all-optimizations --enable-cpu-level=6 --enable-gdb-stub --with-rfb --with-nogui # don't forget to export CC,CXX,CPP,LD from above, and to add -arch i386 to $(CC) line in the Makefile generated
-# before finding out about RFB i used .conf.macosx, which didn' work
-  CXXFLAGS="-arch i386" CFLAGS="-arch i386" ../bochs-svn/configure --prefix=$PREFIX --with-wx --enable-all-optimizations --enable-cpu-level=6 --enable-gdb-stub --DEBUG?? --enable-plugins && make -j 8 all && make install
-# I also need to edit the generated Makefile and put -arch i386 in $(CC) and $(CXX) lines, I also need to remove -lldtl and that that follows from the goal 'bochs'
-# run:
- ../bochs-2.5.1/bochs
- ../cross/bin/i386-elf-gdbtui kernel.k -x gdbscript -d /Users/malaggan/Desktop/arabos/trunk/
-export PATH:=../cross/i386-elf/bin/:$(PATH)
+GDB_URL="ftp://gcc.gnu.org/pub/gdb/releases/gdb-${GDB_VERSION}.tar.xz"
+GDB_SUM="ftp://gcc.gnu.org/pub/gdb/releases/sha512.sum"
+
+current_gdb_version=$("$PREFIX/bin/$TARGET-gdb" --version | head -n 1)
+echo "$current_gdb_version"
+if [ "x${current_gdb_version}" != "xGNU gdb (GDB) ${GDB_VERSION}" ] ;then
+
+    wget -O- "${GDB_SUM}" | grep "gdb-${GDB_VERSION}.tar.xz" > gdb-sum
+    wget "${GDB_URL}"
+    sha512sum --status -c gdb-sum || (echo "corrupt gdb")
+    
+    tar -xJf "gdb-${GDB_VERSION}.tar.xz"
+    mkdir "gdb-${GDB_VERSION}-build"
+    pushd "gdb-${GDB_VERSION}-build"
+    "../gdb-${GDB_VERSION}/configure" "--prefix=${PREFIX}" "--target=${TARGET}" && make all-gdb -j 8 && make install-gdb
+    popd
+else
+    echo "Latest GDB version already installed in $PREFIX/bin/$TARGET-gdb"
+fi
+
+current_binutils_version=$("$PREFIX/bin/$TARGET-ar" --version | head -n 1)
+echo "$current_binutils_version"
+if [ "x${current_binutils_version}" != "xGNU ar (GNU Binutils) ${BINUTILS_VERSION}" ] ;then
+
+    wget -O- "${BINUTILS_SUM}" | grep "binutils-${BINUTILS_VERSION}.tar.bz2" > binutils-sum
+    wget "${BINUTILS_URL}"
+    sha512sum --status -c binutils-sum || (echo "corrupt binutils")
+    
+    tar -xjf "binutils-${BINUTILS_VERSION}.tar.bz2"
+    mkdir "binutils-${BINUTILS_VERSION}-build"
+    pushd "binutils-${BINUTILS_VERSION}-build"
+    "../binutils-${BINUTILS_VERSION}/configure" "--prefix=${PREFIX}" "--target=${TARGET}" --disable-nls --enable-lto && make all -j 8 && make install
+    popd
+else
+    echo "Latest BINUTILS version already installed in $PREFIX/bin/$TARGET-binutils"
+fi
+
+current_gcc_version=$("$PREFIX/bin/$TARGET-gcc" --version | head -n 1)
+echo "$current_gcc_version"
+if [ "x${current_gcc_version}" != "xi386-elf-gcc (GCC) ${GCC_VERSION}" ] ;then
+
+    wget -O- "${GCC_SUM}" | grep "gcc-${GCC_VERSION}.tar.bz2" > gcc-sum
+    wget "${GCC_URL}"
+    sha512sum --status -c gcc-sum || (echo "corrupt gcc")
+    
+    tar -xjf "gcc-${GCC_VERSION}.tar.bz2"
+    mkdir "gcc-${GCC_VERSION}-build"
+    pushd "gcc-${GCC_VERSION}-build"
+    "../gcc-${GCC_VERSION}/configure" "--prefix=${PREFIX}" "--target=${TARGET}" --disable-nls --enable-lto --enable-languages=c,c++ --without-headers && make all-gcc -j 8 && make install-gcc && make all-target-libgcc -j 8 && make install-target-libgcc
+    popd
+else
+    echo "Latest GCC version already installed in $PREFIX/bin/$TARGET-gcc"
+fi
+
+
+popd
+# rm -rf "$mydir"
+
+# # The following is the configuration for building GCC cross compiler (given that binutils are in prefix/target/bin)
+# # http://gcc.gnu.org/install/configure.html
+# # Notes: i786 is pentium 4 until core i7
+
+# # ftp://ftp.irisa.fr/pub/mirrors/gcc.gnu.org/gcc/releases/gcc-5.1.0/gcc-5.1.0.tar.bz2
+# # ftp://ftp.irisa.fr/pub/mirrors/gcc.gnu.org/binutils/releases/binutils-2.25.tar.bz2
+# # ftp://ftp.irisa.fr/pub/mirrors/gcc.gnu.org/gdb/releases/gdb-7.9.tar.xz
+
+# # necessary on Mac
+# export CC=/usr/bin/gcc-4.2
+# export CXX=/usr/bin/g++-4.2
+# export CPP=/usr/bin/cpp-4.2
+# export LD=/usr/bin/gcc-4.2
+# export PREFIX=/Users/malaggan/Desktop/arabos/cross
+# export TARGET=i386-elf
+# # NEVER set PATH until all is compiled: #export PATH=$PREFIX/i386-elf/bin/:$PATH
+# # make install will install to $PREFIX/bin, $PREFIX/lib,...
+#   --prefix=PREFIX         install in PREFIX
+
+# # binutils
+#   --target=$TARGET --prefix=$PREFIX --disable-nls --enable-lto  && make && make install # Installs the file to $PREFIX
+# #unused: --enable-gold --enable-plugins
+
+# # gcc
+#  ./configure --prefix=$PREFIX --target=$TARGET --disable-nls --enable-languages=c,c++ --without-headers --enable-lto && make all-gcc && make install-gcc
+#  for .ctors (if i don't include libgcc .ctors don't get generated): make all-target-libgcc && make install-target-libgcc
+# #unused: --with-stabs --disable-threads --enable-__cxa_atexit --enable-initfini-array --disable-libssp --disable-libgomp --disable-shared 
+# # cp cc1 and ccplus1
+
+# # GDB
+#  ../gdb-7.4.1/configure --prefix=$PREFIX --target=$TARGET && make all-gdb && make install-gdb
+
+# # Bochs
+# # using RFB (VNC viewer) solves all the problems:
+# ../bochs-svn/configure --prefix=$PREFIX --enable-sb16 --enable-all-optimizations --enable-cpu-level=6 --enable-gdb-stub --with-rfb --with-nogui # don't forget to export CC,CXX,CPP,LD from above, and to add -arch i386 to $(CC) line in the Makefile generated
+# # before finding out about RFB i used .conf.macosx, which didn' work
+#   CXXFLAGS="-arch i386" CFLAGS="-arch i386" ../bochs-svn/configure --prefix=$PREFIX --with-wx --enable-all-optimizations --enable-cpu-level=6 --enable-gdb-stub --DEBUG?? --enable-plugins && make -j 8 all && make install
+# # I also need to edit the generated Makefile and put -arch i386 in $(CC) and $(CXX) lines, I also need to remove -lldtl and that that follows from the goal 'bochs'
+# # run:
+#  ../bochs-2.5.1/bochs
+#  ../cross/bin/i386-elf-gdbtui kernel.k -x gdbscript -d /Users/malaggan/Desktop/arabos/trunk/
+# export PATH:=../cross/i386-elf/bin/:$(PATH)

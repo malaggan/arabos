@@ -18,12 +18,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #ifndef MM_H
 #define MM_H
 
+#include <types.h>
+#include <liballoc.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <types.h>
-#include <liballoc.h>
 
 // page table entry format :
 // addr/avail to os/zero/zero/dirty/accessed/page cache disable/pg write throuhg(1) back(0)/user,supervisor/write,read/present

@@ -18,11 +18,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
+#include <lib.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <lib.h>
 
 #define VM_ECMA 0 // if we should print ECMA in the VM lpt output
 

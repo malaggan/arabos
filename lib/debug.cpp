@@ -201,7 +201,7 @@ extern "C" void stab_data(int eip)
     lline+=2; // this line is a hack, dunno why it works or if it will work everytime
     while((lline > lfile && stabs[lline].n_type != N_SO && stabs[lline].n_type != N_SOL) || stabs[lline].n_value == 0)
         lline --;
-    const char* inlinedFileName = NULL;
+    const char* inlinedFileName = nullptr;
     if(lline > lfile && stabs[lline].n_strx > 0)
     {
          inlinedFileName = stabstr+stabs[lline].n_strx;

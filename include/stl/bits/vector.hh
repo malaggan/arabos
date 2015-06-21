@@ -7,8 +7,7 @@ namespace { namespace __detail {
 						reference_t<It>>
 	{
 	private:
-	    It current;
-	    It begin, end;
+	    It begin, current, end;
 
 	public:
 	    using iterator_category = typename iterator<iterator_category_t<It>,value_type_t<It>,difference_type_t<It>,pointer_t<It>,iterator_category_t<It>>::iterator_category;
@@ -21,6 +20,9 @@ namespace { namespace __detail {
 
 	    explicit vector_iterator(It begin, It end)
 		: begin{begin}, current{begin}, end{end} {}
+
+	    explicit vector_iterator(It begin, It current, It end)
+		: begin{begin}, current{current}, end{end} {}
 
 	    reference operator*() const {
 		// TODO: bounds checking
@@ -51,14 +53,14 @@ namespace { namespace __detail {
 		return tmp;
 	    }
 
-	    vector_iterator operator+(difference_type n) const { return vector_iterator(current + n); }
+	    vector_iterator operator+(difference_type n) const { return vector_iterator{begin, current + n, end}; }
 
 	    vector_iterator& operator+=(difference_type n) {
 		current += n;
 		return *this;
 	    }
 
-	    vector_iterator operator-(difference_type n) const { return vector_iterator(current - n); }
+	    vector_iterator operator-(difference_type n) const { return vector_iterator{begin, current - n, end}; }
 
 	    vector_iterator& operator-=(difference_type n) {
 		current -= n;
@@ -141,14 +143,22 @@ public:
     const_iterator end() const; // TODO: implement
 
     
-    reference front(); // equivalent to *begin() // TODO: implement
-    const_reference front() const; // TODO: implement
+    reference front() {
+	return *begin();
+    }
+    const_reference front() const {
+	return *begin();
+    }
     
     iterator erase(const_iterator, const_iterator); // TODO: implement
     iterator erase(const_iterator); // TODO: implement
 
-    bool empty() const noexcept; // TODO: implement
-    void clear() noexcept; // TODO: implement
+    bool empty() const noexcept {
+	return m_size == 0;
+    }
+    void clear() noexcept {
+	m_size = 0;
+    }
 
     iterator insert(const_iterator, value_type const &); // TODO: implement
     iterator insert(const_iterator, value_type &&); // TODO: implement
@@ -156,14 +166,20 @@ public:
     template<typename Iterator>
     iterator insert(const_iterator, Iterator, Iterator); // TODO: implement
 
-    size_type size() const noexcept; // TODO: implement
+    size_type size() const noexcept {
+	return m_size;
+    }
 
     void push_back(value_type const &); // TODO: implement
     void push_back(value_type &&); // TODO: implement
 
-    reference at(size_type); // TODO: implement
-    const_reference at(size_type) const; // TODO: implement
+    reference at(size_type n) {
+	return *(begin() + n);
+    }
+    const_reference at(size_type n) const {
+	return *(begin() + n);
+    }
 
-    reference operator[](size_type); // TODO: implement
-    const_reference operator[](size_type) const; // TODO: implement
+    reference operator[](size_type n) { return at(n); }
+    const_reference operator[](size_type n) const { return at(n); }
 } __attribute__((packed));

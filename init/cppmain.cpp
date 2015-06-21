@@ -89,8 +89,10 @@ void init_process()
     printk("in init now :)\n");
 
     int x = 5*6;
-    aos::vector<int> v;
-    auto b = v.begin();
+    aos::vector<int> const v1;
+    auto b = v1.begin();
+    aos::vector<int> const v2;
+    auto c = v2.begin();
     monitor();
     
     printk("Forking: \n");

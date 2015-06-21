@@ -1,25 +1,25 @@
 namespace { namespace __detail {
-	template <typename T>
-	class vector_iterator : public iterator<iterator_category_t<T*>,
-						value_type_t<T*>,
-						difference_type_t<T*>,
-						pointer_t<T*>,
-						reference_t<T*>>
+	template <typename It>
+	class vector_iterator : public iterator<iterator_category_t<It>,
+						value_type_t<It>,
+						difference_type_t<It>,
+						pointer_t<It>,
+						reference_t<It>>
 	{
 	private:
-	    T *current;
-	    T *begin, *end;;
+	    It current;
+	    It begin, end;
 
 	public:
-	    using iterator_category = typename iterator<iterator_category_t<T*>,value_type_t<T*>,difference_type_t<T*>,pointer_t<T*>,iterator_category_t<T*>>::iterator_category;
-	    using value_type = typename iterator<iterator_category_t<T*>,value_type_t<T*>,difference_type_t<T*>,pointer_t<T*>,value_type_t<T*>>::value_type;
-	    using difference_type = typename iterator<iterator_category_t<T*>,value_type_t<T*>,difference_type_t<T*>,pointer_t<T*>,difference_type_t<T*>>::difference_type;
-	    using pointer = typename iterator<iterator_category_t<T*>,value_type_t<T*>,difference_type_t<T*>,pointer_t<T*>,pointer_t<T*>>::pointer;
-	    using reference = typename iterator<iterator_category_t<T*>,value_type_t<T*>,difference_type_t<T*>,pointer_t<T*>,reference_t<T*>>::reference;
+	    using iterator_category = typename iterator<iterator_category_t<It>,value_type_t<It>,difference_type_t<It>,pointer_t<It>,iterator_category_t<It>>::iterator_category;
+	    using value_type = typename iterator<iterator_category_t<It>,value_type_t<It>,difference_type_t<It>,pointer_t<It>,value_type_t<It>>::value_type;
+	    using difference_type = typename iterator<iterator_category_t<It>,value_type_t<It>,difference_type_t<It>,pointer_t<It>,difference_type_t<It>>::difference_type;
+	    using pointer = typename iterator<iterator_category_t<It>,value_type_t<It>,difference_type_t<It>,pointer_t<It>,pointer_t<It>>::pointer;
+	    using reference = typename iterator<iterator_category_t<It>,value_type_t<It>,difference_type_t<It>,pointer_t<It>,reference_t<It>>::reference;
 
 	    vector_iterator() : begin{nullptr}, current{begin}, end{begin} { }
 
-	    explicit vector_iterator(T* begin, T* end)
+	    explicit vector_iterator(It begin, It end)
 		: begin{begin}, current{begin}, end{end} {}
 
 	    reference operator*() const {
@@ -67,7 +67,7 @@ namespace { namespace __detail {
 
 	    reference operator[](difference_type n) const { return *(*this + n); }
 
-	    T* base() const {return current;}
+	    It base() const {return current;}
 	};
 
 	template<typename ItL, typename ItR>
@@ -110,7 +110,7 @@ namespace { namespace __detail {
 	inline auto
 	operator-(const vector_iterator<ItL>& x,
 		  const vector_iterator<ItR>& y)
-	{ return y.base() - x.base(); }
+	{ return y.base() - x.base(); }	
 
     }
 }
@@ -131,9 +131,11 @@ public:
     vector() : m_array{new T[8]}, m_capacity{8}, m_size{0} {}
     
     iterator begin() {
-	return __detail::vector_iterator<value_type>{m_array.get(),m_array.get()+m_size};
+	return iterator{m_array.get(),m_array.get()+m_size};
     }
-    const_iterator begin() const; // TODO: implement
+    const_iterator begin() const {
+	return const_iterator{m_array.get(),m_array.get()+m_size};
+    }
 
     iterator end(); // TODO: implement
     const_iterator end() const; // TODO: implement

@@ -1,13 +1,16 @@
 template<typename T>
 class vector {
-    T *a;
+    shared_array<T> a;
 public:
-    typedef size_t size_type;
-    typedef T value_type;
-    typedef T& reference;
-    typedef T const& const_reference;
-    typedef T* iterator;
-    typedef T const* const_iterator;
+    using size_type		= size_t ;
+    using value_type		= T;
+    using reference		= T& ;
+    using const_reference	= T const& ;
+    using iterator		= T* ;
+    using const_iterator	= T const* ;
+
+    vector() : a{new T[8]} {}
+    
     reference front(); // equivalent to *begin() // TODO: implement
     const_reference front() const; // TODO: implement
     iterator begin(); // TODO: implement

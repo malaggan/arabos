@@ -24,7 +24,8 @@ namespace aos {
 #include <stl/bits/copy_if.hh>
 #include <stl/bits/copy_n.hh>
 #include <stl/bits/find.hh>
-
+#include <stl/bits/shared_ptr.hh>
+#include <stl/bits/vector.hh>
     
     template<typename T, size_t N>
     class static_vector {

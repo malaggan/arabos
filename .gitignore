@@ -34,3 +34,4 @@ kernel.map
 *.exe
 *.out
 *.app
+/TAGS

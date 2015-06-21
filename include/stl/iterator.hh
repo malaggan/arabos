@@ -20,60 +20,11 @@ namespace aos {
 	using  pointer		 = Pointer  	;
 	using  reference	 = Reference	;
     };
-    // N3844 (for explanation), and N3923 for most recent wording
-    template<typename...> using void_t = void;
+
+#include <bits/iterator_traits.hh>
+#include <bits/range_access.hh>
     
-    template<typename It, typename = void_t<>>
-	struct __iterator_traits { };
-    
-    template<typename It>
-    struct __iterator_traits<_Iterator, void_t<typename It::iterator_category,
-					       typename It::value_type,
-					       typename It::difference_type,
-					       typename It::pointer,
-					       typename It::reference>>
-    {
-        using iterator_category = typename It::iterator_category;
-        using value_type        = typename It::value_type;
-        using difference_type   = typename It::difference_type;
-        using pointer           = typename It::pointer;
-        using reference         = typename It::reference;
-    };
 
-    template<typename It>
-    struct iterator_traits : public __iterator_traits<_Iterator> { };
-
-
-    template<typename T>
-    struct iterator_traits<T*>
-    {
-        using iterator_category = random_access_iterator_tag;
-        using value_type        = T;
-        using difference_type   = ptrdiff_t;
-        using pointer           = T*;
-        using reference         = T&;
-    };
-
-
-    template<typename T>
-    struct iterator_traits<T const *>
-    {
-        using iterator_category = random_access_iterator_tag;
-        using value_type        = T;
-        using difference_type   = ptrdiff_t;
-        using pointer           = T const *;
-        using reference         = T const &;
-    };
-
-    
-    template<class C> auto begin			(C &c)		{ return c.begin(); }
-    template<class C> auto end				(C &c)		{ return c.end(); }
-    template<class C> auto begin			(C const &c)	{ return c.begin(); }
-    template<class C> auto end				(C const &c)	{ return c.end(); }
-    template<class T, size_t N> constexpr T* begin	(T (&array)[N])	{ return array; }
-    template<class T, size_t N> constexpr T* end	(T (&array)[N])	{ return array+N; }
-    template<class C> auto cbegin			(C const &c)	{ return c.begin(); }
-    template<class C> auto cend				(C const &c)	{ return c.end(); }
 
     // not std c++, but helpful:
     template <typname It> using iterator_category_t	= typename iterator_category<It>::iterator_category;

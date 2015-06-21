@@ -5,34 +5,11 @@
 #include <types.h> // for ptrdiff_t and move
 
 namespace aos {
-    struct input_iterator_tag { };
-    struct output_iterator_tag { };
-    struct forward_iterator_tag : public input_iterator_tag { };
-    struct bidirectional_iterator_tag : public forward_iterator_tag { };
-    struct random_access_iterator_tag : public bidirectional_iterator_tag { };
 
-    template<typename Category, typename T, typename Distance = ptrdiff_t, typename Pointer = T*, typename Reference = T&>
-    struct iterator
-    {
-	using  iterator_category = Category 	;
-	using  value_type	 = T        	;
-	using  difference_type	 = Distance 	;
-	using  pointer		 = Pointer  	;
-	using  reference	 = Reference	;
-    };
-
-#include <bits/iterator_traits.hh>
-#include <bits/range_access.hh>
+#include <stl/bits/iterator_type.hh>
+#include <stl/bits/iterator_traits.hh>
+#include <stl/bits/range_access.hh>
     
-
-
-    // not std c++, but helpful:
-    template <typname It> using iterator_category_t	= typename iterator_category<It>::iterator_category;
-    template <typname It> using value_type_t		= typename iterator_category<It>::value_type;
-    template <typname It> using difference_type_t	= typename iterator_category<It>::difference_type;   
-    template <typname It> using pointer_t		= typename iterator_category<It>::pointer;
-    template <typname It> using reference_t		= typename iterator_category<It>::reference;
-
     template<class InputIt>
     difference_type_t<InputIt>
     distance(InputIt first, InputIt last) {
@@ -45,8 +22,8 @@ namespace aos {
     // TODO: advance()
 
 
-#include <bits/back_insert_iterator.hh>
-#include <bits/reverse_iterator.hh>
+#include <stl/bits/back_insert_iterator.hh>
+#include <stl/bits/reverse_iterator.hh>
     
     // std::ceil
     // std::chrono::system_clock::now()
@@ -55,25 +32,26 @@ namespace aos {
     // std::make_shared
     // std::unique_lock<std::mutex>
     // std::lock_guard<std::mutex>
-#include <bits/copy.hh>
-#include <bits/copy_if.hh>
-#include <bits/copy_n.hh>
-#include <bits/find.hh>
+#include <stl/bits/copy.hh>
+#include <stl/bits/copy_if.hh>
+#include <stl/bits/copy_n.hh>
+#include <stl/bits/find.hh>
 
     
-    template<typename value_type,
-	     typename Iterator, typename const_iterator, typename reverse_iterator, typename 
+    template<typename T,
+	     typename Iterator,
+	     typename Const_iterator,
+	     typename Reverse_iterator,  
 	     typename Size_type = size_t,
-	     typename Pointer = value_type*,
-	     typename Reference = value_type&,
-	     typename Const_reference = value_type const &>
+	     typename Pointer = T*,
+	     typename Reference = T&,
+	     typename Const_reference = T const &>
     struct container
     {
-	using  iterator_category = Category 	;
-	using  value_type	 = T        	;
-	using  difference_type	 = Distance 	;
-	using  pointer		 = Pointer  	;
-	using  reference	 = Reference	;
+	//using  value_type	 = T        	;
+	//using  difference_type	 = Distance 	;
+	//using  pointer		 = Pointer  	;
+	//using  reference	 = Reference	;
     };
 
     

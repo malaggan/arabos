@@ -3,13 +3,18 @@ class reverse_iterator : public iterator<iterator_category_t<It>,
 					 value_type_t<It>,
 					 difference_type_t<It>,
 					 pointer_t<It>,
-					 reference_t<It> >
+					 reference_t<It>>
 {
 private:
     It current;
 
 public:
     using iterator_type = It;
+    using iterator_category = typename iterator<iterator_category_t<It>,value_type_t<It>,difference_type_t<It>,pointer_t<It>,iterator_category_t<It>>::iterator_category;
+    using value_type = typename iterator<iterator_category_t<It>,value_type_t<It>,difference_type_t<It>,pointer_t<It>,value_type_t<It>>::value_type;
+    using difference_type = typename iterator<iterator_category_t<It>,value_type_t<It>,difference_type_t<It>,pointer_t<It>,difference_type_t<It>>::difference_type;
+    using pointer = typename iterator<iterator_category_t<It>,value_type_t<It>,difference_type_t<It>,pointer_t<It>,pointer_t<It>>::pointer;
+    using reference = typename iterator<iterator_category_t<It>,value_type_t<It>,difference_type_t<It>,pointer_t<It>,reference_t<It>>::reference;
 
     reverse_iterator() : current{} { }
 

@@ -5,11 +5,11 @@ template<typename It, typename = void_t<>>
     struct __iterator_traits { };
     
 template<typename It>
-struct __iterator_traits<_Iterator, void_t<typename It::iterator_category,
-					   typename It::value_type,
-					   typename It::difference_type,
-					   typename It::pointer,
-					   typename It::reference>>
+struct __iterator_traits<It, void_t<typename It::iterator_category,
+				    typename It::value_type,
+				    typename It::difference_type,
+				    typename It::pointer,
+				    typename It::reference>>
 {
     using iterator_category = typename It::iterator_category;
     using value_type        = typename It::value_type;
@@ -19,7 +19,7 @@ struct __iterator_traits<_Iterator, void_t<typename It::iterator_category,
 };
 
 template<typename It>
-struct iterator_traits : public __iterator_traits<_Iterator> { };
+struct iterator_traits : public __iterator_traits<It> { };
 
 
 template<typename T>
@@ -42,3 +42,10 @@ struct iterator_traits<T const *>
     using pointer           = T const *;
     using reference         = T const &;
 };
+
+// not std c++, but helpful:
+template <typename It> using iterator_category_t	= typename iterator_traits<It>::iterator_category;
+template <typename It> using value_type_t		= typename iterator_traits<It>::value_type;
+template <typename It> using difference_type_t		= typename iterator_traits<It>::difference_type;   
+template <typename It> using pointer_t			= typename iterator_traits<It>::pointer;
+template <typename It> using reference_t		= typename iterator_traits<It>::reference;

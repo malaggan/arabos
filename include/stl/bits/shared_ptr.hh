@@ -58,6 +58,9 @@ public:
 	sp.m_array = nullptr;
 	return *this;
     }
+
+    element_type* get() { return m_array; }
+    element_type const * get() const { return m_array; }
    
     ~shared_array() {
 	// TODO: atomic? (get_and_decrement)

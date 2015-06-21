@@ -90,6 +90,7 @@ void init_process()
 
     int x = 5*6;
     aos::vector<int> v;
+    auto b = v.begin();
     monitor();
     
     printk("Forking: \n");

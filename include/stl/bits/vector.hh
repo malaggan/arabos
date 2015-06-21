@@ -133,15 +133,14 @@ public:
     vector() : m_array{new T[8]}, m_capacity{8}, m_size{0} {}
     
     iterator begin() {
-	return iterator{m_array.get(),m_array.get()+m_size};
+	return iterator{m_array.get(), m_array.get()+m_size};
     }
     const_iterator begin() const {
-	return const_iterator{m_array.get(),m_array.get()+m_size};
+	return const_iterator{m_array.get(), m_array.get()+m_size};
     }
 
-    iterator end(); // TODO: implement
-    const_iterator end() const; // TODO: implement
-
+    iterator end() { return iterator{m_array.get(), m_array.get()+m_size, m_array.get()+m_size}; }
+    const_iterator end() const { return const_iterator(m_array.get(), m_array.get()+m_size, m_array.get()+m_size); }
     
     reference front() {
 	return *begin();

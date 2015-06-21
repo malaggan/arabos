@@ -94,10 +94,12 @@ void init_process()
     auto d = v1.front();
     auto f = v1[3];
     auto h = v1.size();
+    auto u = v1.end();
     aos::vector<int> const v2;
     auto c = v2.begin();
     auto e = v2.front();
     auto g = v2[3];
+    auto v = v2.end();
     monitor();
     
     printk("Forking: \n");

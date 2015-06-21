@@ -83,12 +83,14 @@ int esp = 0;
 volatile semaphore_t sem = 1;
 volatile int owner = 0; // this is to force owner change, to test semaphors, instead of looping a constant number of times
 void monitor();
+void identify_drive();
 // the init process
 void init_process()
 {    
     printk("in init now :)\n");
 
     int x = 5*6;
+    identify_drive();
     monitor();
     
     printk("Forking: \n");

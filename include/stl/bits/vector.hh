@@ -161,9 +161,16 @@ public:
     	    if(last == end())
     		return last;
     	    else
-    		return ++last;
-    	// NOTE: we should call the destructors (placement delete)
-    	return end(); // TODO: 
+	    {
+		++last;
+    		return last;
+	    }
+    	while(first != last)
+	{   // Note: probably there are more efficient ways to do this
+	    erase(first);
+	    ++first;
+	}
+    	return end(); 
     }
     iterator erase(const_iterator it) {
 	pointer_t<iterator> p = const_cast<pointer_t<iterator>>(it.get());
@@ -181,19 +188,25 @@ public:
 	return ret;
     }
 
+    void grow() {
+	auto new_size = m_size * 3; // TODO: check overflow
+	
+    }
+
+    iterator insert(const_iterator pos, value_type const &value); // insert value before pos
+    iterator insert(const_iterator pos, value_type &&value); // insert value before pos
+    iterator insert(const_iterator, size_type, value_type const &); // TODO: implement
+    template<typename Iterator>
+    iterator insert(const_iterator, Iterator, Iterator); // TODO: implement
+
+
     bool empty() const noexcept {
 	return m_size == 0;
     }
     void clear() noexcept {
 	m_size = 0;
     }
-
-    iterator insert(const_iterator, value_type const &); // TODO: implement
-    iterator insert(const_iterator, value_type &&); // TODO: implement
-    iterator insert(const_iterator, size_type, value_type const &); // TODO: implement
-    template<typename Iterator>
-    iterator insert(const_iterator, Iterator, Iterator); // TODO: implement
-
+    
     size_type size() const noexcept {
 	return m_size;
     }

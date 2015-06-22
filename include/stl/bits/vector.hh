@@ -139,7 +139,7 @@ public:
 	return const_iterator{m_array.get(), m_array.get()+m_size};
     }
 
-    iterator end() { return iterator{m_array.get(), m_array.get()+m_size, m_array.get()+m_size}; }
+    iterator end() { return iterator{m_array.get(), m_array.get()+m_size, m_array.get()+m_size}; } // TODO: adapt as sentinel 
     const_iterator end() const { return const_iterator(m_array.get(), m_array.get()+m_size, m_array.get()+m_size); }
     
     reference front() {
@@ -149,7 +149,10 @@ public:
 	return *begin();
     }
     
-    iterator erase(const_iterator, const_iterator); // TODO: implement
+    iterator erase(const_iterator first, const_iterator last) {
+	if(first == last)
+	    return ++last;
+    }
     iterator erase(const_iterator); // TODO: implement
 
     bool empty() const noexcept {

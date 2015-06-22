@@ -18,11 +18,17 @@ namespace { namespace __detail {
 
 	    vector_iterator() : begin{nullptr}, current{begin}, end{begin} { }
 
+	    // implicitly convert iterator to const_iterator
+	    operator vector_iterator<aos::remove_pointer_t<It> const *>() const
+	    { return vector_iterator<aos::remove_pointer_t<It> const *>{begin,current,end}; }
+
 	    explicit vector_iterator(It begin, It end)
 		: begin{begin}, current{begin}, end{end} {}
 
 	    explicit vector_iterator(It begin, It current, It end)
 		: begin{begin}, current{current}, end{end} {}
+
+	    auto get() { return current; }
 
 	    reference operator*() const {
 		// TODO: bounds checking
@@ -127,9 +133,10 @@ public:
     using value_type		= T;
     using reference		= T& ;
     using const_reference	= T const& ;
-    using iterator		= __detail::vector_iterator<value_type>;
+    using iterator		= __detail::vector_iterator<value_type      *>;
     using const_iterator	= __detail::vector_iterator<value_type const*> ;
 
+    // NOTE: T must be default constructible. Otherwise, we are going to have to use uninitialized storage and uninitialized_copy/move
     vector() : m_array{new T[8]}, m_capacity{8}, m_size{0} {}
     
     iterator begin() {
@@ -150,10 +157,18 @@ public:
     }
     
     iterator erase(const_iterator first, const_iterator last) {
-	if(first == last)
-	    return ++last;
+    	if(first == last)
+    	    if(last == end())
+    		return last;
+    	    else
+    		return ++last;
+    	// NOTE: we should call the destructors (placement delete)
+    	return end(); // TODO: 
     }
-    iterator erase(const_iterator); // TODO: implement
+    iterator erase(const_iterator it) {
+	auto p = it.get();     
+    	return end(); // TODO: implement
+    }
 
     bool empty() const noexcept {
 	return m_size == 0;

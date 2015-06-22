@@ -89,12 +89,13 @@ void init_process()
     printk("in init now :)\n");
 
     int x = 5*6;
-    aos::vector<int> const v1;
+    aos::vector<int> v1;
     auto b = v1.begin();
     auto d = v1.front();
     auto f = v1[3];
     auto h = v1.size();
     auto u = v1.end();
+    v1.erase(b);
     aos::vector<int> const v2;
     auto c = v2.begin();
     auto e = v2.front();

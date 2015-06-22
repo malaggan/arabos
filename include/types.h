@@ -76,6 +76,10 @@ namespace aos {
     template< class T > struct remove_reference<T&>  {typedef T type;};
     template< class T > struct remove_reference<T&&> {typedef T type;};
     template< class T > using remove_reference_t = typename remove_reference<T>::type;
+
+    template< class T > struct remove_pointer      {typedef T type;};
+    template< class T > struct remove_pointer<T*>  {typedef T type;};
+    template< class T > using remove_pointer_t = typename remove_pointer<T>::type;
     
     template<typename _Tp> constexpr _Tp&&
     forward(remove_reference_t<_Tp>& __t) noexcept

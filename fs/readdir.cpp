@@ -1,5 +1,25 @@
 #include <file_t.h>
 
+aos::vector<aos::string> sfs_readdir (const char *path)
+{
+
+    int parent;
+    parent=ROOT.find(path);
+    aos::vector<aos::string> temp;
+    if(!(hd.blocks[parent].get<file_t>().isDirectory()))
+      return temp;
+    aos::static_vector<uint32_t,94> file_inode=hd.blocks[hd.blocks[parent].get<file_t>().inode].get<inode_t>().index_file;
+   
+    temp.push_back(".");
+    temp.push_back("..");
+    for(unsigned int i=0;i<file_inode.size();i++){
+     temp.push_back(hd.blocks[file_inode.at(i)].get<file_t>().name);
+    }
+      return temp;
+}
+
+#if 0
+
 // #include <libgen.h>
 // #include <boost/algorithm/string.hpp>
 
@@ -60,3 +80,4 @@ int sfs_readdir (const char *path, void *buf, fuse_fill_dir_t filler, off_t UNUS
 	
   return 0;
   }*/
+#endif

@@ -7,7 +7,7 @@ int sfs_chown (const char *path, uid_t uid, gid_t gid)
     if(index_file==-1)
 	return -ENOENT;
 	
-    uid_t current_uid = fuse_get_context()->uid;
+    uid_t current_uid = 0;
 
     if(current_uid != hd.blocks[hd.blocks[index_file].get<file_t>().inode].get<inode_t>().uid)
 	if(current_uid)

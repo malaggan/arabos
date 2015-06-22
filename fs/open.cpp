@@ -7,7 +7,7 @@ int sfs_open (const char *path, int /*out*/ *file_handle)//struct fuse_file_info
     if(file==-1 )
 	return -ENOENT;
     
-    if(!(hd.blocks[hd.blocks[file].file.inode].inode.check_permission(fuse_get_context()->uid,fuse_get_context()->gid))
+    if(!(hd.blocks[hd.blocks[file].file.inode].inode.check_permission(0/*uid*/, 0/*gid*/))
        && hd.blocks[file].file.type==file_type::D ) {
 	return -EACCES;
     }

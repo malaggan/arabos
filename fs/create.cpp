@@ -10,7 +10,7 @@ int sfs_create (char const *path, mode_t mode, int /*out*/ *file_handle)
 	return -EEXIST;
      
     aos::list<aos::string> strs;
-    boost::split(strs, path, boost::is_any_of("/")); 
+    ROOT.split(path,"/",strs);; 
     strs.erase(strs.begin());
     auto e = strs.end();
    

@@ -28,7 +28,7 @@ inode_t::inode_t()
     : size(0),
       usecount(0),
       ctime(aos::now()), atime(ctime),mtime(ctime),
-      uid(fuse_get_context()->uid), gid(fuse_get_context()->gid),
+      uid(0), gid(0),
       readcount(0), writecount(0), /*cond(),*/link(1)
 {
 }
@@ -43,6 +43,23 @@ file_t::file_t(aos::string  name, mode_t mode,file_type type,int inode,bool is_s
     printk(DEBUG ">>>>>>>>>>>>>>>>>>>>>>>>>in find 2  before end %s:\n",name.c_str());
     // if(!isDirectory())
     //	contents = aos::make_shared<aos::vector<char>>();
+}
+void file_t::split(const aos::string& str, const aos::string& delim,aos::list<aos::string>& parts)
+{
+   size_t start, end = 0;
+  while (end < str.size()) {
+    start = end;
+    while (start < str.size() && (delim.find(str[start]) !=aos::string::npos)) {
+      start++;  // skip initial whitespace
+    }
+    end = start;
+    while (end < str.size() && (delim.find(str[end]) ==aos::string::npos)) {
+      end++; // skip to end of word
+    }
+    if (end-start != 0) {  // just ignore zero-length strings.
+      parts.push_back(aos::string(str, start,end-start));
+    }
+  }
 }
 
 bool file_t::isSymlink() const {return is_symlink;}
@@ -66,7 +83,7 @@ int file_t::find(const aos::string path)
     printk(DEBUG ">>>>>>>>>>>>>>>>>>>>>>>>>in loop of find 1 ");
     printk(DEBUG ">>>>>>>>>>>>>>>>>>>>>>>>>in  find 1 the original path is:%s ",path.c_str());
     aos::list<aos::string> strs;
-    boost::split(strs, path, boost::is_any_of("/")); 
+    ROOT.split(path,"/",strs); 
     strs.erase(strs.begin());
     printk(DEBUG ">>>>>>>>>>>>>>>>>>>>>>>>>in for loop find 1 file name strs.begine():%s ",(*strs.begin()).c_str());
     return hd.blocks[0].get<file_t>().find(aos::begin(strs), aos::end(strs));////ROOT.find(aos::begin(strs), aos::end(strs));

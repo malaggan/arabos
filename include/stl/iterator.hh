@@ -163,14 +163,18 @@ namespace aos {
 
     class string{
     public:
-	string() {}
-	/*implicit*/ string(char const*str); // TODO: implement
 	typedef size_t size_type;
 	typedef char value_type;
 	typedef char& reference;
 	typedef char const& const_reference;
 	typedef char* iterator;
 	typedef char const* const_iterator;
+
+	string() {}
+	string( const string& other,
+              size_type pos,
+              size_type count = npos);
+	/*implicit*/ string(char const*str); // TODO: implement
 	iterator begin(); // TODO: implement
 	const_iterator begin() const; // TODO: implement
 	iterator end(); // TODO: implement
@@ -183,6 +187,11 @@ namespace aos {
 	const_reference operator[](size_type) const; // TODO: implement
 	iterator erase(const_iterator, const_iterator); // TODO: implement
 	iterator erase(const_iterator); // TODO: implement
+	static const size_type npos = -1;
+	size_type find( const string& str, size_type pos = 0 ) const;
+	size_type find( const char* s, size_type pos, size_type count ) const;
+	size_type find( const char* s, size_type pos = 0 ) const;
+	size_type find( char ch, size_type pos = 0 ) const;
 	bool empty() const noexcept; // TODO: implement
     } __attribute__((packed));
     bool operator==( const string& lhs, const string& rhs );

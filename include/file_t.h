@@ -25,6 +25,9 @@
 #include <mm.h> // for placement new. // TODO: move new operators to <new.h>
 #include <lib.h> // for assert and printk
 
+constexpr uint16_t BLOCK_SIZE = 512;
+constexpr uint16_t NUM_BLOCKS = 100; // TODO: read from ATA
+
 typedef int64_t off_t;
 
 enum {EACCES=1, EEXIST, ENOENT, ENOTDIR};
@@ -155,6 +158,7 @@ struct file_t
     int find(aos::string const path) const; // AAAAAH return by value !
     int find(aos::list<aos::string>::const_iterator first, aos::list<aos::string>::const_iterator last) const;
 
+    void split(const aos::string& str,const aos::string& delim,aos::list<aos::string>& parts);
     void add(aos::list<uint32_t> index);
     void add(int index);
     bool isDirectory() const;
@@ -314,3 +318,5 @@ public:
 
 extern HDD hd;
 extern file_t& ROOT;
+
+aos::vector<aos::string> sfs_readdir (const char *path);

@@ -166,8 +166,19 @@ public:
     	return end(); // TODO: 
     }
     iterator erase(const_iterator it) {
-	auto p = it.get();     
-    	return end(); // TODO: implement
+	pointer_t<iterator> p = const_cast<pointer_t<iterator>>(it.get());
+	iterator ret = (p + 1 == m_array.get() + m_size)? end() : iterator{m_array.get(), p + 1, m_array.get() + m_size};
+	if(p < m_array.get() || p >= m_array.get() + m_size)
+	    return end();
+	p->~T();
+	while((p+1) != m_array.get() + m_size)
+	{
+	    // move ctor. use swap() instead?
+	    *p = move(*(p+1));
+	    ++p;
+	}
+	--m_size;
+	return ret;
     }
 
     bool empty() const noexcept {

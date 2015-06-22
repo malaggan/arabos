@@ -17,10 +17,13 @@
 
 
 default: all
-.PHONY: all clean link install build TAGS
+.PHONY: all clean link install build TAGS cloc
 
 TAGS:
-	etags include/*.h boot/*.S console/*.c kernel/*.c lib/*.c lib/*.cpp mm/*.c mm/*.cpp init/*.c init/*.cpp i386/*.c 
+	find . -name '*.c' -or -name '*.h' -or -name '*.hh' -or -name '*.cpp' -or -name '*.S' | xargs etags	
+# source code statistics:
+cloc:
+	find . -name '*.c' -or -name '*.h' -or -name '*.hh' -or -name '*.cpp' -or -name '*.S' | xargs cloc	
 
 RM := (ls FILE && rm FILE) > /dev/null 2>&1 || true
 JOBS := 4
@@ -48,7 +51,7 @@ KERNEL_MAP := kernel.map
 
 UNHOSTED := -nostartfiles -nostdinc -nostdlib -ffreestanding
 # -s for strip all sybols, -x for discard local symbols
-LDFLAGS := $(UNHOSTED) -Wl,-T$(LINKER_SCRIPT) -Wl,-Map -Wl,$(KERNEL_MAP)
+LDFLAGS := $(UNHOSTED) -Wl,-T$(LINKER_SCRIPT) -Wl,-Map -Wl,$(KERNEL_MAP) # -Wl,-print-memory-usage
 #DBG := -gdwarf-2 -DDBG_DWARF2
 DBG := -gstabs -DDBG_STABS
 INCLUDE := include -I../include -I../include/c++ -I../include/c++/c++
@@ -86,7 +89,7 @@ export CXXFLAGS := -c -m32 -std=c++14 -Wc++14-compat\
 
 #####!!!!!!!!!!!!!!!############
 
-all: TAGS subdirs link install #runBochs
+all: cloc TAGS subdirs link install #runBochs
 
 
 ## http://wiki.osdev.org/Calling_Global_Constructors
@@ -135,6 +138,9 @@ clean: $(foreach DIR,$(SUBDIRS),$(DIR).clean)
 
 debug:
 	gdbtui kernel.k -x gdbscript
+
+
+
 
 # How to build the Bochs disk image ( from the MTI os lab )
 #$(OBJDIR)/kern/bochs.img: $(OBJDIR)/kern/kernel $(OBJDIR)/boot/boot

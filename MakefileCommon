@@ -28,19 +28,7 @@ RM := (ls FILE && rm FILE) > /dev/null 2>&1 || true
 
 #########################
 
-define DEPEND
-$(SHELL) -ec '$(CC) -M $(CFLAGS) $< \
-| sed '\''s/\($*\)\.o[ :]*/\1.o $@ : /g'\'' > $@; \
-[ -s $@ ] || rm -f $@'
-endef
-
-define DEPENDCXX
-$(SHELL) -ec '$(CXX) -M $(CXXFLAGS) $< \
-| sed '\''s/\($*\)\.o[ :]*/\1.o $@ : /g'\'' > $@; \
-[ -s $@ ] || rm -f $@'
-endef
-
-SRCS := $(wildcard *.c) $(wildcard *.S) $(wildcard *.asm) $(wildcard *.cpp)
+SRCS := $(wildcard *.c) $(wildcard *.S) $(wildcard *.cpp)
 
 list0 := $(SRCS:.cpp=.f)
 list1 := $(list0:.asm=.f)
@@ -66,32 +54,19 @@ build_$(MODULE_NAME): del_errs $(OBJS)
 ../obj/%.o: %.cpp
 	@echo '+ CXX $(DIR)/$<'
 	@echo '+ CXX $(DIR)/$<' >>error_log 
-	@( cd .. ; $(CXX) $(DIR)/$< $(CXXFLAGS) -o obj/$@ 2>>$(DIR)/error_log )
+	@( $(CXX) $< $(CXXFLAGS) -MD -MF $*.d -MT ../obj/$*.o -MT $*.d -o ../obj/$@ 2>>error_log )
 #-fdebug-prefix-map==$(DIR)/ # no used cuz not supported on older compilers
 
 ../obj/%.o: %.c
 	@echo '+ CC $(DIR)/$<'
 	@echo '+ CC $(DIR)/$<' >>error_log 
-	@( cd .. ; $(CC) $(DIR)/$< $(CFLAGS) -o obj/$@ 2>>$(DIR)/error_log )
+	@( $(CC) $< $(CFLAGS) -MD -MF $*.d -MT ../obj/$*.o -MT $*.d -o ../obj/$@ 2>>error_log )
 #	-@$(LINT) $< -I$(INCLUDE)
 
 ../obj/%.o: %.S
 	@echo '+ AS $(DIR)/$<'
 	@echo '+ AS $(DIR)/$<' >>error_log
-	( cd .. ; $(AS) $(DIR)/$< $(ASFLAGS) -o obj/$@ 2>>$(DIR)/error_log )
-
-# dependency files
-%.d: %.cpp
-	@$(DEPENDCXX)
-
-%.d: %.c
-	@$(DEPEND)
-
-%.d: %.S
-	@$(DEPEND)
-
-%.d: %.asm
-	@echo "$< $@ :" > $*.d
+	( $(AS) $< $(ASFLAGS) -MD -MF $*.d -MT ../obj/$*.o -MT $*.d -o ../obj/$@ 2>>error_log )
 
 #########################
 

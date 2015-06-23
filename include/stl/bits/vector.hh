@@ -193,12 +193,22 @@ public:
 	    return;
 	
 	auto new_capacity = m_capacity * 3; // TODO: check overflow
-	shared_array<T> new_array = new T[new_array];
+	shared_array<T> new_array = new T[new_array]; 
 	move(m_array.get(), m_array.get() + m_size(), new_array.get()); 
-	swap(m_array, new_array); 
+	swap(m_array, new_array);
+
+	m_capacity = new_capacity;
     }
 
-    iterator insert(const_iterator pos, value_type const &value); // insert value before pos
+    iterator insert(const_iterator pos, value_type const &value) {
+	pointer_t<iterator> p = const_cast<pointer_t<iterator>>(it.get());
+	if(p < m_array.get() || p >= m_array.get() + m_size)
+	    return end();
+	
+	auto needed_capacity = m_size+1;
+	guarantee_capacity(needed_capacity);
+	
+    }
     iterator insert(const_iterator pos, value_type &&value); // insert value before pos
     iterator insert(const_iterator, size_type, value_type const &); // TODO: implement
     template<typename Iterator>

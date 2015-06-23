@@ -21,6 +21,8 @@ namespace aos {
     // std::unique_lock<std::mutex>
     // std::lock_guard<std::mutex>
 #include <stl/bits/copy.hh>
+#include <stl/bits/move.hh>
+#include <stl/bits/swap.hh>
 #include <stl/bits/copy_if.hh>
 #include <stl/bits/copy_n.hh>
 #include <stl/bits/find.hh>

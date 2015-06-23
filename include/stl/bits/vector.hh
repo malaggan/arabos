@@ -188,9 +188,14 @@ public:
 	return ret;
     }
 
-    void grow() {
-	auto new_size = m_size * 3; // TODO: check overflow
+    void guarantee_capacity(size_t minimum_capacity) {
+	if(m_capacity >= minimum_capacity)
+	    return;
 	
+	auto new_capacity = m_capacity * 3; // TODO: check overflow
+	shared_array<T> new_array = new T[new_array];
+	move(m_array.get(), m_array.get() + m_size(), new_array.get()); 
+	swap(m_array, new_array); 
     }
 
     iterator insert(const_iterator pos, value_type const &value); // insert value before pos

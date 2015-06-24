@@ -106,7 +106,7 @@ namespace __detail {
     inline bool
     operator<=(const vector_iterator<ItL>& x,
 	       const vector_iterator<ItR>& y)
-    { return !(y < x); }
+    { return !(x > y); }
 
     template<typename ItL, typename ItR>
     inline bool

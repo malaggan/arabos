@@ -236,7 +236,25 @@ public:
 
 	return _create_iterator( p );
     }
-    //iterator insert(const_iterator pos, value_type &&value); // insert value before pos
+    iterator insert(const_iterator pos, value_type &&value) {
+	// same as insert(const_iterator, value_type const &) but using move
+	if(pos < begin() || pos > end())
+	    return end();
+
+	auto needed_capacity = m_size+1;
+	guarantee_capacity(needed_capacity);
+
+	new (m_array.get() + m_size) value_type(); 
+
+	move_backward(pos, const_iterator{end()}, _create_iterator(m_array.get() + m_size));
+
+	auto p = const_cast<pointer>(pos.get());
+	*p = move(value);
+
+	++m_size;
+
+	return _create_iterator( p );
+    }
     iterator insert(const_iterator, size_type, value_type const &); // TODO: implement
     template<typename Iterator>
     iterator insert(const_iterator, Iterator, Iterator); // TODO: implement

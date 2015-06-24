@@ -4,6 +4,7 @@
 
 #include <stl/new.hh>
 #include <lib.h>
+#include <types.h> // for SFINAE stuff
 
 namespace aos {
 

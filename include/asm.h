@@ -1,7 +1,6 @@
-#ifndef _ASM_H
-#define	_ASM_H
-
-#include "timer.h"
+#pragma once
+#include <timer.h>
+#include <types.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,10 +51,36 @@ extern "C" {
 // val must be 64 bits long
 #define rdtscll(val) ASM("rdtsc" : "=A" (val))
 
-//;printk("\n--:%i\n",scheduling_started)
-#define block_timer() --scheduling_started 
-//;printk("\n++:%i\n",scheduling_started)
-#define unmask_timer() ++scheduling_started 
+inline void atomic_inc(volatile unsigned int * variable) __attribute__((always_inline));
+inline void atomic_dec(volatile unsigned int * variable) __attribute__((always_inline));
+inline uint32_t cmpxchg(volatile int * ptr, int _old, int _new) __attribute__((always_inline));
+inline void block_timer() __attribute__((always_inline));
+inline void unmask_timer() __attribute__((always_inline));
+    
+inline void atomic_inc(volatile unsigned int * variable) {
+    ASM("lock; incl %[v];"
+                   :: [v] "m" (*variable)  
+                   :"memory");
+}
+inline void atomic_dec(volatile unsigned int * variable) {
+    ASM("lock; decl %[v];"
+		 :: [v] "m" (*variable)  //Input
+		 :"memory");
+}
+
+// returns zero on success
+inline uint32_t cmpxchg(volatile int * ptr, int _old, int _new ) {			   
+  uint32_t ret;                                     
+  ASM( "lock; cmpxchgl %2,%1"           
+       : "=a" (ret)/* %0 = %%eax */, "+m" (*ptr) /* %1 */                
+       : "r" (_new) /* %2 */, "0" (_old) /* %0 as well */                    
+       : "cc", "memory");				 
+                         
+  return ret;                                         
+}
+
+inline void block_timer() { atomic_dec(&scheduling_started); }
+inline void unmask_timer() { atomic_inc(&scheduling_started); }
     
 void cpuid_check();
     
@@ -63,4 +88,4 @@ void cpuid_check();
 }
 #endif
 
-#endif	/* _ASM_H */    
+

@@ -12,24 +12,13 @@
 
 /** @{ */
 
-
-
-// If we are told to not define our own size_t, then we skip the define.
-#ifndef _ALLOC_SKIP_DEFINE
-
 #ifndef	NULL
 #define NULL		0
 #endif
 
-#endif
-
-#define PREFIX(func)		func
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-
 
 /** This function is supposed to lock the memory data structures. It
  * could be as simple as disabling interrupts or acquiring a spinlock.
@@ -67,19 +56,12 @@ extern void* liballoc_alloc(size_t);
  */
 extern int liballoc_free(void*,size_t);
 
-
-       
-
-void     *PREFIX(malloc)(size_t);				///< The standard function.
-void     *PREFIX(realloc)(void *, size_t);		///< The standard function.
-void     *PREFIX(calloc)(size_t, size_t);		///< The standard function.
-void      PREFIX(free)(void *);					///< The standard function.
-
+void     *malloc(size_t);				///< The standard function.
+void      free(void *);					///< The standard function.
 
 #ifdef __cplusplus
 }
 #endif
-
 
 /** @} */
 

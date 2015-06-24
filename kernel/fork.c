@@ -27,8 +27,8 @@ volatile unsigned int scheduling_started = 0;
 int currentProcess=-1;
 struct ProcessData processes[MAX_PROCESSES];
 
-#define debug (0)
-#define debug2 (0)
+#define debug (1)
+#define debug2 (1)
 
 void stack_trace(int* ebp, int* esp, int* eip)
 {
@@ -216,7 +216,7 @@ int spawn_handler(struct interrupt_frame *r)
     processes[procIndex].frame.esi = 0;
     processes[procIndex].frame.edi = 0;
 
-    int* stack = alloc_page();
+    int* stack = alloc_page(); // XXX is this the problem? not enough stack for libmalloc?
 
     //stack += 1024-50; // integers, => stack += 2*1024 bytes
     stack += 1024-1;
@@ -269,12 +269,16 @@ int fork_handler(struct interrupt_frame *r)
 
     if debug printf("\nfork:parent stack:\n");
     if debug stack_trace((int*)r->ebp, (int*)r->esp, (int*)r->eip);
-
+    if debug printf("\nfork: END parent stack\n");
+    
     //=========== update all ebp's
     int old_ebp_offset = (int*)r->ebp - (int*)r->esp;
-    do{
+    do{	
+	if debug printf("old_ebp_offset = %d\n", old_ebp_offset);
         int next_ebp_offset =  (int*)stack[old_ebp_offset] - (int*)r->esp;
+	if debug printf("next_ebp_offset = %d\n", next_ebp_offset);
         stack[old_ebp_offset] = stack + next_ebp_offset;
+	if debug printf("A\n");
         old_ebp_offset = next_ebp_offset;
     }
     while(stack[old_ebp_offset] != 0);

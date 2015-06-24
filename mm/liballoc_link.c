@@ -17,7 +17,7 @@ int liballoc_unlock()
 
 void* liballoc_alloc( size_t pages )
 {
-    // TODO only single page allowed to alloc continuously    
+    // TODO: only single page allowed to alloc continuously    
     if(pages > 1)
         panic("pages requested by liballoc > 1");
 

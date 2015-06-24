@@ -1,6 +1,5 @@
 /* -*- mode: c++; -*- */
-#ifndef TYPES_H 
-#define TYPES_H 
+#pragma once
 
 typedef __INT8_TYPE__ int8_t;
 typedef __INT16_TYPE__ int16_t;
@@ -61,16 +60,18 @@ namespace aos {
     typedef integral_constant<bool,true> true_type;
     typedef integral_constant<bool,false> false_type;
     template<bool B, class T = void>
-    struct enable_if {};
- 
+    struct enable_if {}; 
     template<class T>
     struct enable_if<true, T> { typedef T type; };
-    template< bool B, class T = void >
+    template<bool B, class T = void>
     using enable_if_t = typename enable_if<B,T>::type;
+    
     template<class T, class U>
     struct is_same : false_type {}; 
     template<class T>
     struct is_same<T, T> : true_type {};
+    template<class T, class U>
+    constexpr bool is_same_v = is_same<T, U>::value;
 
     template< class T > struct remove_reference      {typedef T type;};
     template< class T > struct remove_reference<T&>  {typedef T type;};
@@ -100,5 +101,3 @@ namespace aos {
 #ifndef __cplusplus
 #define NULL (0) // use nullptr in C++
 #endif
-
-#endif /* TYPES_H */

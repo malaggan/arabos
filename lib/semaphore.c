@@ -5,27 +5,25 @@ void wait(volatile semaphore_t* sem)
 {
     while(1)
     {
-        block_timer();
-        if(*sem > 0)
+        //block_timer();
+	int value = *sem;
+        if(value > 0)
         {
-            (*sem)--;
-
-            //printk("\nlock obtained\n");
-            unmask_timer();
-            return;
+	    if(!cmpxchg(sem, value, value-1))
+            //unmask_timer();
+		return;
         }
         else
         {
-            unmask_timer();
+            //unmask_timer();
         }
     }
-    //printk("\nlock obtained ILLEGALLY\n");
 }
 
 void signal(volatile semaphore_t* sem)
 {
-    block_timer();
-    (*sem)++;
-    //printk("\nlock released\n");
-    unmask_timer();
+    //block_timer();
+    // (*sem)++;
+    cmpxchg(sem, *sem, *sem+1);    
+    //unmask_timer();
 }

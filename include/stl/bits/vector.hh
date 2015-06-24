@@ -22,11 +22,11 @@ namespace __detail {
 	operator vector_iterator<remove_pointer_t<It> const *>() const
 	{ return vector_iterator<remove_pointer_t<It> const *>{begin,current,end}; }
 
-	explicit vector_iterator(It begin, It end)
-	    : begin{begin}, current{begin}, end{end} {}
+	explicit vector_iterator(It _begin, It _end)
+	    : begin{begin}, current{_begin}, end{_end} {}
 
-	explicit vector_iterator(It begin, It current, It end)
-	    : begin{begin}, current{current}, end{end} {}
+	explicit vector_iterator(It _begin, It _current, It _end)
+	    : begin{_begin}, current{_current}, end{_end} {}
 
 	auto get() { return current; }
 
@@ -143,7 +143,19 @@ private:
 public:
 
     // NOTE: value_type must be default constructible. Otherwise, we are going to have to use uninitialized storage and uninitialized_copy/move
-    vector() : m_array{new value_type[8]}, m_capacity{8}, m_size{0} {}
+    explicit vector(bool init) { //: m_array{new value_type[8]}, m_capacity{8}, m_size{0} {
+        printf("enter: in vector::vector()\n");
+	printf("allocating ...\n");
+	if(init){
+	    auto p = new value_type[8];
+	    printf("allocation done\n");
+	    m_array = shared_array<T>{p};
+	}
+	printf("initialization of m_array done\n");
+        if(init) m_capacity = 8;
+        if(init) m_size = 0; 
+	printf("exit: in vector::vector()\n");
+    }
 
     iterator begin() {
 	return iterator{m_array.get(), m_array.get()+m_size};
@@ -253,9 +265,27 @@ public:
 
 	return _create_iterator( p );
     }
-    iterator insert(const_iterator, size_type, value_type const &); // TODO: implement
+    iterator insert(const_iterator pos, size_type n, value_type const &value) {
+	// same as insert(const_iterator, Iterator, Iterator) but using same vlue
+	if(pos < begin() || pos > end())
+	    return end();
+
+	auto dist = distance(cbegin(), pos);
+
+	if(n == 0) return begin() + dist; 
+
+	while(n --> 0)
+	    insert(pos, value); 
+
+	return begin() + dist; 
+    }
     template<typename Iterator>
-    iterator insert(const_iterator pos, Iterator first, Iterator last) {
+    enable_if_t<
+	!is_same_v<
+            value_type_t<Iterator>,
+            void>,
+	iterator>
+    insert(const_iterator pos, Iterator first, Iterator last) {
 	if(pos < begin() || pos > end())
 	    return end();
 

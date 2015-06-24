@@ -121,30 +121,35 @@ void init_process()
     if(afaf == v1.begin()+1) printf("yes\n");
     printf("erasing begin():     ");
     for(auto i : v1)
-	printf("%d, ", i);
+    	printf("%d, ", i);
     printf("\n");
 
     v1.insert(v1.begin(), 3);
     printf("insert 3 at begin(): ");
     for(auto i : v1)
-	printf("%d, ", i);
+    	printf("%d, ", i);
     printf("\n");
 
     aos::vector<int> v3; v3.push_back(133); v3.push_back(144); v3.push_back(155);
     v1.insert(v1.begin() + 3, aos::begin(v3), aos::end(v3));
     printf("insert range at begin(): ");
     for(auto i : v1)
-	printf("%d, ", i);
+    	printf("%d, ", i);
     printf("\n");
 
-    aos::vector<int> const v2;
+    // v1.insert(v1.begin() + 3, 4, 111); // had to use SFINAE for this one...
+    // printf("insert bulk at begin()+3: ");
+    // for(auto i : v1)
+    // 	printf("%d, ", i);
+    // printf("\n");
+
+    aos::vector<int> const v2{};
     auto c = v2.begin();
     auto e = v2.front();
     auto g = v2[3];
     auto v = v2.end();
     // v2.insert(v2.begin(), 3); // cannot insert into a const vector
     monitor();
-    
     printk("Forking: \n");
     int proc = fork();    
     printk(TRACE "this is process %i\n",proc);

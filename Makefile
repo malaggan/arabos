@@ -107,6 +107,7 @@ OBJ_LINK_LIST:=$(CRTI_OBJ) $(CRTBEGIN_OBJ) $(filter-out $(CRTI_OBJ) $(CRTN_OBJ),
 link: $(SUBDIRS)
 	@echo linking
 	$(CC) $(OBJ_LINK_LIST) -o $(KERN_BIN) $(LDFLAGS)
+	~/opt/bin/i386-elf-nm $(KERN_BIN) > kernel.sym # for bochs internal debugger
 	@echo
 
 $(KERN_BIN): link
@@ -137,7 +138,7 @@ clean: $(foreach DIR,$(SUBDIRS),$(DIR).clean)
 	@$(MAKE) -C $* clean_files --no-print-directory
 
 debug:
-	gdbtui kernel.k -x gdbscript
+	~/opt/bin/i386-elf-gdb --tui kernel.k -x gdbscript
 
 
 

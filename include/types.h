@@ -71,6 +71,8 @@ namespace aos {
     struct is_same : false_type {}; 
     template<class T>
     struct is_same<T, T> : true_type {};
+    template<class T, class U>
+    constexpr bool is_same_v = is_same<T, U>::value;
 
     template< class T > struct remove_reference      {typedef T type;};
     template< class T > struct remove_reference<T&>  {typedef T type;};

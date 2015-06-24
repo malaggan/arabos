@@ -22,11 +22,11 @@ namespace __detail {
 	operator vector_iterator<remove_pointer_t<It> const *>() const
 	{ return vector_iterator<remove_pointer_t<It> const *>{begin,current,end}; }
 
-	explicit vector_iterator(It begin, It end)
-	    : begin{begin}, current{begin}, end{end} {}
+	explicit vector_iterator(It _begin, It _end)
+	    : begin{begin}, current{_begin}, end{_end} {}
 
-	explicit vector_iterator(It begin, It current, It end)
-	    : begin{begin}, current{current}, end{end} {}
+	explicit vector_iterator(It _begin, It _current, It _end)
+	    : begin{_begin}, current{_current}, end{_end} {}
 
 	auto get() { return current; }
 
@@ -253,9 +253,27 @@ public:
 
 	return _create_iterator( p );
     }
-    iterator insert(const_iterator, size_type, value_type const &); // TODO: implement
+    iterator insert(const_iterator pos, size_type n, value_type const &value) {
+	// same as insert(const_iterator, Iterator, Iterator) but using same vlue
+	if(pos < begin() || pos > end())
+	    return end();
+
+	auto dist = distance(cbegin(), pos);
+
+	if(n == 0) return begin() + dist;
+
+	while(n --> 0)
+	    insert(pos, value);
+
+	return begin() + dist;
+    }
     template<typename Iterator>
-    iterator insert(const_iterator pos, Iterator first, Iterator last) {
+    enable_if_t<
+	!is_same_v<
+            value_type_t<Iterator>,
+            void>,
+	iterator>
+    insert(const_iterator pos, Iterator first, Iterator last) {
 	if(pos < begin() || pos > end())
 	    return end();
 

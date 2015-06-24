@@ -96,11 +96,16 @@ void init_process()
     auto h = v1.size();
     auto u = v1.end();
     v1.erase(b);
+    v1.insert(v1.begin(), 3);
+    for(auto i : v1)
+	printf("%d, ", i);
+    printf("\n");
     aos::vector<int> const v2;
     auto c = v2.begin();
     auto e = v2.front();
     auto g = v2[3];
     auto v = v2.end();
+    // v2.insert(v2.begin(), 3); // cannot insert into a const vector
     monitor();
     
     printk("Forking: \n");

@@ -45,13 +45,7 @@ void printk (const char *, ...);
 
 #ifdef __cplusplus
 } extern "C++" {
-
-void* operator new(size_t size);
-void* operator new[](size_t size);
-void operator delete(void * ptr);
-void operator delete[](void * ptr);
-
-
+#include <stl/new.hh>
 enum CacheMode {WriteBack = 0, WriteThrough};
 enum Privilage {Supervisor = 0, User};
 enum Access {ReadOnly=0, ReadWrite};

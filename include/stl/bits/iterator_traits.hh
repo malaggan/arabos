@@ -15,6 +15,7 @@ struct __iterator_traits<It, void_t<typename It::iterator_category,
     using value_type        = typename It::value_type;
     using difference_type   = typename It::difference_type;
     using pointer           = typename It::pointer;
+    using const_pointer     = remove_pointer_t<pointer> const *; // non-standard
     using reference         = typename It::reference;
 };
 
@@ -29,6 +30,7 @@ struct iterator_traits<T*>
     using value_type        = T;
     using difference_type   = ptrdiff_t;
     using pointer           = T*;
+    using const_pointer     = T const *; // non-standard
     using reference         = T&;
 };
 
@@ -40,6 +42,7 @@ struct iterator_traits<T const *>
     using value_type        = T;
     using difference_type   = ptrdiff_t;
     using pointer           = T const *;
+    using const_pointer     = T const *; // non-standard
     using reference         = T const &;
 };
 
@@ -48,4 +51,5 @@ template <typename It> using iterator_category_t	= typename iterator_traits<It>:
 template <typename It> using value_type_t		= typename iterator_traits<It>::value_type;
 template <typename It> using difference_type_t		= typename iterator_traits<It>::difference_type;   
 template <typename It> using pointer_t			= typename iterator_traits<It>::pointer;
+template <typename It> using const_pointer_t		= typename iterator_traits<It>::const_pointer;
 template <typename It> using reference_t		= typename iterator_traits<It>::reference;

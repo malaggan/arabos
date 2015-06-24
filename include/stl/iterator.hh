@@ -3,7 +3,7 @@
 #pragma once
 
 #include <types.h> // for ptrdiff_t and move
-
+#include <stl/new.hh>
 namespace aos {
 
 #include <stl/bits/iterator_type.hh>
@@ -22,6 +22,8 @@ namespace aos {
     // std::lock_guard<std::mutex>
 #include <stl/bits/copy.hh>
 #include <stl/bits/move.hh>
+#include <stl/bits/copy_backward.hh>
+#include <stl/bits/move_backward.hh>
 #include <stl/bits/uninitialized_copy.hh>
 #include <stl/bits/uninitialized_move.hh>
 #include <stl/bits/swap.hh>

@@ -7,3 +7,4 @@ OutputIt copy(InputIt first, InputIt last,
     }
     return d_first;
 }
+

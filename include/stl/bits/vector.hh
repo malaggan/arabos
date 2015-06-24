@@ -88,7 +88,7 @@ namespace __detail {
     inline bool
     operator<(const vector_iterator<ItL>& x,
 	      const vector_iterator<ItR>& y)
-    { return y.base() < x.base(); }
+    { return x.base() < y.base(); }
 
     template<typename ItL, typename ItR>
     inline bool
@@ -118,34 +118,33 @@ namespace __detail {
     inline auto
     operator-(const vector_iterator<ItL>& x,
 	      const vector_iterator<ItR>& y)
-    { return y.base() - x.base(); }	
+    { return x.base() - y.base(); }
 
 }
 
-	
 template<typename T>
 class vector {
-    shared_array<T> m_array;
-    uint32_t m_capacity;
-    uint32_t m_size;
 public:
-    using size_type		= size_t ;
+    using size_type		= size_t;
     using value_type		= T;
-    using reference		= T& ;
-    using const_reference	= T const& ;
+    using reference		= value_type&;
+    using const_reference	= value_type const&;
     using iterator		= __detail::vector_iterator<value_type      *>;
     using const_iterator	= __detail::vector_iterator<value_type const*>;
-
-    // NOTE: T must be default constructible. Otherwise, we are going to have to use uninitialized storage and uninitialized_copy/move
-    vector() : m_array{new T[8]}, m_capacity{8}, m_size{0} {}
-
 private:
+    shared_array<value_type> m_array;
+    uint32_t m_capacity;
+    uint32_t m_size;
+
     using pointer = pointer_t<iterator>;
     using const_pointer = const_pointer_t<iterator>;
     iterator _create_iterator(pointer p) { return iterator{m_array.get(), p, m_array.get() + m_size}; }
     const_iterator _create_const_iterator(const_pointer p) const { return const_iterator{m_array.get(), p, m_array.get() + m_size}; }
 public:
-    
+
+    // NOTE: value_type must be default constructible. Otherwise, we are going to have to use uninitialized storage and uninitialized_copy/move
+    vector() : m_array{new value_type[8]}, m_capacity{8}, m_size{0} {}
+
     iterator begin() {
 	return iterator{m_array.get(), m_array.get()+m_size};
     }
@@ -153,49 +152,44 @@ public:
 	return const_iterator{m_array.get(), m_array.get()+m_size};
     }
 
-    iterator end() { return _create_iterator(m_array.get()+m_size); } // TODO: adapt as sentinel 
+    iterator end() { return _create_iterator(m_array.get()+m_size); } // TODO: adapt as sentinel
     const_iterator end() const { return _create_const_iterator(m_array.get()+m_size); }
-    
+
     reference front() {
 	return *begin();
     }
     const_reference front() const {
 	return *begin();
     }
-    
+
     iterator erase(const_iterator first, const_iterator last) {
-    	if(first == last)
-    	    if(last == end())
-    		return last;
-    	    else
+	if(first == last)
+	    if(last == end())
+		return last;
+	    else
 	    {
 		++last;
-    		return last;
+		return last;
 	    }
-    	while(first != last)
+	while(first != last)
 	{   // Note: probably there are more efficient ways to do this
 	    erase(first);
 	    ++first;
 	}
-    	return end(); 
+	return end();
     }
     iterator erase(const_iterator it) {
-	if(it < begin() || it >= end())
-	    return end();
-	
+
+	if(it < begin())
+	    return printf("vector: it < begin()\n"),end();
+	if(it >= end())
+	    return printf("vector: it >= end()\n"),end();
+
 	pointer p = const_cast<pointer>(it.get());
-	iterator ret =
-	    (p + 1 == m_array.get() + m_size)
-	    ? end()
-	    : _create_iterator(p+1);
-	
-	p->~T();
-	while((p+1) != m_array.get() + m_size)
-	{
-	    // move ctor. use swap() instead?
-	    *p = move(*(p+1));
-	    ++p;
-	}
+	iterator ret = _create_iterator(p+1); // should correctly return end() as required in certain cases
+
+	p->~value_type();
+	move(p+1, m_array.get() + m_size, p);
 	--m_size;
 	return ret;
     }
@@ -203,10 +197,10 @@ public:
     void guarantee_capacity(size_t minimum_capacity) {
 	if(m_capacity >= minimum_capacity)
 	    return;
-	
+
 	auto new_capacity = m_capacity * 3; // TODO: check overflow
-	shared_array<T> new_array = shared_array<T>{new T[new_capacity]}; 
-	move(m_array.get(), m_array.get() + m_size, new_array.get()); 
+	shared_array<value_type> new_array = shared_array<value_type>{new value_type[new_capacity]};
+	move(m_array.get(), m_array.get() + m_size, new_array.get());
 	swap(m_array, new_array);
 
 	m_capacity = new_capacity;
@@ -225,9 +219,9 @@ public:
 	// To avoid default constructible assumption we have to do
 	// uninitialized_copy_backward, but call the destructors for
 	// all elements except "new end()".
-	
+
 	// move pos to pos+1 (make space).
-	move_backward(pos, const_iterator{end()}, _create_iterator(m_array.get() + m_size));
+	move_backward(pos, const_iterator{end()}, _create_iterator(m_array.get() + m_size + 1));
 
 	auto p = const_cast<pointer>(pos.get()); // no need to subtract: "before pos" is now "pos"
 	*p = value;
@@ -244,9 +238,9 @@ public:
 	auto needed_capacity = m_size+1;
 	guarantee_capacity(needed_capacity);
 
-	new (m_array.get() + m_size) value_type(); 
+	new (m_array.get() + m_size) value_type();
 
-	move_backward(pos, const_iterator{end()}, _create_iterator(m_array.get() + m_size));
+	move_backward(pos, const_iterator{end()}, _create_iterator(m_array.get() + m_size + 1));
 
 	auto p = const_cast<pointer>(pos.get());
 	*p = move(value);
@@ -259,20 +253,29 @@ public:
     template<typename Iterator>
     iterator insert(const_iterator, Iterator, Iterator); // TODO: implement
 
-
     bool empty() const noexcept {
 	return m_size == 0;
     }
     void clear() noexcept {
 	m_size = 0;
     }
-    
+
     size_type size() const noexcept {
 	return m_size;
     }
 
-    void push_back(value_type const &); // TODO: implement
-    void push_back(value_type &&); // TODO: implement
+    void push_back(value_type const &v) {
+	guarantee_capacity(m_size+1);
+	auto p = m_array.get() + m_size; // uninitialized
+	new (p) value_type(v); // copy constrictuble
+	++m_size;
+    }
+    void push_back(value_type &&v) {
+	guarantee_capacity(m_size+1);
+	auto p = m_array.get() + m_size;
+	new (p) value_type(move(v));
+	++m_size;
+    }
 
     reference at(size_type n) {
 	return *(begin() + n);

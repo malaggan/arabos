@@ -90,13 +90,42 @@ void init_process()
 
     int x = 5*6;
     aos::vector<int> v1;
-    auto b = v1.begin();
-    auto d = v1.front();
-    auto f = v1[3];
-    auto h = v1.size();
+    v1.push_back( 1 );
+    v1.push_back( 2 );
+    v1.push_back( 3 );
+    v1.push_back( 4 );
+    v1.push_back( 5 );
+    v1.push_back( 6 );
+    v1.push_back( 7 );
+    v1.push_back( 8 );
+    v1.push_back( 9 );
+    v1.push_back(10 );
+    v1.push_back(11 );
+    v1.push_back(12 );
+    v1.push_back(13 );
+    v1.push_back(14 );
+    v1.push_back(15 );
+    v1.push_back(16 );
+    v1.push_back(17 );
+    v1.push_back(18 );
+    v1.push_back(19 );
+    v1.push_back(20 );
+    v1.push_back(21 );
+    auto b = v1.begin(); printf("*begin() = %d\n", *b);
+    auto d = v1.front(); printf("front() = %d\n", d);
+    auto f = v1[3]; printf("[3] = %d\n", f);
+    auto h = v1.size(); printf("size = %d\n", h);
     auto u = v1.end();
-    v1.erase(b);
+    auto afaf = v1.erase(b);
+    if(afaf == v1.end()) printf("no\n");
+    if(afaf == v1.begin()+1) printf("yes\n");
+    printf("erasing begin():     ");
+    for(auto i : v1)
+	printf("%d, ", i);
+    printf("\n");
+
     v1.insert(v1.begin(), 3);
+    printf("insert 3 at begin(): ");
     for(auto i : v1)
 	printf("%d, ", i);
     printf("\n");

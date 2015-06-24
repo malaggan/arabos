@@ -151,9 +151,13 @@ public:
     const_iterator begin() const {
 	return const_iterator{m_array.get(), m_array.get()+m_size};
     }
+    const_iterator cbegin() const {
+	return const_iterator{m_array.get(), m_array.get()+m_size};
+    }
 
     iterator end() { return _create_iterator(m_array.get()+m_size); } // TODO: adapt as sentinel
     const_iterator end() const { return _create_const_iterator(m_array.get()+m_size); }
+    const_iterator cend() const { return _create_const_iterator(m_array.get()+m_size); }
 
     reference front() {
 	return *begin();
@@ -221,7 +225,7 @@ public:
 	// all elements except "new end()".
 
 	// move pos to pos+1 (make space).
-	move_backward(pos, const_iterator{end()}, _create_iterator(m_array.get() + m_size + 1));
+	move_backward(pos, cend(), _create_iterator(m_array.get() + m_size + 1));
 
 	auto p = const_cast<pointer>(pos.get()); // no need to subtract: "before pos" is now "pos"
 	*p = value;
@@ -251,7 +255,19 @@ public:
     }
     iterator insert(const_iterator, size_type, value_type const &); // TODO: implement
     template<typename Iterator>
-    iterator insert(const_iterator, Iterator, Iterator); // TODO: implement
+    iterator insert(const_iterator pos, Iterator first, Iterator last) {
+	if(pos < begin() || pos > end())
+	    return end();
+
+	auto dist = distance(cbegin(), pos);
+
+	if(first == last) return begin() + dist; //pos; cannot return pos because it is const_iterator, but we return iterator
+
+	while(first != last)
+	    insert(pos, *first++); // TODO: can be done more efficiently (insert by bulk)
+
+	return begin() + dist; // must do it here to account for possible pointer invalidation due to resize
+    }
 
     bool empty() const noexcept {
 	return m_size == 0;

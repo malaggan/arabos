@@ -36,3 +36,4 @@ kernel.map
 *.app
 /TAGS
 /#errors_summary#
+/.#errors_summary

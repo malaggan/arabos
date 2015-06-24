@@ -129,6 +129,14 @@ void init_process()
     for(auto i : v1)
 	printf("%d, ", i);
     printf("\n");
+
+    aos::vector<int> v3; v3.push_back(133); v3.push_back(144); v3.push_back(155);
+    v1.insert(v1.begin() + 3, aos::begin(v3), aos::end(v3));
+    printf("insert range at begin(): ");
+    for(auto i : v1)
+	printf("%d, ", i);
+    printf("\n");
+
     aos::vector<int> const v2;
     auto c = v2.begin();
     auto e = v2.front();

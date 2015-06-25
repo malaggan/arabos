@@ -7,7 +7,7 @@
 int sfs_write (const char UNUSED *path, const char  *buf, size_t  size, off_t  offset,
 	       int file_handle) // NOTE file_handle was f->fh , and f was fuse_file_info
 {
-    aos::string temp;
+    aos::string<128> temp;
 
     int file= file_handle;
     
@@ -22,7 +22,7 @@ int sfs_write (const char UNUSED *path, const char  *buf, size_t  size, off_t  o
     hd.blocks[hd.blocks[file].get<file_t>().inode].get<inode_t>().writecount++;
     hd.blocks[hd.blocks[file].get<file_t>().inode].get<inode_t>().mtime = aos::now();
       
-    aos::list<uint32_t> free_index=hd.search(size);
+    aos::static_vector<uint32_t,8> free_index=hd.search(size);
     //the file is empty
       
     if (hd.blocks[hd.blocks[file].get<file_t>().inode].get<inode_t>().index_file.empty())
@@ -45,7 +45,7 @@ int sfs_write (const char UNUSED *path, const char  *buf, size_t  size, off_t  o
 				 
 	hd.blocks[hd.blocks[file].get<file_t>().inode].get<inode_t>().index_file.clear();
 	data.insert(data.end(), buf, buf+size);
-	aos::list<uint32_t> free_index_2=hd.search(data.size());
+	aos::static_vector<uint32_t,8> free_index_2=hd.search(data.size());
 	auto free_ind=free_index_2.begin();
 	unsigned int free_index_size=free_index_2.size();
 	for(unsigned int i=0;i<free_index_size;i++)

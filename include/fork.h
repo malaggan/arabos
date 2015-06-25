@@ -8,11 +8,11 @@
 #ifndef _FORK_H
 #define	_FORK_H
 
+#include <idt.h>
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
-
-#include <idt.h>
 
 /*syscall*/
 IRQ(16)

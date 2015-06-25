@@ -1,3 +1,7 @@
 target remote localhost:1234
 
+set directories i386:console:boot:mm:lib:init:kernel:include:include/stl:include/stl/bits
+layout src # split
+break liballoc.c:512
+continue
 

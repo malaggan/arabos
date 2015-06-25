@@ -71,19 +71,32 @@ namespace aos {
     struct is_same : false_type {}; 
     template<class T>
     struct is_same<T, T> : true_type {};
+    template<class T, class U>
+    constexpr bool is_same_v = is_same<T, U>::value;
+
 
     template< class T > struct remove_reference      {typedef T type;};
     template< class T > struct remove_reference<T&>  {typedef T type;};
     template< class T > struct remove_reference<T&&> {typedef T type;};
     template< class T > using remove_reference_t = typename remove_reference<T>::type;
+
+    template< class T > struct remove_pointer      {typedef T type;};
+    template< class T > struct remove_pointer<T*>  {typedef T type;};
+    template< class T > using remove_pointer_t = typename remove_pointer<T>::type;
     
-    template<typename _Tp> constexpr _Tp&&
-    forward(remove_reference_t<_Tp>& __t) noexcept
-    { return static_cast<_Tp&&>(__t); }
+    template<typename T> constexpr T&&
+    forward(remove_reference_t<T>& t) noexcept
+    { return static_cast<T&&>(t); }
     
-    template<typename _Tp> constexpr _Tp&&
-    forward(remove_reference_t<_Tp>&& __t) noexcept
-    { return static_cast<_Tp&&>(__t); }
+    template<typename T> constexpr T&&
+    forward(remove_reference_t<T>&& t) noexcept
+    { return static_cast<T&&>(t); }
+
+    template<typename T>
+    constexpr remove_reference_t<T>&&
+    move(T&& t) noexcept
+    { return static_cast<remove_reference_t<T>&&>(t); }
+
     
 }
 #endif

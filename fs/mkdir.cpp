@@ -21,7 +21,7 @@ int  sfs_mkdir(const char *path , mode_t mode)
     if(parent==-1)
    	return -ENOENT;
 
-    aos::list<uint32_t> free_index=hd.search(2*sizeof(block_t));
+    auto free_index=hd.search(2*sizeof(block_t));
     if(free_index.size() !=2)
 	return -EEXIST;
     printk(DEBUG  "In Mkdir4  free_index:%d\n",free_index.front());

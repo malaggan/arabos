@@ -21,9 +21,11 @@
 // #include <array>
 // #include <map>
 // #include <utility>
+
 #include <types.h>
 #include <mm.h> // for placement new. // TODO: move new operators to <new.h>
 #include <lib.h> // for assert and printk
+#include <stl/iterator.hh>
 
 constexpr uint16_t BLOCK_SIZE = 512;
 constexpr uint16_t NUM_BLOCKS = 100; // TODO: read from ATA
@@ -70,8 +72,11 @@ struct stat
 
 #include <iterator.hh>
 
-extern "C"
-char *dirname (char *path) {
+
+inline char *dirname (char *path) __attribute__((always_inline));
+inline char *basename (char* path) __attribute__((always_inline));
+
+inline char *dirname (char *path) {
     if(!path || !*path)
 	return strdup(".");
 
@@ -89,8 +94,7 @@ char *dirname (char *path) {
     return strndup(path, last-path); // TODO: test
 }
 
-extern "C"
-char *basename (char* path) {
+inline char *basename (char* path) {
     if(!path || !*path)
 	return strdup(".");
 
@@ -134,7 +138,7 @@ struct data_t
 {
     //aos::static_vector<uint8_t,496> data;   //char not int
     aos::static_vector<char,496> data;
-    //aos::array<char,496> data;
+    //aos::static_vector<char,496> data;
     static constexpr block_type tag = block_type::data;
 } __attribute__((packed));
 
@@ -147,19 +151,19 @@ struct file_t
     static constexpr block_type tag = block_type::file;
     int inode;
     file_type type;
-    aos::string name;
+    aos::string<20> name;
     mode_t mode;
     bool is_symlink;
-    explicit file_t(aos::string  name , mode_t mode,file_type type,int inode,bool is_symlink);
+    explicit file_t(aos::string<20> const & name , mode_t mode, file_type type, int inode, bool is_symlink=false);
 
     bool isSymlink() const;
     bool isRoot() const;
 
-    int find(aos::string const path) const; // AAAAAH return by value !
-    int find(aos::list<aos::string>::const_iterator first, aos::list<aos::string>::const_iterator last) const;
+    int find(aos::string<128> const path) const; // AAAAAH return by value !
+    int find(aos::static_vector<aos::string<20>,10>::const_iterator first, aos::static_vector<aos::string<20>,10>::const_iterator last) const;
 
-    void split(const aos::string& str,const aos::string& delim,aos::list<aos::string>& parts);
-    void add(aos::list<uint32_t> index);
+    void split(const aos::string<128>& str,const aos::string<2>& delim,aos::static_vector<aos::string<20>,10>& parts); // TODO: should be static
+    void add(aos::static_vector<uint32_t,8> const & index);
     void add(int index);
     bool isDirectory() const;
     ~file_t(){} // AAAAH non-virtual destructor ! fine, if the class is final (keyword?)
@@ -218,7 +222,7 @@ struct block_t {
     block_type tag;
 
     /* static data member */
-    static constexpr uint16_t obj_size = block_size - sizeof(tag);
+    static constexpr uint16_t obj_size = block_size - sizeof(tag) - sizeof(uint32_t) /* because we are using static_vector instead of array */;
 
     /* non-static data member */
     // this is what is called a ``discriminated union''
@@ -226,7 +230,7 @@ struct block_t {
 	inode_t inode;
 	data_t data;
 	file_t file;
-	aos::array<uint8_t,obj_size> pad;
+	aos::static_vector<uint8_t,obj_size> pad;
     };
 
     // copy constructor
@@ -305,7 +309,7 @@ struct block_t {
 struct HDD
 {
 public:
-    aos::array<block_t,num_blocks> blocks;
+    aos::static_vector<block_t,num_blocks> blocks;
 
     HDD(): blocks{}
 	{
@@ -313,10 +317,10 @@ public:
 	    blocks[2].change_type<inode_t>();
 	    blocks[3].change_type<inode_t>(); //inode of the root
 	}
-    aos::list<uint32_t> search(size_t total_size);
+    aos::static_vector<uint32_t,8> search(size_t total_size);
 };
 
 extern HDD hd;
 extern file_t& ROOT;
 
-aos::vector<aos::string> sfs_readdir (const char *path);
+aos::static_vector<aos::string<20>,10> sfs_readdir (const char *path);

@@ -33,7 +33,7 @@ inode_t::inode_t()
 {
 }
 
-file_t::file_t(aos::string  name, mode_t mode,file_type type,int inode,bool is_symlink=false)
+file_t::file_t(aos::string<20> const &  name, mode_t mode,file_type type,int inode,bool is_symlink)
     :inode(inode),
      type(type),
      name(name),
@@ -44,20 +44,20 @@ file_t::file_t(aos::string  name, mode_t mode,file_type type,int inode,bool is_s
     // if(!isDirectory())
     //	contents = aos::make_shared<aos::vector<char>>();
 }
-void file_t::split(const aos::string& str, const aos::string& delim,aos::list<aos::string>& parts)
+void file_t::split(const aos::string<128>& str, const aos::string<2>& delim,aos::static_vector<aos::string<20>,10>& parts)
 {
    size_t start, end = 0;
   while (end < str.size()) {
     start = end;
-    while (start < str.size() && (delim.find(str[start]) !=aos::string::npos)) {
+    while (start < str.size() && (delim.find(str[start]) !=aos::string<2>::npos)) {
       start++;  // skip initial whitespace
     }
     end = start;
-    while (end < str.size() && (delim.find(str[end]) ==aos::string::npos)) {
+    while (end < str.size() && (delim.find(str[end]) ==aos::string<2>::npos)) {
       end++; // skip to end of word
     }
     if (end-start != 0) {  // just ignore zero-length strings.
-      parts.push_back(aos::string(str, start,end-start));
+	parts.push_back(aos::string<20>(str, start,end-start));
     }
   }
 }
@@ -67,7 +67,7 @@ bool file_t::isSymlink() const {return is_symlink;}
  */
 
 // AAAAAAAAAAAAAAAAAAAAH return by value not reference !!!!!!!!!!!!!
-int file_t::find(const aos::string path)	
+int file_t::find(const aos::string<128> path)	
     const
 {
     printk(DEBUG "IN FIND path=%s\n",path.c_str());
@@ -82,14 +82,14 @@ int file_t::find(const aos::string path)
     //  return -1;
     printk(DEBUG ">>>>>>>>>>>>>>>>>>>>>>>>>in loop of find 1 ");
     printk(DEBUG ">>>>>>>>>>>>>>>>>>>>>>>>>in  find 1 the original path is:%s ",path.c_str());
-    aos::list<aos::string> strs;
-    ROOT.split(path,"/",strs); 
+    aos::static_vector<aos::string<20>,10> strs;
+    ROOT.split(path,aos::string<2>{"/"},strs); 
     strs.erase(strs.begin());
     printk(DEBUG ">>>>>>>>>>>>>>>>>>>>>>>>>in for loop find 1 file name strs.begine():%s ",(*strs.begin()).c_str());
     return hd.blocks[0].get<file_t>().find(aos::begin(strs), aos::end(strs));////ROOT.find(aos::begin(strs), aos::end(strs));
 }
 
-int  file_t::find(aos::list<aos::string>::const_iterator first, aos::list<aos::string>::const_iterator last)
+int  file_t::find(aos::static_vector<aos::string<20>,10>::const_iterator first, aos::static_vector<aos::string<20>,10>::const_iterator last)
     const
 {
     assert(type==file_type::D);
@@ -129,7 +129,7 @@ int  file_t::find(aos::list<aos::string>::const_iterator first, aos::list<aos::s
 }
 
 
-void file_t::add(aos::list<uint32_t> index)
+void file_t::add(aos::static_vector<uint32_t,8> const &index)
 {
     for(unsigned int i=0;i<index.size();i++)
 	hd.blocks[inode].get<inode_t>().index_file.push_back(*(index.begin()));//++); // WARN: increment here does not make sense
@@ -162,11 +162,11 @@ bool inode_t::check_permission(uid_t uid, gid_t gid ) const {
 
 
 
-aos::list<uint32_t> HDD::search(size_t total_size) //// AAAAAH signed size !!
+aos::static_vector<uint32_t,8> HDD::search(size_t total_size) //// AAAAAH signed size !!
 {
     unsigned int blocks_num=aos::ceil((float)total_size/BLOCK_SIZE); // AAAAAAAH integer division
   
-    aos::list<uint32_t> free_index;
+    aos::static_vector<uint32_t,8> free_index;
     for(unsigned int i=0;i<blocks.size();i++)
     {
 	if(blocks[i].tag==block_type::free)

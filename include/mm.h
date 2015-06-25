@@ -45,18 +45,7 @@ void printk (const char *, ...);
 
 #ifdef __cplusplus
 } extern "C++" {
-
-void* operator new(size_t size);
-void* operator new[](size_t size);
-void operator delete(void * ptr);
-void operator delete[](void * ptr);
-// placement new
-inline void *operator new(size_t, void *p)     noexcept { return p; }
-inline void *operator new[](size_t, void *p)   noexcept { return p; }
-inline void  operator delete  (void *, void *) noexcept { }
-inline void  operator delete[](void *, void *) noexcept { }
-
-
+#include <stl/new.hh>
 
 enum CacheMode {WriteBack = 0, WriteThrough};
 enum Privilage {Supervisor = 0, User};

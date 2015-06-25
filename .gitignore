@@ -35,5 +35,8 @@ kernel.map
 *.out
 *.app
 
-TAGS
-*error_log
+/TAGS
+/#errors_summary#
+/.#errors_summary
+/kernel.sym
+/link_errors

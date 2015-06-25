@@ -9,8 +9,8 @@ int sfs_create (char const *path, mode_t mode, int /*out*/ *file_handle)
     if(p>=0)
 	return -EEXIST;
      
-    aos::list<aos::string> strs;
-    ROOT.split(path,"/",strs);; 
+    aos::static_vector<aos::string<20>,10> strs;
+    ROOT.split(aos::string<128>{path},aos::string<2>{"/"},strs);; 
     strs.erase(strs.begin());
     auto e = strs.end();
    
@@ -25,7 +25,7 @@ int sfs_create (char const *path, mode_t mode, int /*out*/ *file_handle)
 	return -ENOTDIR;
     }
 
-    aos::list<uint32_t> free_index=hd.search(2*sizeof(block_t));
+    auto free_index=hd.search(2*sizeof(block_t));
     if(free_index.size() !=2)
 	return -EEXIST;
     

@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #include <debug.h>
 #include <fork.h>
 
-
+#include <stl/iterator.hh>
 
 void cppmain();
 
@@ -89,8 +89,75 @@ void init_process()
     printk("in init now :)\n");
 
     int x = 5*6;
+    aos::static_vector<int, 10> v1;
+    v1.push_back( 1 );
+    v1.push_back( 2 );
+    v1.push_back( 3 );
+    v1.push_back( 4 );
+    v1.push_back( 5 );
+    v1.push_back( 6 );
+    v1.push_back( 7 );
+    v1.push_back( 8 );
+    v1.push_back( 9 );
+    v1.push_back(10 );
+    v1.push_back(11 );
+    v1.push_back(12 );
+    v1.push_back(13 );
+    v1.push_back(14 );
+    v1.push_back(15 );
+    v1.push_back(16 );
+    v1.push_back(17 );
+    v1.push_back(18 );
+    v1.push_back(19 );
+    v1.push_back(20 );
+    v1.push_back(21 );
+    auto b = v1.begin(); printf("*begin() = %d\n", *b);
+    auto d = v1.front(); printf("front() = %d\n", d);
+    auto f = v1[3]; printf("[3] = %d\n", f);
+    auto h = v1.size(); printf("size = %d\n", h);
+    auto u = v1.end();
+    auto afaf = v1.erase(b);
+    if(afaf == v1.end()) printf("no\n");
+    if(afaf == v1.begin()+1) printf("yes\n");
+    printf("erasing begin():     ");
+    for(auto i : v1)
+    	printf("%d, ", i);
+    printf("\n");
+
+    v1.insert(v1.begin(), 3);
+    printf("insert 3 at begin(): ");
+    for(auto i : v1)
+    	printf("%d, ", i);
+    printf("\n");
+
+    v1.erase(v1.begin());
+    v1.erase(v1.begin());
+    v1.erase(v1.begin());
+
+    aos::static_vector<int, 10> v3; v3.push_back(133); v3.push_back(144); v3.push_back(155);
+    v1.insert(v1.begin() + 3, aos::begin(v3), aos::end(v3));
+    printf("insert range at begin(): ");
+    for(auto i : v1)
+    	printf("%d, ", i);
+    printf("\n");
+
+    aos::string<300> s1{"hi"};
+    printf("s1: %s\n", s1.c_str());
+    if(s1 == aos::string<3>{"hi"} && !(s1== aos::string<3>{"hI"})) { printf("string == ok\n"); }
+
+    // v1.insert(v1.begin() + 3, 4, 111); // had to use SFINAE for this one...
+    // printf("insert bulk at begin()+3: ");
+    // for(auto i : v1)
+    // 	printf("%d, ", i);
+    // printf("\n");
+
+    aos::static_vector<int, 10> const v2{};
+    auto c = v2.begin();
+    auto e = v2.front();
+    auto g = v2[3];
+    auto v = v2.end();
+    // v2.insert(v2.begin(), 3); // cannot insert into a const static_vector
     monitor();
-    
     printk("Forking: \n");
     int proc = fork();    
     printk(TRACE "this is process %i\n",proc);

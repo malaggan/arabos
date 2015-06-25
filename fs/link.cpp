@@ -8,7 +8,7 @@ int sfs_link (const char *oldpath, const char *newpath)
     int file=ROOT.find(oldpath);
     if(file==-1)
 	return -ENOENT;
-    aos::list<uint32_t> free_index=hd.search(sizeof(block_t));
+    auto free_index=hd.search(sizeof(block_t));
     if(free_index.size() !=1)
 	return -EEXIST;
     if(ROOT.find(newpath)>=0)

@@ -1,11 +1,11 @@
 #include <file_t.h>
 
-aos::vector<aos::string> sfs_readdir (const char *path)
+aos::static_vector<aos::string<20>,10> sfs_readdir (const char *path)
 {
 
     int parent;
     parent=ROOT.find(path);
-    aos::vector<aos::string> temp;
+    aos::static_vector<aos::string<20>,10> temp;
     if(!(hd.blocks[parent].get<file_t>().isDirectory()))
       return temp;
     aos::static_vector<uint32_t,94> file_inode=hd.blocks[hd.blocks[parent].get<file_t>().inode].get<inode_t>().index_file;

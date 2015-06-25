@@ -10,7 +10,7 @@ int sfs_symlink(char const *target,char const *linkpath)
     if(ROOT.find(linkpath)>0)
 	return EEXIST;
 
-    aos::list<uint32_t> symlink_index = hd.search(sizeof(block_t)*3);
+    auto symlink_index = hd.search(sizeof(block_t)*3);
 
     hd.blocks[*(symlink_index.begin())].change_type<file_t>(basename(strdup(linkpath)), 0777,file_type::F,
 							    //*(++symlink_index.begin())

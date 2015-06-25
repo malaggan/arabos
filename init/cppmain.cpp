@@ -89,7 +89,7 @@ void init_process()
     printk("in init now :)\n");
 
     int x = 5*6;
-    aos::vector<int> v1;
+    aos::static_vector<int, 10> v1;
     v1.push_back( 1 );
     v1.push_back( 2 );
     v1.push_back( 3 );
@@ -130,7 +130,11 @@ void init_process()
     	printf("%d, ", i);
     printf("\n");
 
-    aos::vector<int> v3; v3.push_back(133); v3.push_back(144); v3.push_back(155);
+    v1.erase(v1.begin());
+    v1.erase(v1.begin());
+    v1.erase(v1.begin());
+
+    aos::static_vector<int, 10> v3; v3.push_back(133); v3.push_back(144); v3.push_back(155);
     v1.insert(v1.begin() + 3, aos::begin(v3), aos::end(v3));
     printf("insert range at begin(): ");
     for(auto i : v1)
@@ -143,12 +147,12 @@ void init_process()
     // 	printf("%d, ", i);
     // printf("\n");
 
-    aos::vector<int> const v2{};
+    aos::static_vector<int, 10> const v2{};
     auto c = v2.begin();
     auto e = v2.front();
     auto g = v2[3];
     auto v = v2.end();
-    // v2.insert(v2.begin(), 3); // cannot insert into a const vector
+    // v2.insert(v2.begin(), 3); // cannot insert into a const static_vector
     monitor();
     printk("Forking: \n");
     int proc = fork();    

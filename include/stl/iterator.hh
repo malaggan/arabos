@@ -34,41 +34,8 @@ namespace aos {
 #include <stl/bits/find.hh>
 #include <stl/bits/shared_ptr.hh>
 #include <stl/bits/vector.hh>
+#include <stl/bits/static_vector.hh>
     
-    template<typename T, size_t N>
-    class static_vector {
-	T a[N];
-    public:
-	typedef size_t size_type;
-	typedef T value_type;
-	typedef T& reference;
-	typedef T const& const_reference;
-	typedef T* iterator;
-	typedef T const* const_iterator;
-	typedef T* reverse_iterator;
-	typedef T const* const_reverse_iterator;
-	reference front(); // equivalent to *begin() // TODO: implement
-	const_reference front() const; // TODO: implement
-	iterator begin(); // TODO: implement
-	const_iterator begin() const; // TODO: implement
-	reverse_iterator rbegin();
-	const_reverse_iterator rbegin() const;
-	iterator end(); // TODO: implement
-	const_iterator end() const; // TODO: implement
-	iterator erase(const_iterator, const_iterator); // TODO: implement
-	iterator erase(const_iterator); // TODO: implement
-	bool empty() const noexcept; // TODO: implement
-	void clear() noexcept; // TODO: implement
-	size_type size() const noexcept; // TODO: implement
-	void push_back(value_type const &); // TODO: implement
-	void push_back(value_type &&); // TODO: implement
-	reference at(size_type); // TODO: implement
-	const_reference at(size_type) const; // TODO: implement
-	reference operator[](size_type); // TODO: implement
-	const_reference operator[](size_type) const; // TODO: implement
-    } __attribute__((packed));
-
-
     class time_point{
     } __attribute__((packed));
 

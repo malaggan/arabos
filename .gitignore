@@ -37,3 +37,4 @@ kernel.map
 /TAGS
 /#errors_summary#
 /.#errors_summary
+/kernel.sym

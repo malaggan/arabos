@@ -35,6 +35,7 @@ namespace aos {
 #include <stl/bits/shared_ptr.hh>
 #include <stl/bits/vector.hh>
 #include <stl/bits/static_vector.hh>
+#include <stl/bits/string.hh>
     
     class time_point{
     } __attribute__((packed));
@@ -42,32 +43,6 @@ namespace aos {
     __time_t to_time_t(time_point); // TODO: implement
 
     time_point now(); // TODO: implement
-
-    class string{
-    public:
-	string() {}
-	/*implicit*/ string(char const*str); // TODO: implement
-	typedef size_t size_type;
-	typedef char value_type;
-	typedef char& reference;
-	typedef char const& const_reference;
-	typedef char* iterator;
-	typedef char const* const_iterator;
-	iterator begin(); // TODO: implement
-	const_iterator begin() const; // TODO: implement
-	iterator end(); // TODO: implement
-	const_iterator end() const; // TODO: implement
-	size_t size() const noexcept; // TODO: implement
-	char const* c_str() const; // TODO: implement
-	reference at(size_type); // TODO: implement
-	const_reference at(size_type) const; // TODO: implement
-	reference operator[](size_type); // TODO: implement
-	const_reference operator[](size_type) const; // TODO: implement
-	iterator erase(const_iterator, const_iterator); // TODO: implement
-	iterator erase(const_iterator); // TODO: implement
-	bool empty() const noexcept; // TODO: implement
-    } __attribute__((packed));
-    bool operator==( const string& lhs, const string& rhs );
 
     template<typename T>
     class list {

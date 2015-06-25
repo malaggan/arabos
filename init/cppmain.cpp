@@ -141,6 +141,10 @@ void init_process()
     	printf("%d, ", i);
     printf("\n");
 
+    aos::string<300> s1{"hi"};
+    printf("s1: %s\n", s1.c_str());
+    if(s1 == aos::string<3>{"hi"} && !(s1== aos::string<3>{"hI"})) { printf("string == ok\n"); }
+
     // v1.insert(v1.begin() + 3, 4, 111); // had to use SFINAE for this one...
     // printf("insert bulk at begin()+3: ");
     // for(auto i : v1)

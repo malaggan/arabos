@@ -81,6 +81,7 @@ int esp = 0;
 #include <semaphore.h>
 
 volatile semaphore_t sem = 1;
+volatile semaphore_t children_finished = -1;
 volatile int owner = 0; // this is to force owner change, to test semaphors, instead of looping a constant number of times
 void monitor();
 // the init process
@@ -143,30 +144,29 @@ void init_process()
 	for(auto i : v1)
 	    printf("%d, ", i);
 	printf("\n");
-        // __asm__ __volatile__ ("xchg %bx,%bx\n"); // xxx
+        // __asm__ __volatile__ ("xchg %bx,%bx\n"); // magic breakpoint for bochs internal debugger
 	aos::vector<int> const v2(false);
-	// auto c = v2.begin();
-	// auto e = v2.front();
-	// auto g = v2[3];
-	// auto v = v2.end();
-	// // v2.insert(v2.begin(), 3); // cannot insert into a const vector
+	auto c = v2.begin();
+	auto e = v2.front();
+	auto g = v2[3];
+	auto v = v2.end();
+	// v2.insert(v2.begin(), 3); // cannot insert into a const vector
 
 	printf("testing vector ended. dtors (and shared_array deallocation) should run now\n");
     }
-    //printf("testing vector ended. now going into monitor\n");
-    //monitor();
+    printf("testing vector ended. now going into monitor\n");
 
     int x = 5*6;
     printk("Forking: \n");
     int proc = fork();    
     printk(TRACE "this is process %i\n",proc);
-    if(!proc)
+    if(!proc) // FIXME: fork returns zero to parent ??? this is wrong. 
     {
         wait(&sem);
     	owner = 0;
         while(x--)
         {
-    	    if(x%6==0)
+    	    if(x%6==5)
     	    {
     		signal(&sem);
     		// test semaphor: at no cost break printing 'A' except every 6 A's printed
@@ -179,6 +179,16 @@ void init_process()
             for(int i = 0; i < 0xFFF; i++);
         }
         signal(&sem);
+
+	// wait for all threads to finish
+	wait(&children_finished);
+	printf("\n");
+	SHOW_STAT_FAILED("Discovering devices");
+	SHOW_STAT_FAILED("Filesystem");
+	SHOW_STAT_FAILED("Networking");
+	SHOW_STAT_FAILED("Shell");
+
+	monitor();
     }
     else
     {
@@ -190,7 +200,7 @@ void init_process()
     	    owner = 1;
     	    while(x--)
             {
-    		if(x%6==0)
+    		if(x%6==5)
     		{
     		    signal(&sem);
     		    while(owner == 1)
@@ -202,32 +212,29 @@ void init_process()
     		for(int i = 0; i < 0xFFF; i++);
             }
     	    signal(&sem);
+	    signal(&children_finished);
         }
         else
     	{
             wait(&sem);
-    	    owner = 3;
+    	    owner = 2;
             while(x--)
     	    {
-    		if(x%6==0)
+    		if(x%6==5)
     		{
     		    signal(&sem);
-    		    while(owner == 3)
+    		    while(owner == 2)
     			;
     		    wait(&sem);
-    		    owner = 3;
+    		    owner = 2;
     		}
                 printk(BLUEB "C" NORMAL);
                 for(int i = 0; i < 0xFFF; i++);
             }
             signal(&sem);
+	    signal(&children_finished);
         }
     }
-    
-    SHOW_STAT_FAILED("Discovering devices");
-    SHOW_STAT_FAILED("Filesystem");
-    SHOW_STAT_FAILED("Networking");
-    SHOW_STAT_FAILED("Shell");
 }
 
 // this function doesn't return unless when powering off the system

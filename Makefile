@@ -53,7 +53,7 @@ UNHOSTED := -nostartfiles -nostdinc -nostdlib -ffreestanding
 # -s for strip all sybols, -x for discard local symbols
 LDFLAGS := $(UNHOSTED) -Wl,-T$(LINKER_SCRIPT) -Wl,-Map -Wl,$(KERNEL_MAP) # -Wl,-print-memory-usage
 #DBG := -gdwarf-2 -DDBG_DWARF2
-DBG := -gstabs -DDBG_STABS
+DBG := -ggdb3 #-gstabs -DDBG_STABS
 INCLUDE := include -I../include -I../include/c++ -I../include/c++/c++
 
 #####!!!!!!!!!!!!!!!############d
@@ -72,7 +72,7 @@ export ASFLAGS := -gstabs -c -m32 -I$(INCLUDE)
 # -Wno-unused-parameter to temporarily stops warning about non-used params
 # -Wconversion -Wpacked
 # i substituted '-ffreestanding' for "-nostdinc -mno-stack-arg-probe -fno-builtin"
-export CFLAGS := -c -m32 -std=c11 -Wc99-c11-compat\
+export CFLAGS := -c -O0 -m32 -std=c11 -Wc99-c11-compat\
 	$(UNHOSTED) -I$(INCLUDE) $(DBG) -fno-stack-protector\
 	-Wall -Wextra -pedantic -Wfloat-equal -Wshadow -Wpadded -Winline\
 	-Wunreachable-code -Wno-unused-parameter
@@ -81,7 +81,7 @@ export CFLAGS := -c -m32 -std=c11 -Wc99-c11-compat\
 #-nostartfiles -nostdlib -fno-rtti -fno-exceptions
 # since i didn't specify -nostartfiles, a fucn called _init will be created to initiate construtors of global objs
 # i think i should call it myself, since there is no main, that if the function returns w/out calling main
-export CXXFLAGS := -c -m32 -std=c++14 -Wc++14-compat\
+export CXXFLAGS := -c -O0 -m32 -std=c++14 -Wc++14-compat\
 	$(UNHOSTED) -fno-rtti -fno-exceptions -I$(INCLUDE) $(DBG)\
 	-Wall -Wextra -pedantic -Wunreachable-code -Wno-unused-parameter\
 	-Wfloat-equal -Wshadow -Wpadded -Winline -fno-stack-protector\

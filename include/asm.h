@@ -53,9 +53,18 @@ extern "C" {
 
 inline void atomic_inc(volatile unsigned int * variable) __attribute__((always_inline));
 inline void atomic_dec(volatile unsigned int * variable) __attribute__((always_inline));
+inline int fetch_and_add(volatile int * variable, int value) __attribute__((always_inline));
 inline uint32_t cmpxchg(volatile int * ptr, int _old, int _new) __attribute__((always_inline));
 inline void block_timer() __attribute__((always_inline));
 inline void unmask_timer() __attribute__((always_inline));
+
+inline int fetch_and_add(volatile int * variable, int value) {
+    ASM("lock; xaddl %%eax, %2;"
+		 :"=a" (value)                 
+		 :"a" (value), "m" (*variable) 
+		 :"memory");
+    return value;
+}    
     
 inline void atomic_inc(volatile unsigned int * variable) {
     ASM("lock; incl %[v];"

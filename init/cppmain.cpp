@@ -90,7 +90,6 @@ void init_process()
     printk("in init now :)\n");
 
     int x = 5*6;
-    identify_drive();
     monitor();
     
     printk("Forking: \n");

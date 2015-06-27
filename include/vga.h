@@ -1,7 +1,6 @@
-// implemented from info at http://www.osdever.net/FreeVGA/vga/vga.htm
+#pragma once
 
-#ifndef _VGA_H
-#define	_VGA_H
+// implemented from info at http://www.osdever.net/FreeVGA/vga/vga.htm
 
 #ifdef	__cplusplus
 extern "C" {
@@ -94,5 +93,3 @@ extern "C" {
 #ifdef	__cplusplus
 }
 #endif
-
-#endif	/* _VGA_H */

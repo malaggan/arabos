@@ -1,5 +1,4 @@
-#ifndef TIMER_H
-#define TIMER_H
+#pragma once
 
 #include "idt.h"
 
@@ -33,5 +32,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif //TIMER_H

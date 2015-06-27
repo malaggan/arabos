@@ -1,5 +1,4 @@
-#ifndef KB_H
-#define KB_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,5 +27,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif //KB_H

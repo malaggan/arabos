@@ -1,5 +1,4 @@
-#ifndef _ECMA48_H
-#define	_ECMA48_H
+#pragma once
 
 #ifdef	__cplusplus
 extern "C" {
@@ -51,5 +50,3 @@ extern "C" {
 #ifdef	__cplusplus
 }
 #endif
-
-#endif	/* _ECMA48_H */

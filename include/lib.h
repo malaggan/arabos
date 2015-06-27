@@ -1,5 +1,4 @@
-#ifndef _LIB_H
-#define	_LIB_H
+#pragma once
 
 #include <types.h>
 
@@ -54,5 +53,3 @@ extern "C" {
 #ifdef	__cplusplus
 }
 #endif
-
-#endif	/* _LIB_H */

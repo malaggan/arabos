@@ -1,5 +1,4 @@
-#ifndef _LIBALLOC_H
-#define _LIBALLOC_H
+#pragma once
 
 #include <types.h>
 
@@ -64,5 +63,3 @@ extern "C" {
 #endif
 
 /** @} */
-
-#endif

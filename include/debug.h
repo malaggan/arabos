@@ -1,12 +1,4 @@
-/*
- * File:   debug.h
- * Author: meemo
- *
- * Created on March 18, 2009, 12:38 AM
- */
-
-#ifndef _DEBUG_H
-#define	_DEBUG_H
+#pragma once
 
 #ifdef	__cplusplus
 extern "C" {
@@ -74,5 +66,3 @@ extern "C" {
 #ifdef	__cplusplus
 }
 #endif
-
-#endif	/* _DEBUG_H */

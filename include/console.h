@@ -1,5 +1,4 @@
-#ifndef CONSOLE_H
-#define CONSOLE_H
+#pragma once
 
 #include <lib.h>
 
@@ -35,5 +34,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /*CONSOLE_H*/

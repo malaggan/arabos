@@ -1,12 +1,4 @@
-/*
- * File:   semaphore.h
- * Author: meemo
- *
- * Created on May 9, 2009, 11:27 PM
- */
-
-#ifndef _SEMAPHORE_H
-#define	_SEMAPHORE_H
+#pragma once
 
 #ifdef	__cplusplus
 extern "C" {
@@ -19,5 +11,3 @@ extern "C" {
 #ifdef	__cplusplus
 }
 #endif
-
-#endif	/* _SEMAPHORE_H */

@@ -1,5 +1,4 @@
-#ifndef IDT_H
-#define IDT_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -79,5 +78,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif // IDT_H

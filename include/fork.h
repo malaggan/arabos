@@ -1,12 +1,4 @@
-/*
- * File:   fork.h
- * Author: meemo
- *
- * Created on April 25, 2009, 1:15 AM
- */
-
-#ifndef _FORK_H
-#define	_FORK_H
+#pragma once
 
 #include <idt.h>
 
@@ -27,5 +19,3 @@ extern "C" {
 #ifdef	__cplusplus
 }
 #endif
-
-#endif	/* _FORK_H */

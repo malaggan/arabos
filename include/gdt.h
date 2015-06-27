@@ -1,5 +1,4 @@
-#ifndef GDT_H
-#define GDT_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -67,5 +66,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif // GDT_H

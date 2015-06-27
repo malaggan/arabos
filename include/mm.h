@@ -1,5 +1,4 @@
-#ifndef MM_H
-#define MM_H
+#pragma once
 
 #include <types.h>
 #include <liballoc.h>
@@ -127,5 +126,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif // MM_H

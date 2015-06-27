@@ -1,25 +1,8 @@
 # -*- mode: Makefile; -*-
-# Copyright (C) 2007  Mohammad Nabil 
-# mohammad (dot) nabil (dot) h (at) gmail (dot) com
-# 
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-# 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 .PHONY: default clean_files
 
 # $(MODULE_NAME) must be equal to the name of the module directory
-# anyway $(MODULE_NAME) was just put to make 'make' shows 
+# anyway $(MODULE_NAME) was just put to make 'make' shows
 # ``$(MODULE_NAME) is up to date " instead of ``'build' is up to date"
 
 default: all
@@ -53,13 +36,13 @@ build_$(MODULE_NAME): del_errs $(OBJS)
 
 ../obj/%.o: %.cpp
 	@echo '+ CXX $(DIR)/$<'
-	@echo '+ CXX $(DIR)/$<' >>error_log 
+	@echo '+ CXX $(DIR)/$<' >>error_log
 	@( $(CXX) $< $(CXXFLAGS) -MD -MF $*.d -MT ../obj/$*.o -MT $*.d -o ../obj/$@ 2>>error_log )
 #-fdebug-prefix-map==$(DIR)/ # no used cuz not supported on older compilers
 
 ../obj/%.o: %.c
 	@echo '+ CC $(DIR)/$<'
-	@echo '+ CC $(DIR)/$<' >>error_log 
+	@echo '+ CC $(DIR)/$<' >>error_log
 	@( $(CC) $< $(CFLAGS) -MD -MF $*.d -MT ../obj/$*.o -MT $*.d -o ../obj/$@ 2>>error_log )
 #	-@$(LINT) $< -I$(INCLUDE)
 
@@ -70,7 +53,7 @@ build_$(MODULE_NAME): del_errs $(OBJS)
 
 #########################
 
-clean_files:    
+clean_files:
 	@$(subst FILE,*.d,$(RM))
 	@$(subst FILE,error_log,$(RM))
 

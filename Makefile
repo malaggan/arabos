@@ -1,21 +1,3 @@
-# Copyright (C) 2007  Mohammad Nabil
-# mohammad (dot) nabil (dot) h (at) gmail (dot) com
-#
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-
 default: all
 .PHONY: all clean link install build TAGS cloc
 
@@ -28,7 +10,7 @@ TAGS:
 
 # source code statistics:
 cloc:
-	find . -name '*.c' -or -name '*.h' -or -name '*.hh' -or -name '*.cpp' -or -name '*.S' | xargs cloc	
+	find . -name '*.c' -or -name '*.h' -or -name '*.hh' -or -name '*.cpp' -or -name '*.S' | xargs cloc
 
 RM := (ls FILE && rm FILE) > /dev/null 2>&1 || true
 JOBS := 4
@@ -113,7 +95,7 @@ OBJ_LINK_LIST:=$(CRTI_OBJ) $(CRTBEGIN_OBJ) $(filter-out $(CRTI_OBJ) $(CRTN_OBJ),
 link: $(SUBDIRS)
 	@echo linking
 	$(CC) $(OBJ_LINK_LIST) -o $(KERN_BIN) $(LDFLAGS) 2>link_errors
-	@cat link_errors 
+	@cat link_errors
 	@cat link_errors >> errors_summary
 	~/opt/bin/i386-elf-nm $(KERN_BIN) > kernel.sym # for bochs internal debugger
 	@echo

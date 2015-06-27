@@ -2,10 +2,6 @@
 #include <timer.h>
 #include <types.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define ASM __asm__ __volatile__
 
 #define rebp(ebp) ASM ( "movl %%ebp,%0" : "=a" (ebp));
@@ -51,39 +47,18 @@ extern "C" {
 // val must be 64 bits long
 #define rdtscll(val) ASM("rdtsc" : "=A" (val))
 
-#ifndef __cplusplus
-	inline void atomic_inc(volatile unsigned int * variable) __attribute__((always_inline));
-	inline void atomic_dec(volatile unsigned int * variable) __attribute__((always_inline));
-#endif
-	inline int fetch_and_add(volatile int * variable, int value) __attribute__((always_inline));
-	inline uint32_t cmpxchg(volatile int * ptr, int _old, int _new) __attribute__((always_inline));
-	inline void block_timer() __attribute__((always_inline));
-	inline void unmask_timer() __attribute__((always_inline));
+inline int fetch_and_add(volatile int * variable, int value) __attribute__((always_inline));
+inline uint32_t cmpxchg(volatile int * ptr, int _old, int _new) __attribute__((always_inline));
+inline void block_timer() __attribute__((always_inline));
+inline void unmask_timer() __attribute__((always_inline));
 
-	inline int fetch_and_add(volatile int * variable, int value) {
-		ASM("lock; xaddl %%eax, %2;"
-		    :"=a" (value)
-		    :"a" (value), "m" (*variable)
-		    :"memory");
-		return value;
-	}
-#ifndef __cplusplus
-	inline void atomic_inc(volatile unsigned int * variable) {
-		ASM("lock; incl %[v];"
-		    :: [v] "m" (*variable)
-		    :"memory");
-	}
-	inline void atomic_dec(volatile unsigned int * variable) {
-		ASM("lock; decl %[v];"
-		    :: [v] "m" (*variable)  //Input
-		    :"memory");
-	}
-#endif
-#ifdef __cplusplus
+inline int fetch_and_add(volatile int * variable, int value) {
+	ASM("lock; xaddl %%eax, %2;"
+	    :"=a" (value)
+	    :"a" (value), "m" (*variable)
+	    :"memory");
+	return value;
 }
-#endif
-
-#ifdef __cplusplus
 
 template<typename T>
 inline void atomic_inc(volatile T * variable) __attribute__((always_inline));
@@ -104,29 +79,19 @@ inline void atomic_dec(volatile T * variable) {
 }
 template void atomic_inc<uint_fast32_t>(volatile unsigned int * variable);
 template void atomic_dec<uint_fast32_t>(volatile unsigned int * variable);
-#endif
-
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 // returns zero on success
-	inline uint32_t cmpxchg(volatile int * ptr, int _old, int _new ) {
-		uint32_t ret;
-		ASM( "lock; cmpxchgl %2,%1"
-		     : "=a" (ret)/* %0 = %%eax */, "+m" (*ptr) /* %1 */
-		     : "r" (_new) /* %2 */, "0" (_old) /* %0 as well */
-		     : "cc", "memory");
+inline uint32_t cmpxchg(volatile int * ptr, int _old, int _new ) {
+	uint32_t ret;
+	ASM( "lock; cmpxchgl %2,%1"
+	     : "=a" (ret)/* %0 = %%eax */, "+m" (*ptr) /* %1 */
+	     : "r" (_new) /* %2 */, "0" (_old) /* %0 as well */
+	     : "cc", "memory");
 
-		return ret;
-	}
-
-	inline void block_timer() { atomic_dec(&scheduling_started); }
-	inline void unmask_timer() { atomic_inc(&scheduling_started); }
-
-	void cpuid_check();
-
-#ifdef __cplusplus
+	return ret;
 }
-#endif
+
+inline void block_timer() { atomic_dec(&scheduling_started); }
+inline void unmask_timer() { atomic_inc(&scheduling_started); }
+
+void cpuid_check();

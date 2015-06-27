@@ -33,7 +33,7 @@ void gdt_install()
 	gdt_ptr.limit = (sizeof(struct gdt_entry) * 3) - 1;
 	gdt_ptr.base = (unsigned int)&gdt;
 
-	/* Our NULL descriptor */
+	/* Our nullptr descriptor */
 	gdt_set_gate(0, 0, 0, (unsigned char)0, (unsigned char)0);
 
 	/* The second entry is our Code Segment. The base address

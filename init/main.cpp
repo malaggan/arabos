@@ -15,6 +15,7 @@
 
 /* Forward declarations. */
 void enter_cpp();
+extern "C" // extern C becaused called from assembly and we do not want name manling
 void cmain (unsigned long magic, unsigned long addr);
 
 void mem_check(unsigned long magic,unsigned long addr)
@@ -130,8 +131,7 @@ void mem_check(unsigned long magic,unsigned long addr)
 
 /* Check if MAGIC is valid and print the Multiboot information structure
    pointed by ADDR. */
-void
-cmain (unsigned long magic, unsigned long addr)
+void cmain (unsigned long magic, unsigned long addr)
 {
 	init_serial();
 	init_video();

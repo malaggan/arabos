@@ -2,10 +2,6 @@
 
 #include <lib.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define VM_ECMA 0 // if we should print ECMA in the VM lpt output
 
 #define COLUMNS	80
@@ -15,22 +11,18 @@ extern "C" {
 #define VIDEO	((unsigned short*)0xB8000)
 #define TTY_CNT 1
 
-	struct tty_t
-	{
-		int xpos,ypos;
-		unsigned short data[COLUMNS*LINES];
-	};
+struct tty_t
+{
+	int xpos,ypos;
+	unsigned short data[COLUMNS*LINES];
+};
 
-	extern struct tty_t ttys[];
-	extern unsigned int active_tty;
+extern struct tty_t ttys[];
+extern unsigned int active_tty;
 
-	void cls (void);
-	void putchar (int c);
-	void update_cursor(void);
-	void init_video(void);
-	void flush_video(struct tty_t* tty);
-	void flush_current_tty();
-
-#ifdef __cplusplus
-}
-#endif
+void cls (void);
+void putchar (int c);
+void update_cursor(void);
+void init_video(void);
+void flush_video(struct tty_t* tty);
+void flush_current_tty();

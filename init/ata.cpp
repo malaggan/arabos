@@ -337,7 +337,7 @@ void read(uint16_t data[256])
 	constexpr uint8_t slave = 0xF0;
 
 	outportb(REG_DEVICE, master | ((LBA >> 24) & 0x0F));
-	// Send a NULL byte to port 0x1F1, if you like (it is ignored and wastes lots of CPU time):
+	// Send a nullptr byte to port 0x1F1, if you like (it is ignored and wastes lots of CPU time):
 	outportb(REG_ERROR, 0x00);
 	outportb(REG_SECTOR_COUNT, count);
 	outportb(REG_LBA_LO , static_cast<uint8_t>(LBA));
@@ -368,7 +368,7 @@ void write()
 	constexpr uint8_t slave = 0xF0;
 
 	outportb(REG_DEVICE, master | ((LBA >> 24) & 0x0F));
-	// Send a NULL byte to port 0x1F1, if you like (it is ignored and wastes lots of CPU time):
+	// Send a nullptr byte to port 0x1F1, if you like (it is ignored and wastes lots of CPU time):
 	outportb(REG_ERROR, 0x00);
 	outportb(REG_SECTOR_COUNT, count);
 	outportb(REG_LBA_LO , static_cast<uint8_t>(LBA));

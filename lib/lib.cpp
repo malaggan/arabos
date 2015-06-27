@@ -1,23 +1,31 @@
 #include <asm.h>
 #include <lib.h>
-
-inline unsigned char *memcpy(unsigned char *dest, const unsigned char *src, size_t count)
+#include <liballoc.h> // for malloc
+inline void *memcpy(void *dest, const void *src, size_t count)
 {
 	ASM("cld\n"
 	    "rep\n"
-	    "movsb" :: "S"(src), "D"(dest), "c"(count));
+	    "movsb"
+	    ::
+	     "S"(reinterpret_cast<const uint8_t*>(src)),
+	     "D"(reinterpret_cast<uint8_t*>(dest)),
+	     "c"(count));
 	return dest;
 }
 
-inline unsigned short *memcpyw(unsigned short *dest, const unsigned short *src, size_t count)
+void *memcpyw(void *dest, const void *src, size_t count)
 {
 	ASM("cld\n"
 	    "rep\n"
-	    "movsw" :: "S"(src), "D"(dest), "c"(count));
+	    "movsw"
+	    ::
+	     "S"(reinterpret_cast<const uint16_t*>(src)),
+	     "D"(reinterpret_cast<uint16_t*>(dest)),
+	     "c"(count));
 	return dest;
 }
 
-inline unsigned char *memset(unsigned char *dest, char val, size_t count)
+unsigned char *memset(unsigned char *dest, char val, size_t count)
 {
 	ASM("cld\n"
 	    "rep\n"
@@ -25,7 +33,7 @@ inline unsigned char *memset(unsigned char *dest, char val, size_t count)
 	return dest;
 }
 
-inline unsigned short *memsetw(unsigned short *dest, unsigned short val, size_t count)
+unsigned short *memsetw(unsigned short *dest, unsigned short val, size_t count)
 {
 	ASM("cld\n"
 	    "rep\n"
@@ -103,7 +111,7 @@ itoa (char *buf, int base, int d)
 	}
 }
 
-inline int strnlen(const char *str, int max)
+int strnlen(const char *str, int max)
 {
 	int c = 0;
 
@@ -124,7 +132,7 @@ inline int strnlen(const char *str, int max)
   }
 */
 
-inline int strncmp(const char *s1,const char* s2, int len)
+int strncmp(const char *s1,const char* s2, int len)
 {
 	if(s1 == s2)
 		return(0);
@@ -154,15 +162,15 @@ void write_serial(char c) {
 	outportb(COM1_PORT,c);
 }
 
-char * strdup (const char *s) {
+char * strdup (const char *s) { // TODO: use shared_ptr, or guarantee there's is no leak
 	size_t len = strnlen (s, 10000) + 1;
 
-	void *new = malloc (len);
+	void *_new = malloc (len);
 
-	if (new == NULL)
-		return NULL;
+	if (_new == nullptr)
+		return nullptr;
 
-	return (char *) memcpy (new, s, len);
+	return (char *) memcpy (_new, s, len);
 }
 
 char * strndup (const char *s, size_t at_most) {
@@ -170,12 +178,12 @@ char * strndup (const char *s, size_t at_most) {
 
 	if(len > at_most)
 		len = at_most;
-	void *new = malloc (len);
+	void *_new = malloc (len);
 
-	if (new == NULL)
-		return NULL;
+	if (_new == nullptr)
+		return nullptr;
 
-	return (char *) memcpy (new, s, len);
+	return (char *) memcpy (_new, s, len);
 }
 
 

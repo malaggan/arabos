@@ -14,7 +14,6 @@
 
 void cppmain();
 
-extern "C"
 void enter_cpp()
 {
 
@@ -41,7 +40,7 @@ int kernel_end_addr=reinterpret_cast<int>(&__end),kernel_load_addr=reinterpret_c
 #define RBRACK	WHITE "]" NORMAL
 #define PREFILL(ch)	memsetw(ttys[active_tty].data+ttys[active_tty].ypos*COLUMNS,ch|(0x0700)/*|(ATTRIBUTE<<8)*/,COLUMNS);
 
-extern "C" void write_serial(char);
+void write_serial(char);
 
 void SHOW_STAT(char const * strWhat, char const * strStat, int len) {
 	// PREFILL('.');
@@ -218,7 +217,7 @@ void init_process()
 }
 
 // this function doesn't return unless when powering off the system
-extern "C" void _init();
+extern "C" void _init(); // extern "C" because the function is defined by GCC and we cannot control its name mangling
 void cppmain()
 {
 #if 1
@@ -272,8 +271,8 @@ void cppmain()
 
 	while(1); // will only get here till one time slice ends and never again
 }
-extern "C" void readline(char* buf, int max);
-extern "C" char* alloc_page();
+void readline(char* buf, int max);
+char* alloc_page();
 void print_monitor_help();
 void monitor()
 {

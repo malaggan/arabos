@@ -11,14 +11,6 @@
 
 /** @{ */
 
-#ifndef	NULL
-#define NULL		0
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /** This function is supposed to lock the memory data structures. It
  * could be as simple as disabling interrupts or acquiring a spinlock.
  * It's up to you to decide.
@@ -26,7 +18,7 @@ extern "C" {
  * \return 0 if the lock was acquired successfully. Anything else is
  * failure.
  */
-	extern int liballoc_lock();
+extern int liballoc_lock();
 
 /** This function unlocks what was previously locked by the liballoc_lock
  * function.  If it disabled interrupts, it enables interrupts. If it
@@ -34,16 +26,16 @@ extern "C" {
  *
  * \return 0 if the lock was successfully released.
  */
-	extern int liballoc_unlock();
+extern int liballoc_unlock();
 
 /** This is the hook into the local system which allocates pages. It
  * accepts an integer parameter which is the number of pages
  * required.  The page size was set up in the liballoc_init function.
  *
- * \return NULL if the pages were not allocated.
+ * \return nullptr if the pages were not allocated.
  * \return A pointer to the allocated memory.
  */
-	extern void* liballoc_alloc(size_t);
+extern void* liballoc_alloc(size_t);
 
 /** This frees previously allocated memory. The void* parameter passed
  * to the function is the exact same value returned from a previous
@@ -53,13 +45,10 @@ extern "C" {
  *
  * \return 0 if the memory was successfully freed.
  */
-	extern int liballoc_free(void*,size_t);
+extern int liballoc_free(void*,size_t);
 
-	void     *malloc(size_t);				///< The standard function.
-	void      free(void *);					///< The standard function.
+void     *malloc(size_t);				///< The standard function.
+void      free(void *);					///< The standard function.
 
-#ifdef __cplusplus
-}
-#endif
 
 /** @} */

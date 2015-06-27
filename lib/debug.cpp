@@ -8,7 +8,7 @@ Stab* stabs = reinterpret_cast<Stab*>(&__stab_start);
 Stab* stabs_end = reinterpret_cast<Stab*>(&__stab_end);
 char* stabstr = reinterpret_cast<char*>(&__stabstr_start);
 
-extern "C" void print_debug_info()
+void print_debug_info()
 {
 	printf("Stab info: .stab(0x%x-0x%x) (%d stabs). stabstr(0x%x-0x%x)\n",
 	       stabs,&__stab_end, stabs_end-stabs,stabstr,&__stabstr_end);
@@ -132,7 +132,7 @@ static void seek(int type, int addr, int &low, int &high)
 #endif
 }
 
-extern "C" void stab_data(int eip)
+void stab_data(int eip)
 {
 	int debug = D;
 	int stab_cnt = stabs_end-stabs;
@@ -197,7 +197,7 @@ extern "C" void stab_data(int eip)
 }
 
 
-extern "C" void print_stack_trace()
+void print_stack_trace()
 {
 	int* ebp;
 	rebp(ebp);
@@ -215,12 +215,12 @@ extern "C" void print_stack_trace()
 
 #elif DBG_DWARF2
 
-extern "C" void print_stack_trace()
+void print_stack_trace()
 {
 	printf("no debug info available\n");
 }
 
-extern "C" void print_debug_info()
+void print_debug_info()
 {
 	printf("dwarf debug mode\n");
 }

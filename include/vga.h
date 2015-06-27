@@ -2,10 +2,6 @@
 
 // implemented from info at http://www.osdever.net/FreeVGA/vga/vga.htm
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
 // ______________PORT IO________________
 
 // A - addr
@@ -87,9 +83,3 @@ extern "C" {
 #define VGA_GR_MISC_GFX_I           0x06
 #define VGA_GR_COLOR_DNT_CARE_I     0x07
 #define VGA_GR_BIT_MASK_I           0x08
-
-
-
-#ifdef	__cplusplus
-}
-#endif

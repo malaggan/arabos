@@ -47,7 +47,7 @@ typedef uint32_t gid_t;
 typedef uint32_t mode_t;
 typedef int64_t  __time_t;
 
-#ifdef __cplusplus
+
 namespace aos {
 	template<class T, T v>
 	struct integral_constant {
@@ -98,8 +98,3 @@ namespace aos {
 
 
 }
-#endif
-
-#ifndef __cplusplus
-#define NULL (0) // use nullptr in C++
-#endif

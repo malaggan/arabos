@@ -36,7 +36,7 @@ unsigned char shiftKeyboardUs[128] =
 };
 
 #include <asm.h>
-static char* input = NULL;
+static char* input = nullptr;
 static int cnt_read = 0;
 static int newline_read = 0; // boolean
 static int freeze = 0; // input exceeded buffer, freeze additions
@@ -56,7 +56,7 @@ void readline(char* buf, int max)
 	*input++=0;
 
 	// reset
-	input = NULL;
+	input = nullptr;
 	cnt_read = 0;
 	newline_read = 0;
 	freeze = 0;
@@ -64,7 +64,7 @@ void readline(char* buf, int max)
 
 void readline_handler(unsigned char c)
 { // TODO handle backspaces
-	if(NULL == input)
+	if(nullptr == input)
 		/* discard */;
 	else
 	{

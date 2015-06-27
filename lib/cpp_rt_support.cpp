@@ -6,13 +6,14 @@
  * 4- Exceptions
  * Note: Templates does not need runtime support
  * Note: Done with help from http://www.osdev.org/osfaq2/index.php/Doing%20a%20kernel%20in%20C%2B%2B
- * > When kernel exit I should call __cxa_finalize(NULL) to call all the global dtors
+ * > When kernel exit I should call __cxa_finalize(nullptr) to call all the global dtors
  */
 
 #include <lib.h>
 
 /* 1- Pure virtual functions */
 /* untested */
+extern "C" // extern "C" because called from libgcc
 void __cxa_pure_virtual()
 {
 	// print error message
@@ -38,6 +39,7 @@ unsigned int cDtors = 0;
  * __cxa_atexit -- register a function to be called by exit() or atexit() or when a shared library is unloaded
  * http://refspecs.freestandards.org/LSB_3.1.0/LSB-Core-generic/LSB-Core-generic/baselib---cxa-atexit.html
  */
+extern "C" // extern "C" because called from libgcc
 int __cxa_atexit(void (*func)(void *), void *arg, void /*unused*/ *dso_handle)
 {
 	if (cDtors >= MAX_DTORS)
@@ -51,7 +53,7 @@ int __cxa_atexit(void (*func)(void *), void *arg, void /*unused*/ *dso_handle)
 
 /* When __cxa_finalize(d) is called, it should walk the termination function
  * list, calling each in turn if d matches dso_handle for the termination
- * function entry. If d == NULL, it should call all of them. Multiple calls to
+ * function entry. If d == nullptr, it should call all of them. Multiple calls to
  * __cxa_finalize shall not result in calling termination function entries
  * multiple times; the implementation may either remove entries or mark them
  * finished.
@@ -59,6 +61,7 @@ int __cxa_atexit(void (*func)(void *), void *arg, void /*unused*/ *dso_handle)
  * NOTE: we don't use dynamic library loading and unloading, so we can safely
  * ignore dso_handle
  */
+extern "C" // extern "C" because called from libgcc
 void __cxa_finalize(void /* unsed */ *dso_handle)
 {
 	printk(TRACE "+enter __cxa_finalize()\n");

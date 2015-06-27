@@ -93,6 +93,7 @@ void irq_install()
  *	an EOI command to the first controller. If you don't send
  *	an EOI, you won't raise any more IRQs */
 #include <debug.h>
+extern "C" // called from assembly, so we do not want name mangling
 void irq_handler(struct interrupt_frame *r)
 {
 	/* This is a blank function pointer */

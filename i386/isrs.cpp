@@ -85,7 +85,7 @@ void* get_faulted_address()
 {
 	int cr2;
 	rcr2(cr2);
-	return cr2;
+	return reinterpret_cast<void*>(cr2);
 }
 
 int handling_fault = 0;
@@ -95,7 +95,9 @@ int handling_fault = 0;
  *	endless loop. All ISRs disable interrupts while they are being
  *	serviced as a 'locking' mechanism to prevent an IRQ from
  *	happening and messing up kernel data structures */
-void fault_handler(struct interrupt_frame *r)
+extern "C" // because called from assembly
+void
+fault_handler(struct interrupt_frame *r)
 {
 	handling_fault ++;
 	if (r->int_no < 32)

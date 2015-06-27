@@ -1,9 +1,5 @@
 #pragma once
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
 /* ECMA values
    ref : http://pueblo.sourceforge.net/doc/manual/ansi_color_codes.html */
 
@@ -45,8 +41,4 @@ extern "C" {
 #define REDB	ECMA_PREFIX ECMA_BACK_GND ECMA_RED   ECMA_SEPARATOR ECMA_SET_BOLD ECMA_SUFFIX
 #define BLUEB	ECMA_PREFIX ECMA_BACK_GND ECMA_BLUE  ECMA_SEPARATOR ECMA_SET_BOLD ECMA_SUFFIX
 
-	unsigned char ECMA48(const char ** format);
-
-#ifdef	__cplusplus
-}
-#endif
+unsigned char ECMA48(const char ** format);

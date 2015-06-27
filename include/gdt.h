@@ -1,9 +1,5 @@
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define KERNEL_CODE_SELECTOR 0x08
 #define KERNEL_DATA_SELECTOR 0x10
 
@@ -37,32 +33,28 @@ extern "C" {
 /* Defines a GDT entry. We say packed, because it prevents the
  *	compiler from doing things that it thinks is best: Prevent
  *	compiler "optimization" by packing */
-	struct gdt_entry
-	{ /*see http://www.osdever.net/tutorials/pm.php?the_id=16 for description*/
-		unsigned short limit_low;
-		unsigned short base_low;
-		unsigned char base_middle;
-		unsigned char access;
-		unsigned char granularity;
-		unsigned char base_high;
-	} __attribute__((packed));
+struct gdt_entry
+{ /*see http://www.osdever.net/tutorials/pm.php?the_id=16 for description*/
+	unsigned short limit_low;
+	unsigned short base_low;
+	unsigned char base_middle;
+	unsigned char access;
+	unsigned char granularity;
+	unsigned char base_high;
+} __attribute__((packed));
 
 /* Special pointer which includes the limit: The max bytes
  *	taken up by the GDT, minus 1. Again, this NEEDS to be packed */
-	struct tag_gdt_ptr/*the address of this struct is the one which is passed to the lgdt instuction*/
-	{
-		unsigned short limit;
-		unsigned int base;
-	} __attribute__((packed));
+struct tag_gdt_ptr/*the address of this struct is the one which is passed to the lgdt instuction*/
+{
+	unsigned short limit;
+	unsigned int base;
+} __attribute__((packed));
 
 /* This will be a function in start.asm. We use this to properly
  *	reload the new segment registers */
-	extern void gdt_flush();
+extern void gdt_flush();
 
 /* Setup a descriptor in the Global Descriptor Table */
-	void gdt_set_gate(int num, unsigned long base, unsigned long limit, unsigned char access, unsigned char gran);
-	void gdt_install();
-
-#ifdef __cplusplus
-}
-#endif
+void gdt_set_gate(int num, unsigned long base, unsigned long limit, unsigned char access, unsigned char gran);
+void gdt_install();

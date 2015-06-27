@@ -126,6 +126,7 @@ void init_process()
 	aos::vector<int> v3{}; v3.push_back(133); v3.push_back(144); v3.push_back(155);
 	printf("insert range at begin()+3: ");
 	v1.insert(v1.begin() + 3, aos::begin(v3), aos::end(v3));
+
 	for(auto i : v1)
 	    printf("%d, ", i);
 	printf("\n");

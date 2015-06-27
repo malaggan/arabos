@@ -1,19 +1,19 @@
-/* Copyright (C) 2007  Mohammad Nabil 
-mohammad (dot) nabil (dot) h (at) gmail (dot) com
+/* Copyright (C) 2007  Mohammad Nabil
+   mohammad (dot) nabil (dot) h (at) gmail (dot) com
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License
+   as published by the Free Software Foundation; either version 2
+   of the License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*/
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*/
 
 #ifndef GDT_H
 #define GDT_H
@@ -53,33 +53,33 @@ extern "C" {
 
 
 /* Defines a GDT entry. We say packed, because it prevents the
-*	compiler from doing things that it thinks is best: Prevent
-*	compiler "optimization" by packing */
-struct gdt_entry
-{ /*see http://www.osdever.net/tutorials/pm.php?the_id=16 for description*/
-	unsigned short limit_low;
-	unsigned short base_low;
-	unsigned char base_middle;
-	unsigned char access;
-	unsigned char granularity;
-	unsigned char base_high;
-} __attribute__((packed));
+ *	compiler from doing things that it thinks is best: Prevent
+ *	compiler "optimization" by packing */
+	struct gdt_entry
+	{ /*see http://www.osdever.net/tutorials/pm.php?the_id=16 for description*/
+		unsigned short limit_low;
+		unsigned short base_low;
+		unsigned char base_middle;
+		unsigned char access;
+		unsigned char granularity;
+		unsigned char base_high;
+	} __attribute__((packed));
 
 /* Special pointer which includes the limit: The max bytes
-*	taken up by the GDT, minus 1. Again, this NEEDS to be packed */
-struct tag_gdt_ptr/*the address of this struct is the one which is passed to the lgdt instuction*/
-{
-	unsigned short limit;
-	unsigned int base;
-} __attribute__((packed));
+ *	taken up by the GDT, minus 1. Again, this NEEDS to be packed */
+	struct tag_gdt_ptr/*the address of this struct is the one which is passed to the lgdt instuction*/
+	{
+		unsigned short limit;
+		unsigned int base;
+	} __attribute__((packed));
 
 /* This will be a function in start.asm. We use this to properly
-*	reload the new segment registers */
-extern void gdt_flush();
+ *	reload the new segment registers */
+	extern void gdt_flush();
 
 /* Setup a descriptor in the Global Descriptor Table */
-void gdt_set_gate(int num, unsigned long base, unsigned long limit, unsigned char access, unsigned char gran);
-void gdt_install();
+	void gdt_set_gate(int num, unsigned long base, unsigned long limit, unsigned char access, unsigned char gran);
+	void gdt_install();
 
 #ifdef __cplusplus
 }

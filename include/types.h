@@ -48,55 +48,55 @@ typedef uint32_t mode_t;
 typedef int64_t  __time_t;
 
 #ifdef __cplusplus
-namespace aos {  
-    template<class T, T v>
-    struct integral_constant {
-	static constexpr T value = v;
-	typedef T value_type;
-	typedef integral_constant type;
-	constexpr operator value_type() const noexcept { return value; }
-	constexpr value_type operator()() const noexcept { return value; } 
-    };
-    typedef integral_constant<bool,true> true_type;
-    typedef integral_constant<bool,false> false_type;
-    template<bool B, class T = void>
-    struct enable_if {}; 
-    template<class T>
-    struct enable_if<true, T> { typedef T type; };
-    template<bool B, class T = void>
-    using enable_if_t = typename enable_if<B,T>::type;
-    
-    template<class T, class U>
-    struct is_same : false_type {}; 
-    template<class T>
-    struct is_same<T, T> : true_type {};
-    template<class T, class U>
-    constexpr bool is_same_v = is_same<T, U>::value;
+namespace aos {
+	template<class T, T v>
+	struct integral_constant {
+		static constexpr T value = v;
+		typedef T value_type;
+		typedef integral_constant type;
+		constexpr operator value_type() const noexcept { return value; }
+		constexpr value_type operator()() const noexcept { return value; }
+	};
+	typedef integral_constant<bool,true> true_type;
+	typedef integral_constant<bool,false> false_type;
+	template<bool B, class T = void>
+	struct enable_if {};
+	template<class T>
+	struct enable_if<true, T> { typedef T type; };
+	template<bool B, class T = void>
+	using enable_if_t = typename enable_if<B,T>::type;
+
+	template<class T, class U>
+	struct is_same : false_type {};
+	template<class T>
+	struct is_same<T, T> : true_type {};
+	template<class T, class U>
+	constexpr bool is_same_v = is_same<T, U>::value;
 
 
-    template< class T > struct remove_reference      {typedef T type;};
-    template< class T > struct remove_reference<T&>  {typedef T type;};
-    template< class T > struct remove_reference<T&&> {typedef T type;};
-    template< class T > using remove_reference_t = typename remove_reference<T>::type;
+	template< class T > struct remove_reference      {typedef T type;};
+	template< class T > struct remove_reference<T&>  {typedef T type;};
+	template< class T > struct remove_reference<T&&> {typedef T type;};
+	template< class T > using remove_reference_t = typename remove_reference<T>::type;
 
-    template< class T > struct remove_pointer      {typedef T type;};
-    template< class T > struct remove_pointer<T*>  {typedef T type;};
-    template< class T > using remove_pointer_t = typename remove_pointer<T>::type;
-    
-    template<typename T> constexpr T&&
-    forward(remove_reference_t<T>& t) noexcept
-    { return static_cast<T&&>(t); }
-    
-    template<typename T> constexpr T&&
-    forward(remove_reference_t<T>&& t) noexcept
-    { return static_cast<T&&>(t); }
+	template< class T > struct remove_pointer      {typedef T type;};
+	template< class T > struct remove_pointer<T*>  {typedef T type;};
+	template< class T > using remove_pointer_t = typename remove_pointer<T>::type;
 
-    template<typename T>
-    constexpr remove_reference_t<T>&&
-    move(T&& t) noexcept
-    { return static_cast<remove_reference_t<T>&&>(t); }
+	template<typename T> constexpr T&&
+	forward(remove_reference_t<T>& t) noexcept
+	{ return static_cast<T&&>(t); }
 
-    
+	template<typename T> constexpr T&&
+	forward(remove_reference_t<T>&& t) noexcept
+	{ return static_cast<T&&>(t); }
+
+	template<typename T>
+	constexpr remove_reference_t<T>&&
+	move(T&& t) noexcept
+	{ return static_cast<remove_reference_t<T>&&>(t); }
+
+
 }
 #endif
 

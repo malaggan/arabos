@@ -8,9 +8,9 @@ template<typename Category, typename T, typename Distance = ptrdiff_t, typename 
 class iterator
 {
 public:
-    using  iterator_category	= Category 	;
-    using  value_type		= T        	;
-    using  difference_type	= Distance 	;
-    using  pointer		= Pointer  	;
-    using  reference		= Reference	;
+	using  iterator_category	= Category      ;
+	using  value_type		= T             ;
+	using  difference_type	= Distance      ;
+	using  pointer		= Pointer       ;
+	using  reference		= Reference	;
 };

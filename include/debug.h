@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   debug.h
  * Author: meemo
  *
@@ -46,34 +46,33 @@ extern "C" {
 //#define	N_LENG		0xfe	// length of preceding entry
 
 // Entries in the STABS table are formatted as follows.
-struct Stab {
-	unsigned long n_strx;	// index into string table of name
-	unsigned char n_type;   // type of symbol
-	unsigned char n_other;  // misc info (usually empty)
-	unsigned short n_desc;  // description field
-	unsigned int* n_value;	// value of symbol
-} __attribute__((packed));
+	struct Stab {
+		unsigned long n_strx;	// index into string table of name
+		unsigned char n_type;   // type of symbol
+		unsigned char n_other;  // misc info (usually empty)
+		unsigned short n_desc;  // description field
+		unsigned int* n_value;	// value of symbol
+	} __attribute__((packed));
 
 
-extern int __stab_start;
-extern int __stab_end;
-extern int __stabstr_start;
-extern int __stabstr_end;
-extern struct Stab* stabs;
-extern struct Stab* stabs_end;
-extern char* stabstr;
+	extern int __stab_start;
+	extern int __stab_end;
+	extern int __stabstr_start;
+	extern int __stabstr_end;
+	extern struct Stab* stabs;
+	extern struct Stab* stabs_end;
+	extern char* stabstr;
 
 /* DBG_STABS */
 #elif DBG_DWARF2
 
 #endif /* DBG_* */
 
-void print_stack_trace();
-void print_debug_info();
+	void print_stack_trace();
+	void print_debug_info();
 
 #ifdef	__cplusplus
 }
 #endif
 
 #endif	/* _DEBUG_H */
-

@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   semaphore.h
  * Author: meemo
  *
@@ -12,13 +12,12 @@
 extern "C" {
 #endif
 
-    typedef int semaphore_t;
-    void wait(volatile semaphore_t* sem);
-    void signal(volatile semaphore_t* sem);
+	typedef int semaphore_t;
+	void wait(volatile semaphore_t* sem);
+	void signal(volatile semaphore_t* sem);
 
 #ifdef	__cplusplus
 }
 #endif
 
 #endif	/* _SEMAPHORE_H */
-

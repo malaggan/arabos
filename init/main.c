@@ -1,19 +1,19 @@
-/* Copyright (C) 2007  Mohammad Nabil 
-mohammad (dot) nabil (dot) h (at) gmail (dot) com
+/* Copyright (C) 2007  Mohammad Nabil
+   mohammad (dot) nabil (dot) h (at) gmail (dot) com
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License
+   as published by the Free Software Foundation; either version 2
+   of the License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*/
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*/
 
 #include <multiboot.h>
 #include <lib.h>
@@ -54,7 +54,7 @@ void mem_check(unsigned long magic,unsigned long addr)
 	/* Are mem_* valid? */
 	if (CHECK_FLAG (mbi->flags, 0))
 		printk (DEBUG "mem_lower = %uKB, mem_upper = %uKB\n",
-		(unsigned) mbi->mem_lower, (unsigned) mbi->mem_upper);
+		        (unsigned) mbi->mem_lower, (unsigned) mbi->mem_upper);
 
 	/* Is boot_device valid? */
 	if (CHECK_FLAG (mbi->flags, 1))
@@ -71,14 +71,14 @@ void mem_check(unsigned long magic,unsigned long addr)
 		unsigned int i;
 
 		printk (DEBUG "mods_count = %d, mods_addr = 0x%x\n",
-			(int) mbi->mods_count, (int) mbi->mods_addr);
+		        (int) mbi->mods_count, (int) mbi->mods_addr);
 		for (i = 0, mod = (module_t *) mbi->mods_addr;
-			i < mbi->mods_count;
-			i++, mod += sizeof (module_t))
+		     i < mbi->mods_count;
+		     i++, mod += sizeof (module_t))
 			printk (DEBUG " mod_start = 0x%x, mod_end = 0x%x, string = %s\n",
-			(unsigned) mod->mod_start,
-			(unsigned) mod->mod_end,
-			(char *) mod->string);
+			        (unsigned) mod->mod_start,
+			        (unsigned) mod->mod_end,
+			        (char *) mod->string);
 	}
 
 	/* Bits 4 and 5 are mutually exclusive! */
@@ -94,20 +94,20 @@ void mem_check(unsigned long magic,unsigned long addr)
 		memory_map_t *mmap;
 
 		printk (LOG "mmap_addr = 0x%x, mmap_length = 0x%x\n",
-			(unsigned) mbi->mmap_addr, (unsigned) mbi->mmap_length);
+		        (unsigned) mbi->mmap_addr, (unsigned) mbi->mmap_length);
 #if 1
 		for (mmap = (memory_map_t *) mbi->mmap_addr;
-			(unsigned long) mmap < mbi->mmap_addr + mbi->mmap_length;
-			mmap = (memory_map_t *) ((unsigned long) mmap
-			+ mmap->size + sizeof (mmap->size)))
+		     (unsigned long) mmap < mbi->mmap_addr + mbi->mmap_length;
+		     mmap = (memory_map_t *) ((unsigned long) mmap
+		                              + mmap->size + sizeof (mmap->size)))
 			printk (LOG " size = 0x%x, base_addr = 0x%x%x,"
-			" length = 0x%x%x, type = 0x%x\n",
-			(unsigned) mmap->size,
-			(unsigned) mmap->base_addr_high,
-			(unsigned) mmap->base_addr_low,
-			(unsigned) mmap->length_high,
-			(unsigned) mmap->length_low,
-			(unsigned) mmap->type); // type == 1 -> indicates available RAM, otherwise reserved http://www.gnu.org/software/grub/manual/multiboot/html_node/Boot-information-format.html
+			        " length = 0x%x%x, type = 0x%x\n",
+			        (unsigned) mmap->size,
+			        (unsigned) mmap->base_addr_high,
+			        (unsigned) mmap->base_addr_low,
+			        (unsigned) mmap->length_high,
+			        (unsigned) mmap->length_low,
+			        (unsigned) mmap->type); // type == 1 -> indicates available RAM, otherwise reserved http://www.gnu.org/software/grub/manual/multiboot/html_node/Boot-information-format.html
 #endif
 	}
 
@@ -117,10 +117,10 @@ void mem_check(unsigned long magic,unsigned long addr)
 		aout_symbol_table_t *aout_sym = &(mbi->u.aout_sym);
 
 		printk (DEBUG "aout_symbol_table: tabsize = 0x%0x, "
-			"strsize = 0x%x, addr = 0x%x\n",
-			(unsigned) aout_sym->tabsize,
-			(unsigned) aout_sym->strsize,
-			(unsigned) aout_sym->addr);
+		        "strsize = 0x%x, addr = 0x%x\n",
+		        (unsigned) aout_sym->tabsize,
+		        (unsigned) aout_sym->strsize,
+		        (unsigned) aout_sym->addr);
 	}
 
 	/* Is the section header table of ELF valid? */
@@ -129,38 +129,38 @@ void mem_check(unsigned long magic,unsigned long addr)
 		elf_section_header_table_t *elf_sec = &(mbi->u.elf_sec);
 
 		printk (DEBUG "elf_sec: num = %u, size = 0x%x,"
-			" addr = 0x%x, shndx = 0x%x\n",
-			(unsigned) elf_sec->num, (unsigned) elf_sec->size,
-			(unsigned) elf_sec->addr, (unsigned) elf_sec->shndx); // we can read the kernel symbols from here for a stack-walker
-                
+		        " addr = 0x%x, shndx = 0x%x\n",
+		        (unsigned) elf_sec->num, (unsigned) elf_sec->size,
+		        (unsigned) elf_sec->addr, (unsigned) elf_sec->shndx); // we can read the kernel symbols from here for a stack-walker
+
 #if 1
-                Elf32_Shdr* sections = (Elf32_Shdr*)(elf_sec->addr);
-                for(int i = 0; i < elf_sec->num; i++)
-                {
-                    printf("%s ",//"Section %d : %s\n",i,
-                            (char*)(sections[elf_sec->shndx].sh_addr+sections[i].sh_name));
-                }
-                printf("\n");
+		Elf32_Shdr* sections = (Elf32_Shdr*)(elf_sec->addr);
+		for(int i = 0; i < elf_sec->num; i++)
+		{
+			printf("%s ",//"Section %d : %s\n",i,
+			       (char*)(sections[elf_sec->shndx].sh_addr+sections[i].sh_name));
+		}
+		printf("\n");
 #endif
 	}
 }
 
 /* Check if MAGIC is valid and print the Multiboot information structure
-pointed by ADDR. */
+   pointed by ADDR. */
 void
 cmain (unsigned long magic, unsigned long addr)
 {
-    init_serial();
+	init_serial();
 	init_video();
-        
-        int memCheck = 1;
-        if(memCheck)
-        {
-                mem_check(magic,addr);
-        }
-        
-        printk(DEBUG "Entering C++ main\n");
-        enter_cpp();
-        
-        printk(LOG "exiting cmain\n");
+
+	int memCheck = 1;
+	if(memCheck)
+	{
+		mem_check(magic,addr);
+	}
+
+	printk(DEBUG "Entering C++ main\n");
+	enter_cpp();
+
+	printk(LOG "exiting cmain\n");
 }

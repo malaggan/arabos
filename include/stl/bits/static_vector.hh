@@ -23,7 +23,7 @@ namespace __detail {
 	{ return static_vector_iterator<remove_pointer_t<It> const *>{begin,current,end}; }
 
 	explicit static_vector_iterator(It _begin, It _end)
-	    : begin{begin}, current{_begin}, end{_end} {}
+	    : begin{_begin}, current{_begin}, end{_end} {}
 
 	explicit static_vector_iterator(It _begin, It _current, It _end)
 	    : begin{_begin}, current{_current}, end{_end} {}

@@ -53,7 +53,7 @@ UNHOSTED := -nostartfiles -nostdinc -nostdlib -ffreestanding
 # -s for strip all sybols, -x for discard local symbols
 LDFLAGS := $(UNHOSTED) -Wl,-T$(LINKER_SCRIPT) -Wl,-Map -Wl,$(KERNEL_MAP) # -Wl,-print-memory-usage
 #DBG := -gdwarf-2 -DDBG_DWARF2
-DBG := -gstabs -DDBG_STABS
+DBG := -O0 -ggdb3 -DDBG_DWARF2 #-gstabs -DDBG_STABS
 INCLUDE := include -I../include -I../include/c++ -I../include/c++/c++
 
 #####!!!!!!!!!!!!!!!############d
@@ -64,7 +64,7 @@ export LINT := SPLINT
 #export ASFLAGS := -felf
 export FIND := find
 
-export ASFLAGS := -gstabs -c -m32 -I$(INCLUDE)
+export ASFLAGS := -c -m32 -I$(INCLUDE) -ggdb3 -DDBG_DWARF2 #-gstabs -DDBG_STABS
 
 # !-ansi for __asm__
 # -mno-stack-arg-probe for alloca

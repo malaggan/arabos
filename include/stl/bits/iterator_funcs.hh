@@ -1,8 +1,10 @@
 template<class InputIt>
 difference_type_t<InputIt>
 distance(InputIt first, InputIt last) {
-    difference_type_t<InputIt> dist = 0;
-    while(first++ != last) dist++;
+    difference_type_t<InputIt> dist{0};
+    if(first == last)
+	return dist;
+    while(++first != last) ++dist;
     return dist;
 }
 

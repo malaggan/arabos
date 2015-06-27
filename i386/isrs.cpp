@@ -68,7 +68,7 @@ void isr_install() {
  *	corresponds to each and every exception. We get the correct
  *	message by accessing like:
  *	exception_message[interrupt_number] */
-char *exception_messages[] =
+char const *exception_messages[] =
 {
 	"Division By Zero",
 	"Debug",

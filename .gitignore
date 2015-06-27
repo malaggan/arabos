@@ -34,3 +34,7 @@ kernel.map
 *.exe
 *.out
 *.app
+/TAGS
+/#errors_summary#
+/.#errors_summary
+/kernel.sym

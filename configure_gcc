@@ -72,7 +72,7 @@ fi
 
 
 popd
-# rm -rf "$mydir"
+rm -rf "$mydir"
 
 # # The following is the configuration for building GCC cross compiler (given that binutils are in prefix/target/bin)
 # # http://gcc.gnu.org/install/configure.html

@@ -18,11 +18,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #ifndef _LIB_H
 #define	_LIB_H
 
+#include <types.h>
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
-
-#include <types.h>
     
 unsigned char *memcpy(unsigned char *dest, const unsigned char *src, size_t count);
 unsigned short *memcpyw(unsigned short *dest, const unsigned short *src, size_t count);
@@ -56,6 +56,12 @@ void outportw (unsigned short _port, short _data);
 #define ERROR   "\314"
 #define SEVERE  "\315"
 #define LOG_ALL TRACE
+
+#define assert(cond) if(!(cond)){printk(ERROR "assertion failure %s:%d: \"" #cond "\"",__FILE__,__LINE__);}
+
+/* Return a new identical string.  */
+char * strdup (const char *str);
+char * strndup (const char *str, size_t at_most); 
 
 #define IO_WAIT "nop\n nop\n nop\n nop\n"
 

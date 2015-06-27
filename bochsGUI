@@ -536,7 +536,7 @@ floppy_bootsig_check: disabled=0
 #  2.2.6 2.6Ghz Intel Core 2 Duo with WinXP/g++ 3.4       21 to 25 Mips
 #  2.2.6 2.1Ghz Athlon XP with Linux 2.6/g++ 3.4          12 to 15 Mips
 #=======================================================================
-cpu: model=core2_penryn_t9600, count=1, ips=50000000, reset_on_triple_fault=1, ignore_bad_msrs=1, msrs="msrs.def"
+cpu: model=p4_willamette, count=1, ips=50000000, reset_on_triple_fault=1, ignore_bad_msrs=1, msrs="msrs.def"
 cpu: cpuid_limit_winnt=0
 
 
@@ -1109,7 +1109,7 @@ mouse: enabled=0
 # Default value is enabled=0.
 
 #=======================================================================
-#gdbstub: enabled=0, port=1234, text_base=0, data_base=0, bss_base=0
+gdbstub: enabled=0, port=1234, text_base=0, data_base=0, bss_base=0
 
 #=======================================================================
 # MAGIC_BREAK:
@@ -1120,7 +1120,7 @@ mouse: enabled=0
 # Example:
 #   magic_break: enabled=1
 #=======================================================================
-#magic_break: enabled=1
+magic_break: enabled=0
 
 #=======================================================================
 # DEBUG_SYMBOLS:
@@ -1132,7 +1132,7 @@ mouse: enabled=0
 #   debug_symbols: file="kernel.sym"
 #   debug_symbols: file="kernel.sym", offset=0x80000000
 #=======================================================================
-#debug_symbols: file="kernel.sym"
+debug_symbols: file="kernel.sym"
 
 #print_timestamps: enabled=1
 

@@ -17,10 +17,13 @@
 
 
 default: all
-.PHONY: all clean link install build TAGS
+.PHONY: all clean link install build TAGS cloc
 
 TAGS:
-	etags include/*.h boot/*.S console/*.c kernel/*.c lib/*.c lib/*.cpp mm/*.c mm/*.cpp init/*.c init/*.cpp i386/*.c 
+	find . -name '*.c' -or -name '*.h' -or -name '*.hh' -or -name '*.cpp' -or -name '*.S' | xargs etags	
+# source code statistics:
+cloc:
+	find . -name '*.c' -or -name '*.h' -or -name '*.hh' -or -name '*.cpp' -or -name '*.S' | xargs cloc	
 
 RM := (ls FILE && rm FILE) > /dev/null 2>&1 || true
 JOBS := 4
@@ -48,9 +51,9 @@ KERNEL_MAP := kernel.map
 
 UNHOSTED := -nostartfiles -nostdinc -nostdlib -ffreestanding
 # -s for strip all sybols, -x for discard local symbols
-LDFLAGS := $(UNHOSTED) -Wl,-T$(LINKER_SCRIPT) -Wl,-Map -Wl,$(KERNEL_MAP)
+LDFLAGS := $(UNHOSTED) -Wl,-T$(LINKER_SCRIPT) -Wl,-Map -Wl,$(KERNEL_MAP) # -Wl,-print-memory-usage
 #DBG := -gdwarf-2 -DDBG_DWARF2
-DBG := -gstabs -DDBG_STABS
+DBG := -O0 -ggdb3 -DDBG_DWARF2 #-gstabs -DDBG_STABS
 INCLUDE := include -I../include -I../include/c++ -I../include/c++/c++
 
 #####!!!!!!!!!!!!!!!############d
@@ -61,7 +64,7 @@ export LINT := SPLINT
 #export ASFLAGS := -felf
 export FIND := find
 
-export ASFLAGS := -gstabs -c -m32 -I$(INCLUDE)
+export ASFLAGS := -c -m32 -I$(INCLUDE) -ggdb3 -DDBG_DWARF2 #-gstabs -DDBG_STABS
 
 # !-ansi for __asm__
 # -mno-stack-arg-probe for alloca
@@ -69,7 +72,7 @@ export ASFLAGS := -gstabs -c -m32 -I$(INCLUDE)
 # -Wno-unused-parameter to temporarily stops warning about non-used params
 # -Wconversion -Wpacked
 # i substituted '-ffreestanding' for "-nostdinc -mno-stack-arg-probe -fno-builtin"
-export CFLAGS := -c -m32 -std=c11 -Wc99-c11-compat\
+export CFLAGS := -c -O0 -m32 -std=c11 -Wc99-c11-compat\
 	$(UNHOSTED) -I$(INCLUDE) $(DBG) -fno-stack-protector\
 	-Wall -Wextra -pedantic -Wfloat-equal -Wshadow -Wpadded -Winline\
 	-Wunreachable-code -Wno-unused-parameter
@@ -78,7 +81,7 @@ export CFLAGS := -c -m32 -std=c11 -Wc99-c11-compat\
 #-nostartfiles -nostdlib -fno-rtti -fno-exceptions
 # since i didn't specify -nostartfiles, a fucn called _init will be created to initiate construtors of global objs
 # i think i should call it myself, since there is no main, that if the function returns w/out calling main
-export CXXFLAGS := -c -m32 -std=c++14 -Wc++14-compat\
+export CXXFLAGS := -c -O0 -m32 -std=c++14 -Wc++14-compat\
 	$(UNHOSTED) -fno-rtti -fno-exceptions -I$(INCLUDE) $(DBG)\
 	-Wall -Wextra -pedantic -Wunreachable-code -Wno-unused-parameter\
 	-Wfloat-equal -Wshadow -Wpadded -Winline -fno-stack-protector\
@@ -86,7 +89,7 @@ export CXXFLAGS := -c -m32 -std=c++14 -Wc++14-compat\
 
 #####!!!!!!!!!!!!!!!############
 
-all: TAGS subdirs link install #runBochs
+all: cloc TAGS subdirs link install #runBochs
 
 
 ## http://wiki.osdev.org/Calling_Global_Constructors
@@ -104,6 +107,7 @@ OBJ_LINK_LIST:=$(CRTI_OBJ) $(CRTBEGIN_OBJ) $(filter-out $(CRTI_OBJ) $(CRTN_OBJ),
 link: $(SUBDIRS)
 	@echo linking
 	$(CC) $(OBJ_LINK_LIST) -o $(KERN_BIN) $(LDFLAGS)
+	~/opt/bin/i386-elf-nm $(KERN_BIN) > kernel.sym # for bochs internal debugger
 	@echo
 
 $(KERN_BIN): link
@@ -134,7 +138,10 @@ clean: $(foreach DIR,$(SUBDIRS),$(DIR).clean)
 	@$(MAKE) -C $* clean_files --no-print-directory
 
 debug:
-	gdbtui kernel.k -x gdbscript
+	~/opt/bin/i386-elf-gdb --tui kernel.k -x gdbscript
+
+
+
 
 # How to build the Bochs disk image ( from the MTI os lab )
 #$(OBJDIR)/kern/bochs.img: $(OBJDIR)/kern/kernel $(OBJDIR)/boot/boot

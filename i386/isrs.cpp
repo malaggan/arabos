@@ -12,10 +12,39 @@
 /* These are function prototypes for all of the exception
  *	handlers: The first 32 entries in the IDT are reserved
  *	by Intel, and are designed to service exceptions! */
-ISR(0)	ISR(1)	ISR(2)	ISR(3)	ISR(4)	ISR(5)	ISR(6)	ISR(7)
-ISR(8)	ISR(9)	ISR(10)	ISR(11)	ISR(12)	ISR(13)	ISR(14)	ISR(15)
-ISR(16)	ISR(17)	ISR(18)	ISR(19)	ISR(20)	ISR(21)	ISR(22)	ISR(23)
-ISR(24)	ISR(25)	ISR(26)	ISR(27)	ISR(28)	ISR(29)	ISR(30)	ISR(31)
+// extern "C" because defined in assembly, and we do not want name manling
+extern "C" void _isr0 ();
+extern "C" void _isr1 ();
+extern "C" void _isr2 ();
+extern "C" void _isr3 ();
+extern "C" void _isr4 ();
+extern "C" void _isr5 ();
+extern "C" void _isr6 ();
+extern "C" void _isr7 ();
+extern "C" void _isr8 ();
+extern "C" void _isr9 ();
+extern "C" void _isr10 ();
+extern "C" void _isr11 ();
+extern "C" void _isr12 ();
+extern "C" void _isr13 ();
+extern "C" void _isr14 ();
+extern "C" void _isr15 ();
+extern "C" void _isr16 ();
+extern "C" void _isr17 ();
+extern "C" void _isr18 ();
+extern "C" void _isr19 ();
+extern "C" void _isr20 ();
+extern "C" void _isr21 ();
+extern "C" void _isr22 ();
+extern "C" void _isr23 ();
+extern "C" void _isr24 ();
+extern "C" void _isr25 ();
+extern "C" void _isr26 ();
+extern "C" void _isr27 ();
+extern "C" void _isr28 ();
+extern "C" void _isr29 ();
+extern "C" void _isr30 ();
+extern "C" void _isr31 ();
 
 /* This is a very repetitive function... it's not hard, it's
  *	just annoying. As you can see, we set the first 32 entries
@@ -26,17 +55,14 @@ ISR(24)	ISR(25)	ISR(26)	ISR(27)	ISR(28)	ISR(29)	ISR(30)	ISR(31)
  *	running in ring 0 (kernel level), and has the lower 5 bits
  *	set to the required '14', which is represented by 'E' in
  *	hex. */
-void isr_install()
-{
-	INSTALL_ISR(0)	INSTALL_ISR(1)	INSTALL_ISR(2)	INSTALL_ISR(3)	INSTALL_ISR(4)	INSTALL_ISR(5)	INSTALL_ISR(6)	INSTALL_ISR(7)
-		INSTALL_ISR(8)	INSTALL_ISR(9)	INSTALL_ISR(10)	INSTALL_ISR(11)	INSTALL_ISR(12)	INSTALL_ISR(13)	INSTALL_ISR(14)	INSTALL_ISR(15)
-		INSTALL_ISR(16)	INSTALL_ISR(17)	INSTALL_ISR(18)	INSTALL_ISR(19)	INSTALL_ISR(20)	INSTALL_ISR(21)	INSTALL_ISR(22)	INSTALL_ISR(23)
-		INSTALL_ISR(24)	INSTALL_ISR(25)	INSTALL_ISR(26)	INSTALL_ISR(27)	INSTALL_ISR(28)	INSTALL_ISR(29)	INSTALL_ISR(30)	INSTALL_ISR(31)
+using isr_t = void(void);
+constexpr isr_t* isrs[] = { _isr0,_isr1,_isr2,_isr3,_isr4,_isr5,_isr6,_isr7,_isr8,_isr9,_isr10,_isr11,_isr12,_isr13,_isr14,_isr15,_isr16,_isr17,_isr18,_isr19,_isr20,_isr21,_isr22,_isr23,_isr24,_isr25,_isr26,_isr27,_isr28,_isr29,_isr30,_isr31 };
 
-		//printf("32 ISRs have been installed...\n");
-
-		//~ ASM ("sti");
-		}
+void isr_install() {
+	size_t i = 0;
+	for(auto isr : isrs)
+		idt_set_gate(i++, reinterpret_cast<unsigned int>(isr), 0x08,	ISR_GATE);
+}
 
 /* This is a simple string array. It contains the message that
  *	corresponds to each and every exception. We get the correct

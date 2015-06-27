@@ -124,7 +124,7 @@ isr_common_stub:
 
 	pushl %eax // param
 	movl $fault_handler, %eax
-	call %eax
+	call *%eax
 	popl %eax // return value is returned through popa, not here
 
         popl %ss

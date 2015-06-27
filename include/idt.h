@@ -1,25 +1,20 @@
+// -*- mode: c++; -*-
 #pragma once
 
-#define EOI (char)0x20 /* end of interrupt, used in signaling the PIC after handling IRQ */
+constexpr char EOI = 0x20; /* end of interrupt, used in signaling the PIC after handling IRQ */
 
-#define INTERRUPT_PRESENT		(0x80)
-#define INTERRUPT_RING(n)		((n&0x3)<<5)
-#define INTERRUPT_OP_SIZE_32		(0x8)
-#define IDT_GATE_TYPE_TASK		(0x5)
-#define IDT_GATE_TYPE_INTERRUPT		(0x6)
-#define IDT_GATE_TYPE_TRAP		(0x7)
+constexpr unsigned int INTERRUPT_PRESENT       =	0x80;
+constexpr unsigned int INTERRUPT_RING(unsigned char n) { return	(n & 0x3) << 5; }
+constexpr unsigned int INTERRUPT_OP_SIZE_32    =	0x8;
+constexpr unsigned int IDT_GATE_TYPE_TASK      =	0x5;
+constexpr unsigned int IDT_GATE_TYPE_INTERRUPT =  0x6;
+constexpr unsigned int IDT_GATE_TYPE_TRAP      =	0x7;
 
-#define ISR_GATE ((unsigned char)( INTERRUPT_PRESENT | INTERRUPT_RING( 0 ) | INTERRUPT_OP_SIZE_32 | IDT_GATE_TYPE_INTERRUPT ))
-#define IRQ_GATE ( ISR_GATE ) /*0x8E:1 present, 00 ring 0, 0 , 1 32 bits, 110 interrupt	*/
+constexpr unsigned char ISR_GATE = INTERRUPT_PRESENT | INTERRUPT_RING( 0 ) | INTERRUPT_OP_SIZE_32 | IDT_GATE_TYPE_INTERRUPT;
+constexpr unsigned char IRQ_GATE = ISR_GATE; /*0x8E:1 present, 00 ring 0, 0 , 1 32 bits, 110 interrupt	*/
 
 // extern "C" because defined in assembly, and we do not want name manling
-#define ISR(n) extern "C" void _isr##n();
 #define IRQ(n) extern "C" void _irq##n();
-
-#define INSTALL_ISR(n) idt_set_gate((unsigned char)n,	\
-                                    (unsigned)_isr##n,	\
-                                    (unsigned short)0x08,	\
-                                    ISR_GATE);
 
 #define INSTALL_IRQ(n) idt_set_gate(n+32,	\
                                     (unsigned)_irq##n,	\
@@ -30,13 +25,8 @@
 struct interrupt_frame
 {
 	unsigned int ss, gs, fs, es, ds;		/* we pushed the segs last */
-
-	unsigned int edi, esi, ebp, esp,
-		ebx, edx, ecx, eax;	/* pushed by 'pusha' */
-
-	unsigned int int_no,err_code;
-	/* our 'push byte #' and error codes do this */
-
+	unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;	/* pushed by 'pusha' */
+	unsigned int int_no,err_code;	/* our 'push byte #' and error codes do this */
 	unsigned int eip, cs, eflags;   /* pushed by the processor automatically */
 	/*useresp, ss << these only are pushed on a privilage level change*/
 } __attribute__((packed));

@@ -21,7 +21,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.*
 #include <debug.h>
 #include <mm.h>
 
+#ifdef DBG_STABS
 void stab_data(int eip);
+#endif
 
 volatile unsigned int scheduling_started = 0;
 int currentProcess=-1;
@@ -38,7 +40,9 @@ void stack_trace(int* ebp, int* esp, int* eip)
     printf("stack @ (esp=0x%x,ebp=0x%x,eip=0x%x)\n",esp,ebp,eip);
     
     printf("eip ");
+    #ifdef DBG_STABS
     stab_data(eip);
+    #endif
 
     if(old_ebp_offset == 0 || ebp == 0)
     {
@@ -46,13 +50,15 @@ void stack_trace(int* ebp, int* esp, int* eip)
         return;
     }
 
-    for(int i = 0; i < 100; i ++)
+    for(int i = 0; i < 500; i ++)
     {
         printf((old_ebp_offset==i?"ebp -> ":(old_ebp_offset==i-1?"eip -> ":"")));
         if(old_ebp_offset == i - 1)
         {
             printf("esp[%d]    ",i);
+            #ifdef DBG_STABS
             stab_data(stack[i]);
+            #endif
             if(stack[old_ebp_offset] == 0)
             {
                 printf("end of stack trace\n");
@@ -62,11 +68,12 @@ void stack_trace(int* ebp, int* esp, int* eip)
         }
         else if (old_ebp_offset==i)
         {
-            printf("esp[%d]=0x%x\n",i,stack[i]);
+	    printf("esp[%d]=0x%x\n",i,stack[i]);
         }
         else
         {
-            printf( "esp[%d]=0x%x\n",i,stack[i]);
+            if(stack[i])
+                printf("esp[%d]=0x%x\n",i,stack[i]);
         }
     }
 }
@@ -186,9 +193,9 @@ void taskend()
     processes[currentProcess].valid = 0;
     if(currentProcess == 0)
     {
-	printk("Process 0 died. Calling _fini.\n");
-	_fini(); // TODO: fini does not call __cxa_finalize, although it should! 
-	__cxa_finalize(/*unused*/ NULL);
+       printk("Process 0 died. Calling _fini.\n");
+       _fini(); // TODO: fini does not call __cxa_finalize, although it should!
+       __cxa_finalize(/*unused*/ NULL);
     }
     while(1); // consume the rest of the time slice, till the schedule is invoked again (there's better methods)
     // do some scheduling ??
@@ -216,7 +223,7 @@ int spawn_handler(struct interrupt_frame *r)
     processes[procIndex].frame.esi = 0;
     processes[procIndex].frame.edi = 0;
 
-    int* stack = alloc_page();
+    int* stack = alloc_page(); 
 
     //stack += 1024-50; // integers, => stack += 2*1024 bytes
     stack += 1024-1;
@@ -263,18 +270,22 @@ int fork_handler(struct interrupt_frame *r)
     processes[procIndex].frame = *r;
     int* stack = alloc_page();
 
-    stack += 1024-50; // integers, => stack += 2*1024 bytes
+    stack += 1024-500; // integers, => stack += 2*1024 bytes // FIXME: why 500? should we copy the entire stack ? (no problem since esp is not affected anyway)
        
-    memcpy((unsigned char *)stack,(unsigned char*)r->esp,50*sizeof(int));
+    memcpy((unsigned char *)stack,(unsigned char*)r->esp,500*sizeof(int));
 
     if debug printf("\nfork:parent stack:\n");
     if debug stack_trace((int*)r->ebp, (int*)r->esp, (int*)r->eip);
+    if debug printf("\nfork: END parent stack\n");
 
     //=========== update all ebp's
     int old_ebp_offset = (int*)r->ebp - (int*)r->esp;
-    do{
+    do{	
+	if debug printf("old_ebp_offset = %d\n", old_ebp_offset);
         int next_ebp_offset =  (int*)stack[old_ebp_offset] - (int*)r->esp;
+	if debug printf("next_ebp_offset = %d\n", next_ebp_offset);
         stack[old_ebp_offset] = stack + next_ebp_offset;
+	if debug printf("A\n");
         old_ebp_offset = next_ebp_offset;
     }
     while(stack[old_ebp_offset] != 0);

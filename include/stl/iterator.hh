@@ -5,6 +5,7 @@
 
 #include <stl/new.hh>
 #include <lib.h>
+#include <asm.h> // for atomic_inc
 #include <types.h> // for SFINAE stuff
 
 namespace aos {

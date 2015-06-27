@@ -8,11 +8,6 @@
 #ifndef _DEBUG_H
 #define	_DEBUG_H
 
-
-#if !defined(DBG_STABS) && !defined(DBG_DWARF2)
-#define DBG_STABS // for the IDE to colorize it
-#endif
-
 #ifdef	__cplusplus
 extern "C" {
 #endif

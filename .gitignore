@@ -40,3 +40,4 @@ kernel.map
 /.#errors_summary
 /kernel.sym
 /link_errors
+/fs/error_log

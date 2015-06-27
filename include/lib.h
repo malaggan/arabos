@@ -45,6 +45,8 @@ void panic (const char *format);
 
 unsigned char inportb (unsigned short _port);
 void outportb (unsigned short _port, char _data);
+unsigned short inportw (unsigned short _port);
+void outportw (unsigned short _port, short _data);
 
 // printk levels
 #define TRACE   "\310" // = 200 in decimal
@@ -60,8 +62,8 @@ void outportb (unsigned short _port, char _data);
 /* Return a new identical string.  */
 char * strdup (const char *str);
 char * strndup (const char *str, size_t at_most); 
-    
-#define IO_WAIT() ASM("nop"); ASM("nop"); ASM("nop"); ASM("nop");
+
+#define IO_WAIT "nop\n nop\n nop\n nop\n"
 
 // current printk level
 #define PRINTK_LEVEL LOG_ALL

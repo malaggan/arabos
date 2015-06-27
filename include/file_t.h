@@ -70,9 +70,6 @@ struct stat
     // __ino64_t st_ino;			/* File serial number.			*/
 };
 
-#include <iterator.hh>
-
-
 inline char *dirname (char *path) __attribute__((always_inline));
 inline char *basename (char* path) __attribute__((always_inline));
 

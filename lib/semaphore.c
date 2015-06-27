@@ -3,29 +3,17 @@
 
 void wait(volatile semaphore_t* sem)
 {
-    while(1)
-    {
-        block_timer();
-        if(*sem > 0)
-        {
-            (*sem)--;
-
-            //printk("\nlock obtained\n");
-            unmask_timer();
-            return;
-        }
-        else
-        {
-            unmask_timer();
-        }
+    int old_value = 0;
+    while(old_value <= 0) {
+	while(*sem <= 0);
+	old_value = *sem;
     }
-    //printk("\nlock obtained ILLEGALLY\n");
+    while(cmpxchg(sem, old_value, old_value-1));
+    ASM("mfence" ::: "memory"); // http://stackoverflow.com/questions/12183311/difference-in-mfence-and-asm-volatile-memory
 }
 
 void signal(volatile semaphore_t* sem)
 {
-    block_timer();
-    (*sem)++;
-    //printk("\nlock released\n");
-    unmask_timer();
+    int old = fetch_and_add(sem, +1);
+    ASM("mfence" ::: "memory");
 }

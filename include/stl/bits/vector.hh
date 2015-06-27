@@ -8,6 +8,8 @@ namespace __detail {
     {
     private:
 	It begin, current, end;
+	int32_t version; // for invalidation. 0 means no version tracking (dummy and sentinels)
+	volatile const int32_t *latest_version; // nullptr means no version tracking // TODO: use reference instead of pointer
 
     public:
 	using iterator_category = typename iterator<iterator_category_t<It>,value_type_t<It>,difference_type_t<It>,pointer_t<It>,iterator_category_t<It>>::iterator_category;
@@ -16,22 +18,38 @@ namespace __detail {
 	using pointer = typename iterator<iterator_category_t<It>,value_type_t<It>,difference_type_t<It>,pointer_t<It>,pointer_t<It>>::pointer;
 	using reference = typename iterator<iterator_category_t<It>,value_type_t<It>,difference_type_t<It>,pointer_t<It>,reference_t<It>>::reference;
 
-	vector_iterator() : begin{nullptr}, current{begin}, end{begin} { }
+	vector_iterator() : begin{nullptr}, current{begin}, end{begin}, version{0}, latest_version{nullptr} { }
 
 	// implicitly convert iterator to const_iterator
 	operator vector_iterator<remove_pointer_t<It> const *>() const
-	{ return vector_iterator<remove_pointer_t<It> const *>{begin,current,end}; }
+	{ return vector_iterator<remove_pointer_t<It> const *>{begin,current,end,latest_version}; }
 
-	explicit vector_iterator(It _begin, It _end)
-	    : begin{begin}, current{_begin}, end{_end} {}
+	void check_bounds(size_t line) const {
+	    if(latest_version != nullptr) if(version != *latest_version) printk(ERROR "vector: invalid iterator");
+	    if(current == nullptr)
+		printk(ERROR "vector: current (%x, %x, %x) is null! (line %d)\n", begin, current, end, line),
+		    printk(DEBUG "v = %d,lv = %d\n", version, *latest_version);
+	    if(current < begin)
+		printk(ERROR "vector: current (%x) < begin (%x)! (line %d)\n", current, begin, line),
+		    printk(DEBUG "v = %d,lv = %d\n", version, *latest_version);
+	    if(current > end)
+		printk(ERROR "vector: current (%x) > end (%x)! (line %d)\n", current, end, line),
+		    printk(DEBUG "v = %d,lv = %d\n", version, *latest_version);
+	}
 
-	explicit vector_iterator(It _begin, It _current, It _end)
-	    : begin{_begin}, current{_current}, end{_end} {}
+	explicit vector_iterator(It _begin, It _end, volatile const int32_t * _latest_version)
+	    : begin{_begin}, current{_begin}, end{_end}, version{*_latest_version}, latest_version{_latest_version}
+	{ check_bounds(__LINE__); }
+
+	explicit vector_iterator(It _begin, It _current, It _end, volatile const int32_t * _latest_version)
+	    : begin{_begin}, current{_current}, end{_end}, version{*_latest_version}, latest_version{_latest_version}
+	{ check_bounds(__LINE__); }
 
 	auto get() { return current; }
 
 	reference operator*() const {
 	    // TODO: bounds checking
+	    check_bounds(__LINE__);
 	    return *current;
 	}
 
@@ -39,12 +57,14 @@ namespace __detail {
 
 	vector_iterator& operator++() {
 	    ++current;
+	    check_bounds(__LINE__);
 	    return *this;
 	}
 
 	vector_iterator operator++(int) {
 	    vector_iterator tmp = *this;
 	    ++current;
+	    check_bounds(__LINE__);
 	    return tmp;
 	}
 
@@ -56,20 +76,33 @@ namespace __detail {
 	vector_iterator operator--(int) {
 	    vector_iterator tmp = *this;
 	    --current;
+	    check_bounds(__LINE__);
 	    return tmp;
 	}
 
-	vector_iterator operator+(difference_type n) const { return vector_iterator{begin, current + n, end}; }
+	vector_iterator operator+(difference_type n) const {
+	    auto p = vector_iterator{begin, current + n, end, latest_version};
+	    p.version = this->version;
+	    check_bounds(__LINE__);
+	    return p;
+	}
 
 	vector_iterator& operator+=(difference_type n) {
 	    current += n;
+	    check_bounds(__LINE__);
 	    return *this;
 	}
 
-	vector_iterator operator-(difference_type n) const { return vector_iterator{begin, current - n, end}; }
+	vector_iterator operator-(difference_type n) const {
+	    auto p = vector_iterator{begin, current - n, end, latest_version};
+	    p.version = this->version;
+	    check_bounds(__LINE__);
+	    return p;
+	}
 
 	vector_iterator& operator-=(difference_type n) {
 	    current -= n;
+	    check_bounds(__LINE__);
 	    return *this;
 	}
 
@@ -135,24 +168,45 @@ private:
     shared_array<value_type> m_array;
     uint32_t m_capacity;
     uint32_t m_size;
+    int32_t m_version;
 
     using pointer = pointer_t<iterator>;
     using const_pointer = const_pointer_t<iterator>;
-    iterator _create_iterator(pointer p) { return iterator{m_array.get(), p, m_array.get() + m_size}; }
-    const_iterator _create_const_iterator(const_pointer p) const { return const_iterator{m_array.get(), p, m_array.get() + m_size}; }
+
+    void check_bounds(const_pointer p) const {
+	if(p == nullptr)
+	    printk(ERROR "vector: p (%x, %x, %x) is null! (__LINE__ %d)\n", m_array.get(), p, m_array.get() + m_size, __LINE__);
+	if(p < m_array.get())
+	    printk(ERROR "vector: p (%x) < m_array.get() (%x)! (__LINE__ %d)\n", p, m_array.get(), __LINE__);
+	if(p > m_array.get() + m_size)
+	    printk(ERROR "vector: p (%x) > m_array.get() + m_size (%x)! (__LINE__ %d)\n", p, m_array.get() + m_size, __LINE__);
+    }
+
+    iterator _create_iterator(pointer p) {
+	if(p == nullptr)
+	    panic("create_iterator: null p\n");
+	check_bounds(p);
+	return iterator{m_array.get(), p, m_array.get() + m_size, &m_version};
+    }
+    const_iterator _create_const_iterator(const_pointer p) const {
+	if(p == nullptr)
+	    panic("create_const_iterator: null p\n");
+	check_bounds(p);
+	return const_iterator{m_array.get(), p, m_array.get() + m_size, &m_version};
+    }
 public:
 
     // NOTE: value_type must be default constructible. Otherwise, we are going to have to use uninitialized storage and uninitialized_copy/move
-    vector() : m_array{new value_type[8]}, m_capacity{8}, m_size{0} {}
+    explicit vector() : m_array{new value_type[8]}, m_capacity{8}, m_size{0}, m_version{1} {}
 
     iterator begin() {
-	return iterator{m_array.get(), m_array.get()+m_size};
+	return iterator{m_array.get(), m_array.get()+m_size, &m_version};
     }
     const_iterator begin() const {
-	return const_iterator{m_array.get(), m_array.get()+m_size};
+	return const_iterator{m_array.get(), m_array.get()+m_size, &m_version};
     }
     const_iterator cbegin() const {
-	return const_iterator{m_array.get(), m_array.get()+m_size};
+	return const_iterator{m_array.get(), m_array.get()+m_size, &m_version};
     }
 
     iterator end() { return _create_iterator(m_array.get()+m_size); } // TODO: adapt as sentinel
@@ -183,29 +237,37 @@ public:
 	return end();
     }
     iterator erase(const_iterator it) {
-
 	if(it < begin())
 	    return printf("vector: it < begin()\n"),end();
 	if(it >= end())
 	    return printf("vector: it >= end()\n"),end();
 
 	pointer p = const_cast<pointer>(it.get());
-	iterator ret = _create_iterator(p+1); // should correctly return end() as required in certain cases
 
 	p->~value_type();
 	move(p+1, m_array.get() + m_size, p);
 	--m_size;
-	return ret;
+	++m_version; // erase() is invalidating
+
+	if(p >= m_array.get() + m_size)
+	    return end();
+	else
+	    return _create_iterator(p);
     }
 
     void guarantee_capacity(size_t minimum_capacity) {
 	if(m_capacity >= minimum_capacity)
 	    return;
 
-	auto new_capacity = m_capacity * 3; // TODO: check overflow
+	m_version++; // TODO: make atomic.
+
+	auto new_capacity = m_capacity * 3;
+	if(new_capacity / 3 != m_capacity)
+	    panic("vector: guarantee_capacity overflow\n");
+
 	shared_array<value_type> new_array = shared_array<value_type>{new value_type[new_capacity]};
 	move(m_array.get(), m_array.get() + m_size, new_array.get());
-	swap(m_array, new_array);
+	swap(m_array, new_array); 
 
 	m_capacity = new_capacity;
     }
@@ -215,8 +277,10 @@ public:
 	if(pos < begin() || pos > end())
 	    return end();
 
-	auto needed_capacity = m_size+1;
-	guarantee_capacity(needed_capacity);
+	auto dist = distance(cbegin(), pos);
+	// pos will be invalidated after this
+	guarantee_capacity(m_size+1);
+	pos = cbegin() + dist;
 
 	// the new end() is not initialized
 	new (m_array.get() + m_size) value_type(); // default constructible assumption.
@@ -225,7 +289,7 @@ public:
 	// all elements except "new end()".
 
 	// move pos to pos+1 (make space).
-	move_backward(pos, cend(), _create_iterator(m_array.get() + m_size + 1));
+	move_backward(pos, cend(),iterator{m_array.get(), m_array.get() + m_size + 1, m_array.get() + m_size + 1, &m_version});
 
 	auto p = const_cast<pointer>(pos.get()); // no need to subtract: "before pos" is now "pos"
 	*p = value;
@@ -239,12 +303,14 @@ public:
 	if(pos < begin() || pos > end())
 	    return end();
 
-	auto needed_capacity = m_size+1;
-	guarantee_capacity(needed_capacity);
+	auto dist = distance(cbegin(), pos);
+	// pos will be invalidated after this
+	guarantee_capacity(m_size+1);
+	pos = cbegin() + dist;
 
 	new (m_array.get() + m_size) value_type();
 
-	move_backward(pos, const_iterator{end()}, _create_iterator(m_array.get() + m_size + 1));
+	move_backward(pos, const_iterator{end()},iterator{m_array.get(), m_array.get() + m_size + 1, m_array.get() + m_size + 1, &m_version});
 
 	auto p = const_cast<pointer>(pos.get());
 	*p = move(value);
@@ -259,30 +325,36 @@ public:
 	    return end();
 
 	auto dist = distance(cbegin(), pos);
+	// pos will be invalidated after this
+	guarantee_capacity(m_size+n);
+	pos = cbegin() + dist;
 
 	if(n == 0) return begin() + dist;
 
 	while(n --> 0)
-	    insert(pos, value);
+	    insert(cbegin() + (dist), value);
 
 	return begin() + dist;
     }
     template<typename Iterator>
     enable_if_t<
 	!is_same_v<
-            value_type_t<Iterator>,
-            void>,
+	    value_type_t<Iterator>,
+	    void>,
 	iterator>
     insert(const_iterator pos, Iterator first, Iterator last) {
 	if(pos < begin() || pos > end())
 	    return end();
 
 	auto dist = distance(cbegin(), pos);
+	// pos will be invalidated after this
+	guarantee_capacity(m_size + distance(first, last));
+	pos = cbegin() + dist;
 
 	if(first == last) return begin() + dist; //pos; cannot return pos because it is const_iterator, but we return iterator
 
 	while(first != last)
-	    insert(pos, *first++); // TODO: can be done more efficiently (insert by bulk)
+	    insert(cbegin() + (dist++), *first++); // TODO: can be done more efficiently (insert by bulk)
 
 	return begin() + dist; // must do it here to account for possible pointer invalidation due to resize
     }

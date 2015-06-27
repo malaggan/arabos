@@ -415,6 +415,7 @@ ata3: enabled=0, ioaddr1=0x168, ioaddr2=0x360, irq=9
 #ata0-slave: type=cdrom, path=D:, status=inserted
 #ata0-slave: type=cdrom, path=/dev/cdrom, status=inserted
 #ata0-slave: type=cdrom, path="drive", status=inserted
+#ata0-master: type=disk, path="hd.img", mode=flat
 ata0-slave: type=cdrom, path=grub.iso, status=inserted
 
 #=======================================================================
@@ -1119,7 +1120,7 @@ gdbstub: enabled=0, port=1234, text_base=0, data_base=0, bss_base=0
 # Example:
 #   magic_break: enabled=1
 #=======================================================================
-magic_break: enabled=1
+magic_break: enabled=0
 
 #=======================================================================
 # DEBUG_SYMBOLS:

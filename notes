@@ -1,0 +1,3 @@
+mask irq 1 on irq 1 entry ?
+check suprior irq 7 and check ISR and IRR values of PIC for that interrupt
+use e9hack to print to bochsout.txt whenever a spurious irq occurs. checn check '1 now high'->'1 now low'->spurious irq%

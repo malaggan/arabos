@@ -18,7 +18,7 @@ SECTIONS
   }
 
   .ctors : {
-    . = ALIGN(0x4);
+    . = ALIGN(0x4); /* TODO: use ~/opt/bin/i386-elf-ld --verbose to obtain the built-in linker script !!!!!!! */
     /* gcc uses crtbegin.o to find the start of the constructors, so we make sure it is first.
     Because this is a wildcard, it doesn't matter if the user does not actually link against
     crtbegin.o; the linker won't look for a file to match a wildcard.  The wildcard also means

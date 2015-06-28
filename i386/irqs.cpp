@@ -44,17 +44,23 @@ void irq_remap(void)
 
 	// to do : io_wait ?
 
+    // mask all interrupts
+	outportb(0x21, 0xff);
+	outportb(0xa1, 0xff);
+    
 	outportb((unsigned short)0x20, (char)0x11); // init
 	outportb((unsigned short)0x21, (char)0x20); // offset (v.) ( must be divisible by 8 )
 	outportb((unsigned short)0x21, (char)0x04);
 	outportb((unsigned short)0x21, (char)0x01); // 8086/88 (MCS-80/85) mode ( see http://www.mega-tokyo.com/osfaq/Can%20I%20remap%20the%20PIC%3F )
-	outportb((unsigned short)0x21, (char)0x0);  // FIXME // ?? // old value 0x01  // unmask all interrupts
 
 	outportb((unsigned short)0xA0, (char)0x11);
 	outportb((unsigned short)0xA1, (char)0x28);
 	outportb((unsigned short)0xA1, (char)0x02);
 	outportb((unsigned short)0xA1, (char)0x01);
-	outportb((unsigned short)0xA1, (char)0x0);
+
+	// unmask all interrupts
+	outportb(0x21, 0x00);
+	outportb(0xa1, 0x00);
 }
 
 int handle_coprocessor_math_fault(struct interrupt_frame *r)
@@ -105,7 +111,7 @@ void irq_handler(struct interrupt_frame *r)
 
 	if(r->int_no > 0)
 	{
-		//printf("\nIRQ %d\n",r->int_no);
+		printf("\nIRQ %d\n",r->int_no);
 		//printf("IRQ %d(Ecode %d):\n",r->int_no,r->err_code);
 		//printf("At EIP:0x%x CS:0x%x\n",r->eip,r->cs);
 		//printf("DS:0x%x SS:0x%x\n",r->ds,r->ss);
@@ -117,7 +123,7 @@ void irq_handler(struct interrupt_frame *r)
 	}
 	else
 	{
-		//printf("No custom handler exists for IRQ%d\n",r->int_no);
+		printf("No custom handler exists for IRQ%d\n",r->int_no);
 	}
 
 	/* If the IDT entry that was invoked was greater than 40

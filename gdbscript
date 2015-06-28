@@ -1,5 +1,6 @@
 target remote localhost:1234
 set directories i386:console:boot:mm:lib:init:kernel:include:include/stl:include/stl/bits
 layout split
-break cppmain.cpp
+break irq.S:98
 continue
+

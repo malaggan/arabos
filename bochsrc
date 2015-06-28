@@ -92,7 +92,7 @@ config_interface: textconfig
 #display_library: vncsrv
 #display_library: win32
 #display_library: wx
-display_library: x #, options="gui_debug"
+display_library: x #, options="gui_debug,nokeyrepeat"
 
 #=======================================================================
 # CPU:
@@ -479,7 +479,7 @@ vga: extension=vbe, update_freq=5, realtime=1
 #   keyboard: keymap=gui/keymaps/x11-pc-de.map
 #   keyboard: user_shortcut=ctrl-alt-del
 #=======================================================================
-keyboard: type=mf, serial_delay=250
+keyboard: type=at, serial_delay=250
 
 #=======================================================================
 # MOUSE:
@@ -759,9 +759,9 @@ floppy_bootsig_check: disabled=0
 #   log: ./bochs.out
 #   log: /dev/tty
 #=======================================================================
-log: /dev/stdout
+#log: /dev/stdout
 #log: /dev/null
-#log: bochsout.txt
+log: bochsout.txt
 
 #=======================================================================
 # LOGPREFIX:
@@ -806,9 +806,9 @@ log: /dev/stdout
 # if you disable it you may get a spectacular disaster instead.
 #=======================================================================
 panic: action=ask
-error: action=report
-info: action=report
-debug: action=ignore, pci=report # report BX_DEBUG from module 'pci'
+error: action=report, pic=report, keyboard=report
+info: action=report, pic=report, keyboard=report
+debug: action=ignore, pic=report, keyboard=report, pci=report # report BX_DEBUG from module 'pci'
 
 #=======================================================================
 # DEBUGGER_LOG:
@@ -819,8 +819,8 @@ debug: action=ignore, pci=report # report BX_DEBUG from module 'pci'
 #   debugger_log: ./debugger.out
 #=======================================================================
 #debugger_log: /dev/null
-#debugger_log: debugger.out
-debugger_log: /dev/stdout
+debugger_log: debugger.out
+#debugger_log: /dev/stdout
 
 #=======================================================================
 # COM1, COM2, COM3, COM4:
@@ -1137,7 +1137,7 @@ speaker: enabled=1, mode=system
 # Enable GDB stub. See user documentation for details.
 # Default value is enabled=0.
 #=======================================================================
-#gdbstub: enabled=0, port=1234, text_base=0, data_base=0, bss_base=0
+gdbstub: enabled=0, port=1234, text_base=0, data_base=0, bss_base=0
 
 #=======================================================================
 # MAGIC_BREAK:
@@ -1177,7 +1177,7 @@ speaker: enabled=1, mode=system
 # Example:
 #   port_e9_hack: enabled=1
 #=======================================================================
-#port_e9_hack: enabled=1
+port_e9_hack: enabled=1
 
 #=======================================================================
 # other stuff

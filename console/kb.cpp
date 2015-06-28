@@ -38,15 +38,15 @@ unsigned char shiftKeyboardUs[128] =
 #include <asm.h>
 static char* input = nullptr;
 static int cnt_read = 0;
-static int newline_read = 0; // boolean
-static int freeze = 0; // input exceeded buffer, freeze additions
+volatile static int newline_read = 0; // boolean
+volatile static int freeze = 0; // input exceeded buffer, freeze additions
 void readline(char* buf, int max)
 {
 	input = buf;
 	while(1)
 	{
-		ASM("pause\n"
-		    "hlt"); // hlt waits for interrupts
+	    ASM("pause\n"
+	    	    "hlt"); // hlt waits for interrupts
 
 		if(newline_read)
 			break;
@@ -68,12 +68,12 @@ void readline_handler(unsigned char c)
 		/* discard */;
 	else
 	{
-		putchar(c);
-		if('\n' == c)
-			newline_read = 1;
-		else if(!freeze)
-			*input++ = c;
-		cnt_read ++;
+	    putchar(c);
+	    if('\n' == c)
+		newline_read = 1;
+	    	else if(!freeze)
+	    		*input++ = c;
+	    	cnt_read ++;
 	}
 }
 
@@ -83,7 +83,7 @@ int keyboard_handler(struct interrupt_frame * r/*unused*/)
 	unsigned char status = inportb((unsigned short)0x64);
 	if(!(status&0x1)) // has data ?
 		return 0;
-	unsigned char scancode = inportb((unsigned short)0x60);
+	unsigned short scancode = inportb((unsigned short)0x60);
 
 	if (scancode & 0x80) // released
 	{

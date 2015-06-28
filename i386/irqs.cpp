@@ -44,10 +44,10 @@ void irq_remap(void)
 
 	// to do : io_wait ?
 
-    // mask all interrupts
+	// mask all interrupts
 	outportb(0x21, 0xff);
 	outportb(0xa1, 0xff);
-    
+
 	outportb((unsigned short)0x20, (char)0x11); // init
 	outportb((unsigned short)0x21, (char)0x20); // offset (v.) ( must be divisible by 8 )
 	outportb((unsigned short)0x21, (char)0x04);
@@ -125,6 +125,11 @@ void irq_handler(struct interrupt_frame *r)
 	{
 		printf("No custom handler exists for IRQ%d\n",r->int_no);
 	}
+
+	// IRQ 7 and 15 are most likely spurious. Do not send EOI
+	// TODO: actually check whether they are spurious.
+	if(r->int_no == 7 || r->int_no == 15)
+		return;
 
 	/* If the IDT entry that was invoked was greater than 40
 	 *	(meaning IRQ8 - 15), then we need to send an EOI to

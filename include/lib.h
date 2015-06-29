@@ -2,11 +2,10 @@
 
 #include <types.h>
 
-
-void *memcpy(void *dest, const void *src, size_t count);
-void *memcpyw(void *dest, const void *src, size_t count);
-unsigned char *memset(unsigned char *dest, char val, size_t count);
-unsigned short *memsetw(unsigned short *dest, unsigned short val, size_t count);
+void *memcpy(void *dest, const void *src, size_t count) __attribute__((nonnull));
+void *memcpyw(void *dest, const void *src, size_t count) __attribute__((nonnull));
+unsigned char *memset(unsigned char *dest, char val, size_t count) __attribute__((nonnull));
+unsigned short *memsetw(unsigned short *dest, unsigned short val, size_t count) __attribute__((nonnull));
 
 void itoa (char *buf, int base, int d); // int to ascii
 int strnlen(const char *str, int max);
@@ -19,8 +18,8 @@ void write_serial(char);
 #define MAX_CHARS 1024
 
 extern "C" // because called from assembly
-void printf (const char *format, ...);
-void printk (const char *format, ...);
+void printf (const char *format, ...) __attribute__((format(__printf__,1,2)));
+void printk (const char *format, ...)  __attribute__((format(__printf__,1,2)));
 void panic (const char *format);
 
 unsigned char inportb (unsigned short _port);

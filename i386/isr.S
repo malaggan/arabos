@@ -5,7 +5,7 @@
 	.type _isr\isr_no, @function
 	.align 2
 	_isr\isr_no:
-        cli
+  cli
 	pushl $0
 	pushl $(\isr_no)
 	jmp isr_common_stub
@@ -105,29 +105,30 @@ isr_no_err_code 31
 // up for kernel mode segments, calls the C-level fault handler,
 // and finally restores the stack frame.
 isr_common_stub:
-        pusha
+  pusha
 	pushl %ds
 	pushl %es
 	pushl %fs
 	pushl %gs
-        pushl %ss
+  pushl %ss
 
-        movw $0x10,%ax
+  movw $0x10,%ax
 	movw %ax, %ds
 	movw %ax, %es
 	movw %ax, %fs
 	movw %ax, %gs
 
-    /* the pointer to the stack-frame-based-img of the interrupt frame */
+  /* the pointer to the stack-frame-based-img of the interrupt frame */
 	movl %esp, %eax
-        //subl $4, %eax /* FIXME: there is an extra parameter pushed on the stack !!, this is just a fix */
+  //subl $4, %eax /* FIXME: there is an extra parameter pushed on the stack !!, this is just a fix */
 
 	pushl %eax // param
 	movl $fault_handler, %eax
+  cld // GCC ABI requires this on entry of C functions, should the eflags be restored before iret?
 	call *%eax
 	popl %eax // return value is returned through popa, not here
 
-        popl %ss
+  popl %ss
 	popl %gs
 	popl %fs
 	popl %es

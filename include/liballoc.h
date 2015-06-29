@@ -47,7 +47,7 @@ extern void* liballoc_alloc(size_t);
  */
 extern int liballoc_free(void*,size_t);
 
-void     *malloc(size_t);				///< The standard function.
+void     *malloc(size_t) __attribute__((malloc));				///< The standard function.
 void      free(void *);					///< The standard function.
 
 

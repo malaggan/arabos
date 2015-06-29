@@ -1,0 +1,25 @@
+ifunc
+nonnull
+const
+pure
+noreturn
+interrupt and interrupt_handler, probably not present for x86 backends
+returns_nonnull
+"used" to force instantation of member functions of class templates
+warn_unused_result
+
+#pragma GCC diagnostic warning "-Wformat"
+#pragma GCC diagnostic error "-Wformat"
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic pop
+
+
+#pragma message "Compiling " __FILE__ "..."
+#define DO_PRAGMA(x) _Pragma (#x)
+#define TODO(x) DO_PRAGMA(message ("TODO - " #x))
+TODO(Remember to fix this)
+
+* varible attr "mode" __pointer__ to indicate that "int" can be a pointer?
+
+https://gcc.gnu.org/onlinedocs/gcc/Type-Traits.html#Type-Traits

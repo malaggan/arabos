@@ -41,3 +41,4 @@ kernel.map
 /kernel.sym
 /link_errors
 /fs/error_log
+/bochsout.txt

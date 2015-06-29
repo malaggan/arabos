@@ -246,8 +246,6 @@ void cppmain()
 
 	SHOW_STAT_OK("IDT");
 
-	init_kb();
-
 	init_paging();
 
 	SHOW_STAT_OK("Memory Manager");
@@ -260,6 +258,9 @@ void cppmain()
 	irq_install_custom_handler(17,spawn_handler);
 
 	memset(reinterpret_cast<unsigned char*>(processes),0,MAX_PROCESSES*sizeof(ProcessData));
+
+	init_kb();
+	SHOW_STAT_OK("Keyboard");
 
 	_init();
 

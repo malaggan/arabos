@@ -26,10 +26,10 @@ int timer_handler(struct interrupt_frame *r)
 
 	/* Every 10 ticks (approximately 1 second), we will
 	 *    display a message on the screen */
-	if ((timer_ticks % TICKS_PER_SEC) == 0)
-	{
+	//if ((timer_ticks % TICKS_PER_SEC) == 0)
+	//{
 		//printf("One second has passed (%d)\n",timer_ticks/TICKS_PER_SEC);
-	}
+	//}
 
 	int ret = 0;
 

@@ -88,6 +88,44 @@ void irq_install()
 		irq_install_custom_handler(13,handle_coprocessor_math_fault);
 }
 
+// returns false if spurious
+bool is_normal_irq(uint8_t n)
+{
+	if(n != 7 && n != 15)
+		return true;
+	if(n == 7) // master
+	{
+		// read master PIC ISR register
+		outportb(0x20 /*master pic*/, 0x0b /* request reading ISR */);
+		return 0x80 & inportb(0x20);
+	}
+	else // slave
+	{
+		outportb(0xa0, 0x0b);
+		return 0x80 & inportb(0xa0);
+	}
+}
+
+void spurious_EOI(uint8_t n)
+{
+	// send EOI to master only if the spurious IRQ came from the slave
+	if(n == 15)
+			outportb(0x20, EOI);
+}
+
+void normal_EOI(uint8_t n)
+{
+	/* If the IDT entry that was invoked was greater than 40
+	 *	(meaning IRQ8 - 15), then we need to send an EOI to
+	 *	the slave controller */
+	if (n >= 8)
+		outportb(0xA0, EOI);
+
+	/* In either case, we need to send an EOI to the master
+	 *	interrupt controller too */
+	outportb(0x20, EOI);
+}
+
 /* Each of the IRQ ISRs point to this function, rather than
  *	the 'fault_handler' in 'isrs.c'. The IRQ Controllers need
  *	to be told when you are done servicing them, so you need
@@ -109,37 +147,25 @@ void irq_handler(struct interrupt_frame *r)
 	 *	IRQ, and then finally, run it */
 	handler = irq_routines[r->int_no];
 
+	if(!is_normal_irq(r->int_no))
+	{
+		printk(WARNING "spurios irq %d\n", r->int_no);
+		spurious_EOI(r->int_no);
+		return;
+	}
+
 	if(r->int_no > 0)
 	{
-		printf("\nIRQ %d\n",r->int_no);
+		//printf("\nIRQ %d\n",r->int_no);
 		//printf("IRQ %d(Ecode %d):\n",r->int_no,r->err_code);
 		//printf("At EIP:0x%x CS:0x%x\n",r->eip,r->cs);
 		//printf("DS:0x%x SS:0x%x\n",r->ds,r->ss);
 	}
 
 	if (handler)
-	{
 		handler(r);
-	}
 	else
-	{
 		printf("No custom handler exists for IRQ%d\n",r->int_no);
-	}
 
-	// IRQ 7 and 15 are most likely spurious. Do not send EOI
-	// TODO: actually check whether they are spurious.
-	if(r->int_no == 7 || r->int_no == 15)
-		return;
-
-	/* If the IDT entry that was invoked was greater than 40
-	 *	(meaning IRQ8 - 15), then we need to send an EOI to
-	 *	the slave controller */
-	if (r->int_no >= 8)
-	{
-		outportb((unsigned short)0xA0, EOI /*end of interrupt*/);
-	}
-
-	/* In either case, we need to send an EOI to the master
-	 *	interrupt controller too */
-	outportb((unsigned short)0x20, EOI /*end of interrupt*/);
+	normal_EOI(r->int_no);
 }

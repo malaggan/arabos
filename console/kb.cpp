@@ -80,34 +80,39 @@ void readline_handler(unsigned char c)
 // keyboard controller ref from: http://sardes.inrialpes.fr/~jphilipp/edu/cse07/doc/keyboard/Keyboard%20Reference.htm
 int keyboard_handler(struct interrupt_frame * r/*unused*/)
 {
-	unsigned char status = inportb((unsigned short)0x64);
-	if(!(status&0x1)) // has data ?
+	printf("*");
+	if(!(inportb(0x64) & 0x1)) // has data ?
+	{
+		printf("!");
 		return 0;
-	unsigned short scancode = inportb((unsigned short)0x60);
-
-	unsigned char max_wait = 0xff;
-	while((inportb((unsigned short)0x64) & 0x1) && --max_wait)
-		inportb((unsigned short)0x60);
-
-	if (scancode & 0x80) // released
-	{
-		scancode &= 0x7F; // remove the release flag
-		if(VK_LSHIFT == currKB[scancode] || VK_RSHIFT == currKB[scancode])
-		{
-			shift = 0;
-			currKB = KeyboardUs;
-		}
 	}
-	else
+
+	do
 	{
-		if(VK_LSHIFT == currKB[scancode] || VK_RSHIFT == currKB[scancode])
+		auto scancode = inportb(0x60);
+		if(scancode & 0x80) printf("^%c", currKB[ 0x7f & scancode ]);
+		else printf("v%c", currKB [ scancode ]);
+
+		if (scancode & 0x80) // released
 		{
-			shift = 1;
-			currKB = shiftKeyboardUs;
+			scancode &= 0x7F; // remove the release flag
+			if(VK_LSHIFT == currKB[scancode] || VK_RSHIFT == currKB[scancode])
+			{
+				shift = 0;
+				currKB = KeyboardUs;
+			}
 		}
 		else
-			readline_handler(currKB[scancode]);
-	}
+		{
+			if(VK_LSHIFT == currKB[scancode] || VK_RSHIFT == currKB[scancode])
+			{
+				shift = 1;
+				currKB = shiftKeyboardUs;
+			}
+			//else
+			//	readline_handler(currKB[scancode]);
+		}
+	} while(inportb(0x64) & 0x1);  // flush the buffer (and process it) (TODO: check codeset...)
 }
 
 void init_kb()

@@ -1,8 +1,7 @@
 #pragma once
 
-#include "idt.h"
-
-
+#include <idt.h>
+#include <types.h>
 
 struct ProcessData
 {

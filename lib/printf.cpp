@@ -104,7 +104,14 @@ void print0 (char **format0, int ignore_first_char)
 			case 'i':
 			case 'u':
 			case 'x':
-				itoa (buf, c, *((int *) arg++));
+			case 'p': // pointer
+				if(c == 'p') {
+					buf[0] = '0';
+					buf[1] = 'x';
+					itoa (buf+2, c, *((int *) arg++));
+				}
+				else
+					itoa (buf, c, *((int *) arg++));
 				p = buf;
 				print = 1;
 				break;

@@ -27,13 +27,13 @@ namespace __detail {
 		void check_bounds(size_t line) const {
 			if(latest_version != nullptr) if(version != *latest_version) printk(ERROR "vector: invalid iterator");
 			if(current == nullptr)
-				printk(ERROR "vector: current (%x, %x, %x) is null! (line %d)\n", begin, current, end, line),
+				printk(ERROR "vector: current (%p, %p, %p) is null! (line %d)\n", begin, current, end, line),
 					printk(DEBUG "v = %d,lv = %d\n", version, *latest_version);
 			if(current < begin)
-				printk(ERROR "vector: current (%x) < begin (%x)! (line %d)\n", current, begin, line),
+				printk(ERROR "vector: current (%p) < begin (%p)! (line %d)\n", current, begin, line),
 					printk(DEBUG "v = %d,lv = %d\n", version, *latest_version);
 			if(current > end)
-				printk(ERROR "vector: current (%x) > end (%x)! (line %d)\n", current, end, line),
+				printk(ERROR "vector: current (%p) > end (%p)! (line %d)\n", current, end, line),
 					printk(DEBUG "v = %d,lv = %d\n", version, *latest_version);
 		}
 
@@ -48,7 +48,6 @@ namespace __detail {
 		auto get() { return current; }
 
 		reference operator*() const {
-			// TODO: bounds checking
 			check_bounds(__LINE__);
 			return *current;
 		}
@@ -165,7 +164,7 @@ public:
 	using iterator		= __detail::vector_iterator<value_type      *>;
 	using const_iterator	= __detail::vector_iterator<value_type const*>;
 private:
-	shared_array<value_type> m_array;
+	unique_uncopyable_array<value_type> m_array;
 	uint32_t m_capacity;
 	uint32_t m_size;
 	int32_t m_version;
@@ -175,11 +174,11 @@ private:
 
 	void check_bounds(const_pointer p) const {
 		if(p == nullptr)
-			printk(ERROR "vector: p (%x, %x, %x) is null! (__LINE__ %d)\n", m_array.get(), p, m_array.get() + m_size, __LINE__);
+			printk(ERROR "vector: p (%p, %p, %p) is null! (__LINE__ %d)\n", m_array.get(), p, m_array.get() + m_size, __LINE__);
 		if(p < m_array.get())
-			printk(ERROR "vector: p (%x) < m_array.get() (%x)! (__LINE__ %d)\n", p, m_array.get(), __LINE__);
+			printk(ERROR "vector: p (%p) < m_array.get() (%p)! (__LINE__ %d)\n", p, m_array.get(), __LINE__);
 		if(p > m_array.get() + m_size)
-			printk(ERROR "vector: p (%x) > m_array.get() + m_size (%x)! (__LINE__ %d)\n", p, m_array.get() + m_size, __LINE__);
+			printk(ERROR "vector: p (%p) > m_array.get() + m_size (%d)! (__LINE__ %d)\n", p, m_array.get() + m_size, __LINE__);
 	}
 
 	iterator _create_iterator(pointer p) {
@@ -199,8 +198,29 @@ public:
 	// NOTE: value_type must be default constructible. Otherwise, we are going to have to use uninitialized storage and uninitialized_copy/move
 	explicit vector() : m_array{new value_type[8]}, m_capacity{8}, m_size{0}, m_version{1} {}
 
+	vector(vector const &other) :
+		m_array{new value_type[other.size()]}, m_capacity{other.size()}, m_size{other.size()}, m_version{1}
+		{
+			copy(other.cbegin(). other.cend(), begin());
+		}
+	vector(vector &&) = default;
+	vector &operator=(vector const &other) {
+		++m_version; // invalidate pointers
+		m_array.reset(new value_type[other.size()]);
+		m_capacity = other.size();
+		m_size = other.size();
+		copy(other.cbegin(). other.cend(), begin());
+	}
+	vector &operator=(vector &&) = default;
+
 	iterator begin() {
 		return iterator{m_array.get(), m_array.get()+m_size, &m_version};
+	}
+	reverse_iterator<iterator> rbegin() {
+		return make_reverse_iterator(end());
+	}
+	reverse_iterator<iterator> rbegin() const {
+		return make_reverse_iterator(end());
 	}
 	const_iterator begin() const {
 		return const_iterator{m_array.get(), m_array.get()+m_size, &m_version};
@@ -210,6 +230,12 @@ public:
 	}
 
 	iterator end() { return _create_iterator(m_array.get()+m_size); } // TODO: adapt as sentinel
+	reverse_iterator<iterator> rend() {
+		return make_reverse_iterator(begin());
+	}
+	reverse_iterator<iterator> rend() const {
+		return make_reverse_iterator(begin());
+	}
 	const_iterator end() const { return _create_const_iterator(m_array.get()+m_size); }
 	const_iterator cend() const { return _create_const_iterator(m_array.get()+m_size); }
 
@@ -220,6 +246,12 @@ public:
 		return *begin();
 	}
 
+	reference back() {
+		return *rbegin();
+	}
+	const_reference back() const {
+		return *rbegin();
+	}
 	iterator erase(const_iterator first, const_iterator last) {
 		if(first == last)
 			if(last == end())
@@ -265,7 +297,7 @@ public:
 		if(new_capacity / 3 != m_capacity)
 			panic("vector: guarantee_capacity overflow\n");
 
-		shared_array<value_type> new_array = shared_array<value_type>{new value_type[new_capacity]};
+		auto new_array = unique_uncopyable_array<value_type>{new value_type[new_capacity]};
 		move(m_array.get(), m_array.get() + m_size, new_array.get());
 		swap(m_array, new_array);
 
@@ -332,7 +364,7 @@ public:
 		if(n == 0) return begin() + dist;
 
 		while(n --> 0)
-			insert(cbegin() + (dist), value);
+			insert(cbegin() + dist, value);
 
 		return begin() + dist;
 	}

@@ -1,3 +1,4 @@
+#include <types.h>
 #include <fork.h>
 #include <timer.h>
 #include <asm.h>
@@ -23,7 +24,7 @@ void stack_trace(int* ebp, int* esp, int* eip)
 	int old_ebp_offset = ebp - esp;
 	int* stack = esp;
 
-	printf("stack @ (esp=0x%x,ebp=0x%x,eip=0x%x)\n",esp,ebp,eip);
+	printf("stack @ (esp=%p,ebp=%p,eip=%p)\n",esp,ebp,eip);
 
 	printf("eip ");
 #ifdef DBG_STABS

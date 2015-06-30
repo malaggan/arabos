@@ -97,3 +97,56 @@ public:
 		}
 	}
 };
+
+template<typename T>
+class unique_uncopyable_array
+{
+	T* m_array;
+public:
+	using element_type = T;
+
+	unique_uncopyable_array() : m_array{nullptr} {}
+	explicit unique_uncopyable_array(T* p) : m_array{p} {}
+
+	unique_uncopyable_array(unique_uncopyable_array const &sp) = delete;
+	unique_uncopyable_array(unique_uncopyable_array &&sp) : m_array(sp.m_array) { sp.m_array = nullptr; }
+
+	unique_uncopyable_array& operator=(unique_uncopyable_array const &sp) = delete;
+	unique_uncopyable_array& operator=(unique_uncopyable_array &&sp) {
+		m_array = sp.m_array;
+		sp.m_array = nullptr;
+		return *this;
+	}
+
+	void check() const {
+		if(!m_array)
+			panic("unique_uncopyable_array: !m_array\n");
+	}
+
+  void reset(element_type* e) {
+	  if(m_array != nullptr)
+		{
+			// printf("unique_uncopyable_array::reset: deleting\n");
+			delete[] m_array;
+		}
+	  m_array = e;
+  }
+
+	element_type* get() {
+		check();
+		return m_array;
+	}
+	element_type const * get() const {
+		check();
+		return m_array;
+	}
+
+	~unique_uncopyable_array() {
+		// printf("~unique_uncopyable_array (use_count@after dec = %d), m_array = %x\n", *use_count, m_array);
+		if(m_array != nullptr)
+		{
+			// printf("~unique_uncopyable_array: deleting\n");
+			delete[] m_array;
+		}
+	}
+};

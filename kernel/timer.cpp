@@ -21,17 +21,7 @@ int timer_handler(struct interrupt_frame *r)
 	ASM("outb %0,$0x21\n"::"a"((char)0x01));
 	ASM("outb %0,$0x21\n"::"a"((char)0x01));
 
-	/* Increment our 'tick count' */
-	timer_ticks++;
-
-	/* Every 10 ticks (approximately 1 second), we will
-	 *    display a message on the screen */
-	if ((timer_ticks % TICKS_PER_SEC) == 0)
-	{
-		//printf("One second has passed (%d)\n",timer_ticks/TICKS_PER_SEC);
-	}
-
-	int ret = 0;
+	++timer_ticks;
 
 	if(scheduling_started == 1)
 	{
@@ -44,7 +34,7 @@ int timer_handler(struct interrupt_frame *r)
 	ASM("outb %0,$0x21\n"::"a"((char)0x01));
 	ASM("outb %0,$0x21\n"::"a"((char)0x00));
 
-	return ret;
+	return 0;
 }
 
 /* Sets up the system clock by installing the timer handler

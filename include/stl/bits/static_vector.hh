@@ -22,16 +22,27 @@ namespace __detail {
 		operator static_vector_iterator<remove_pointer_t<It> const *>() const
 		{ return static_vector_iterator<remove_pointer_t<It> const *>{begin,current,end}; }
 
+		void check_bounds(size_t line) const {
+			if(current == nullptr) // TODO: use assert with a printf-like message
+				printk(ERROR "static_vector current (%p, %p, %p) is null! (line %d)\n", begin, current, end, line);
+			if(current < begin)
+				printk(ERROR "static_vector current (%p) < begin (%p)! (line %d)\n", current, begin, line);
+			if(current > end)
+				printk(ERROR "static_vector current (%p) > end (%p)! (line %d)\n", current, end, line);
+		}
+
 		explicit static_vector_iterator(It _begin, It _end)
-			: begin{_begin}, current{_begin}, end{_end} {}
+			: begin{_begin}, current{_begin}, end{_end}
+		{ check_bounds(__LINE__); }
 
 		explicit static_vector_iterator(It _begin, It _current, It _end)
-			: begin{_begin}, current{_current}, end{_end} {}
+			: begin{_begin}, current{_current}, end{_end}
+		{ check_bounds(__LINE__); }
 
 		auto get() { return current; }
 
 		reference operator*() const {
-			// TODO: bounds checking
+			check_bounds(__LINE__);
 			return *current;
 		}
 
@@ -39,12 +50,14 @@ namespace __detail {
 
 		static_vector_iterator& operator++() {
 			++current;
+			check_bounds(__LINE__);
 			return *this;
 		}
 
 		static_vector_iterator operator++(int) {
 			static_vector_iterator tmp = *this;
 			++current;
+			check_bounds(__LINE__);
 			return tmp;
 		}
 
@@ -56,20 +69,29 @@ namespace __detail {
 		static_vector_iterator operator--(int) {
 			static_vector_iterator tmp = *this;
 			--current;
+			check_bounds(__LINE__);
 			return tmp;
 		}
 
-		static_vector_iterator operator+(difference_type n) const { return static_vector_iterator{begin, current + n, end}; }
+		static_vector_iterator operator+(difference_type n) const {
+			check_bounds(__LINE__);
+			return static_vector_iterator{begin, current + n, end};
+		}
 
 		static_vector_iterator& operator+=(difference_type n) {
 			current += n;
+			check_bounds(__LINE__);
 			return *this;
 		}
 
-		static_vector_iterator operator-(difference_type n) const { return static_vector_iterator{begin, current - n, end}; }
+		static_vector_iterator operator-(difference_type n) const {
+			check_bounds(__LINE__);
+			return static_vector_iterator{begin, current - n, end};
+		}
 
 		static_vector_iterator& operator-=(difference_type n) {
 			current -= n;
+			check_bounds(__LINE__);
 			return *this;
 		}
 
@@ -137,8 +159,28 @@ private:
 
 	using pointer = pointer_t<iterator>;
 	using const_pointer = const_pointer_t<iterator>;
-	iterator _create_iterator(pointer p) { return iterator{m_array, p, m_array + m_size}; }
-	const_iterator _create_const_iterator(const_pointer p) const { return const_iterator{m_array, p, m_array + m_size}; }
+	void check_bounds(const_pointer p) const {
+		if(p == nullptr)
+			printk(ERROR "vector: p (%p, %p, %p) is null! (__LINE__ %d)\n", m_array, p, m_array + m_size, __LINE__);
+		if(p < m_array)
+			printk(ERROR "vector: p (%p) < m_array (%p)! (__LINE__ %d)\n", p, m_array, __LINE__);
+		if(p > m_array + m_size)
+			printk(ERROR "vector: p (%p) > m_array + m_size (%d)! (__LINE__ %d)\n", p, m_array + m_size, __LINE__);
+	}
+
+
+	iterator _create_iterator(pointer p) {
+		if(p == nullptr)
+			panic("create_iterator: null p\n");
+		check_bounds(p);
+		return iterator{m_array, p, m_array + m_size};
+	}
+	const_iterator _create_const_iterator(const_pointer p) const {
+		if(p == nullptr)
+			panic("create_const_iterator: null p\n");
+		check_bounds(p);
+		return const_iterator{m_array, p, m_array + m_size};
+	}
 public:
 
 	// NOTE: value_type must be default constructible. Otherwise, we are going to have to use uninitialized storage and uninitialized_copy/move
@@ -187,11 +229,11 @@ public:
 	iterator erase(const_iterator first, const_iterator last) {
 		if(first == last)
 			if(last == end())
-				return end();
+				return begin() + distance(cbegin(), last);
 			else
 			{
 				++last;
-				return _create_iterator( m_array + distance(cbegin(), last) );
+				return begin() + distance(cbegin(), last);
 			}
 		while(first != last)
 		{   // Note: probably there are more efficient ways to do this
@@ -208,18 +250,20 @@ public:
 			return printf("static_vector: it >= end()\n"),end();
 
 		pointer p = const_cast<pointer>(it.get());
-		iterator ret = _create_iterator(p+1); // should correctly return end() as required in certain cases
 
 		p->~value_type();
 		move(p+1, m_array + m_size, p);
 		--m_size;
-		return ret;
+		if(p >= m_array + m_size)
+			return end();
+		else
+			return _create_iterator(p);
 	}
 
 	bool guarantee_capacity(size_t minimuN) {
 		if(N >= minimuN)
 			return true;
-		printf("static_vector: capacity overflow!\n");
+		printf("static_vector: capacity overflow!\n"); // TODO: panic
 		return false;
 	}
 
@@ -270,8 +314,8 @@ public:
 		// same as insert(const_iterator, Iterator, Iterator) but using same vlue
 		if(pos < begin() || pos > end())
 			return end();
-
 		auto dist = distance(cbegin(), pos);
+		guarantee_capacity(m_size+n);
 
 		if(n == 0) return begin() + dist;
 
@@ -295,7 +339,7 @@ public:
 		if(first == last) return begin() + dist; //pos; cannot return pos because it is const_iterator, but we return iterator
 
 		while(first != last)
-			insert(pos, *first++); // TODO: can be done more efficiently (insert by bulk)
+			insert(pos++, *first++); // TODO: can be done more efficiently (insert by bulk)
 
 		return begin() + dist; // must do it here to account for possible pointer invalidation due to resize
 	}

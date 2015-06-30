@@ -83,7 +83,7 @@ itoa (char *buf, int base, int d)
 		buf++;
 		ud = -d;
 	}
-	else if (base == 'x')
+	else if (base == 'x' || base == 'p' /* pointer */)
 		divisor = 16;
 
 	/* Divide UD by DIVISOR until UD == 0. */

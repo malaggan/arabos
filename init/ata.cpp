@@ -252,33 +252,33 @@ struct IDENTIFY_DEVICE_DATA {
 	uint16_t CheckSum :8;				// Indicates the checksum.
 } __attribute__((packed));
 
-constexpr uint16_t REG_DATA		= 0X1F0;
-constexpr uint16_t REG_FEATURES		= 0X1F1;
-constexpr uint16_t REG_ERROR		= 0X1F1;
-constexpr uint16_t REG_SECTOR_COUNT	= 0X1F2;
-constexpr uint16_t REG_LBA_LO		= 0X1F3;
-constexpr uint16_t REG_LBA_MID		= 0X1F4;
-constexpr uint16_t REG_LBA_HI		= 0X1F5;
-constexpr uint16_t REG_DEVICE		= 0X1F6;
-constexpr uint16_t REG_HEAD		= 0X1F6;
-constexpr uint16_t REG_STATUS		= 0X1F7;
-constexpr uint16_t REG_COMMAND		= 0X1F7;
+constexpr uint16_t REG_DATA          = 0X1F0;
+constexpr uint16_t REG_FEATURES      = 0X1F1;
+constexpr uint16_t REG_ERROR         = 0X1F1;
+constexpr uint16_t REG_SECTOR_COUNT  = 0X1F2;
+constexpr uint16_t REG_LBA_LO        = 0X1F3;
+constexpr uint16_t REG_LBA_MID       = 0X1F4;
+constexpr uint16_t REG_LBA_HI        = 0X1F5;
+constexpr uint16_t REG_DEVICE        = 0X1F6;
+constexpr uint16_t REG_HEAD          = 0X1F6;
+constexpr uint16_t REG_STATUS        = 0X1F7;
+constexpr uint16_t REG_COMMAND       = 0X1F7;
 
 // status
-constexpr uint8_t FLAG_BUSY			= 0b10000000;
-constexpr uint8_t FLAG_DEVICE_READY		= 0b01000000;	// RDRY
-constexpr uint8_t FLAG_DRQ			= 0b00001000;	// if DRQ is 0, the device doesn't have data for us
+constexpr uint8_t FLAG_BUSY          = 0b10000000;
+constexpr uint8_t FLAG_DEVICE_READY	 = 0b01000000;	// RDRY
+constexpr uint8_t FLAG_DRQ           = 0b00001000;	// if DRQ is 0, the device doesn't have data for us
 
-constexpr uint8_t CMD_IDENTIFY_DRIVE	= 0xEC;
-constexpr uint8_t CMD_CACHE_FLUSH	= 0xE7;
-constexpr uint8_t CMD_READ_SECTORS	= 0x20;
-constexpr uint8_t CMD_WRITE_SECTORS	= 0x30;
-constexpr uint8_t MASTER		= 0x0;
-constexpr uint8_t SLAVE			= 0x10;
+constexpr uint8_t CMD_IDENTIFY_DRIVE = 0xEC;
+constexpr uint8_t CMD_CACHE_FLUSH    = 0xE7;
+constexpr uint8_t CMD_READ_SECTORS   = 0x20;
+constexpr uint8_t CMD_WRITE_SECTORS  = 0x30;
+constexpr uint8_t MASTER             = 0x0;
+constexpr uint8_t SLAVE              = 0x10;
 
-void wait_not_busy()		{while(  inportb(REG_STATUS) & FLAG_BUSY        ) ;}
-void wait_ready()		{while(!(inportb(REG_STATUS) & FLAG_DEVICE_READY));}
-void wait_for_data()		{while(!(inportb(REG_STATUS) & FLAG_DRQ         ));}
+void wait_not_busy()        {while(  inportb(REG_STATUS) & FLAG_BUSY        ) ;}
+void wait_ready()           {while(!(inportb(REG_STATUS) & FLAG_DEVICE_READY));}
+void wait_for_data()        {while(!(inportb(REG_STATUS) & FLAG_DRQ         ));}
 void select_master_device()	{outportb(REG_DEVICE, MASTER);}
 void identify_drive()
 {

@@ -8,13 +8,15 @@
 #include <kb.h>
 #include <elf32.h>
 #include <serial.h>
+#include <panic.h>
 /* Macros. */
 
 /* Check if the bit BIT in FLAGS is set. */
 #define CHECK_FLAG(flags,bit)	((flags) & (1 << (bit)))
 
 /* Forward declarations. */
-void enter_cpp();
+void cppmain();
+
 extern "C" // extern C becaused called from assembly and we do not want name manling
 void cmain (unsigned long magic, unsigned long addr);
 
@@ -142,8 +144,7 @@ void cmain (unsigned long magic, unsigned long addr)
 		mem_check(magic,addr);
 	}
 
-	printk(DEBUG "Entering C++ main\n");
-	enter_cpp();
+	cppmain();
 
-	printk(LOG "exiting cmain\n");
+	panic("exiting cmain\n");
 }

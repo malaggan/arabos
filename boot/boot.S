@@ -10,56 +10,35 @@
 	jmp	multiboot_entry
 
 	.section .__mbHeader
-	/* Align 32 bits boundary. */
-	.align	4
+	.align	4                                                /* Align 32 bits boundary. */
 
 	multiboot_header:
+	.long	MULTIBOOT_HEADER_MAGIC                             /* magic */
+	.long	MULTIBOOT_HEADER_FLAGS                             /* flags */
+	.long	-(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS) /* checksum */
+  #ifndef __ELF__
+	.long	multiboot_header                                   /* header_addr */
+	.long	_start                                             /* load_addr */
+	.long	__end_data                                         /* load_end_addr */
+	.long	__end_bss                                          /* bss_end_addr */
+	.long	multiboot_entry                                    /* entry_addr */
+	#endif                                                   /* ! __ELF__ */
 
-	/* magic */
-	.long	MULTIBOOT_HEADER_MAGIC
-
-	/* flags */
-	.long	MULTIBOOT_HEADER_FLAGS
-
-	/* checksum */
-	.long	-(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS)
-	#ifndef __ELF__
-
-	/* header_addr */
-	.long	multiboot_header
-
-	/* load_addr */
-	.long	_start
-
-	/* load_end_addr */
-	.long	__end_data
-
-	/* bss_end_addr */
-	.long	__end_bss
-
-	/* entry_addr */
-	.long	multiboot_entry
-	#endif /* ! __ELF__ */
 	.text
 	multiboot_entry:
-	/* Initialize the stack pointer. */
-	movl	$(stack + STACK_SIZE), %esp
 
-	/* Reset EFLAGS. */
-	pushl	$0
+	movl	$(stack + STACK_SIZE), %esp                        /* Initialize the stack pointer. */
+	pushl	$0                                                 /* Reset EFLAGS. */
 	popf
 
-	/* Push the pointer to the Multiboot information structure. */
-	pushl	%ebx
-	/* Push the magic value. */
-	pushl	%eax
-	.global asm_to_c
-	/* Now enter the C main function... */
-	        pushl $0 /* to stop the back trace here, set ebp = NULL */
-	        popl %ebp
+
+	pushl	%ebx                                               /* Push the pointer to the Multiboot information structure. */
+	pushl	%eax                                               /* Push the magic value. */
+	.global asm_to_c                                         /* Now enter the C main function... */
+	pushl $0                                                 /* to stop the back trace here, set ebp = NULL */
+	popl %ebp
 	.stabs "asm_to_c:F1",36,0,0,asm_to_c
 	asm_to_c: call	cmain
-
 	/* Halt. */
 	pushl	timer_ticks
 	pushl	$halt_message

@@ -39,8 +39,8 @@ KERNEL_MAP := kernel.map
 UNHOSTED := -nostartfiles -nostdinc -nostdlib -ffreestanding
 # -s for strip all sybols, -x for discard local symbols
 LDFLAGS := $(UNHOSTED) -Wl,-T$(LINKER_SCRIPT) -Wl,-Map -Wl,$(KERNEL_MAP) # -Wl,-print-memory-usage
-#DBG := -gdwarf-2 -DDBG_DWARF2
-DBG := -O0 -ggdb3 -DDBG_DWARF2 #-gstabs -DDBG_STABS
+DBG := -O0 -gstabs -DDBG_STABS
+#DBG := -O0 -ggdb3 -DDBG_DWARF2
 INCLUDE := include -I../include -I../include/c++ -I../include/c++/c++
 
 #####!!!!!!!!!!!!!!!############d

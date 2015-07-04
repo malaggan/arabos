@@ -30,7 +30,7 @@ void stack_trace(int* ebp, int* esp, int* eip)
 
 	printf("eip ");
 #ifdef DBG_STABS
-	stab_data(eip);
+	stab_data(reinterpret_cast<int>(eip));
 #endif
 
 	if(old_ebp_offset == 0 || ebp == 0)

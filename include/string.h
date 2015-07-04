@@ -1,4 +1,5 @@
 #pragma once
+#include <types.h>
 
 int strnlen(const char *str, int max);
 int strncmp(const char *s1, const char* s2, int max);

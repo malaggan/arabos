@@ -43,6 +43,7 @@ extern int printed_chars;
 // used to output to the bochs console (the host's console)
 void lpt_putc(int c)
 {
+	#if VM_ECMA
 	int i;
 
 	for (i = 0; !(inportb(0x378+1) & 0x80) && i < 12800; i++)
@@ -50,6 +51,7 @@ void lpt_putc(int c)
 	outportb(0x378+0, c);
 	outportb(0x378+2, 0x08|0x04|0x01);
 	outportb(0x378+2, 0x08);
+	#endif
 }
 
 /* Put the character C on the screen. */
@@ -115,25 +117,26 @@ putchar (int c)
 	flush_current_tty();
 }
 
+static void write(char c)
+{
+	lpt_putc(c);
+	write_serial(c);
+}
+
+// parse ecma48 code (if existant) and return a VGA attribute value
 unsigned char ECMA48(const char ** format)
 {
-	/*  30      black foreground
-	 *  31      blue foreground
-	 *  32      green foreground
-	 *  33      brown foreground
-	 *  34      red foreground
-	 *  35      magenta (purple) foreground
-	 *  36      cyan (light blue) foreground
-	 *  37      gray foreground
-	 *
-	 *  40      black background
-	 *  41      blue background
-	 *  42      green background
-	 *  43      brown background
-	 *  44      red background
-	 *  45      magenta background
-	 *  46      cyan background
-	 *  47      white background
+	/*  3x      foreground
+	 *  4x      background
+	 *  followed by:
+	 *  x0      black
+	 *  x1      blue
+	 *  x2      green
+	 *  x3      brown
+	 *  x4      red
+	 *  x5      magenta (purple)
+	 *  x6      cyan (light blue)
+	 *  x7      gray
 	 *
 	 *  0       reset all attributes to their defaults
 	 *  1       set bold
@@ -147,104 +150,57 @@ unsigned char ECMA48(const char ** format)
 	unsigned char attribute = 0x07;
 	if(*fmt == '[')
 	{
-#if VM_ECMA
-		lpt_putc(*fmt);
-#endif
-		write_serial(*fmt);
-		fmt++;
+		write(*fmt++);
 		while(*fmt != 'm')
 		{
 			switch(*fmt)
 			{
 			case '3':
-			{
 				/*foreground color*/
-#if VM_ECMA
-				lpt_putc(*fmt);
-#endif
-				write_serial(*fmt);
-				fmt++;
+				write(*fmt++);
 				attribute &= 0xf0;
 				attribute |= (*fmt-'0')&0xf;
-#if VM_ECMA
-				lpt_putc(*fmt);
-#endif
-				write_serial(*fmt);
-				fmt++;
+				write(*fmt++);
 				break;
-			}
 			case '4':
-			{
 				/*background color*/
-#if VM_ECMA
-				lpt_putc(*fmt);
-#endif
-				write_serial(*fmt);
-				fmt++;
+				write(*fmt++);
 				attribute &= 0x0f;
 				attribute |= ((*fmt-'0')<<4)&0xf0;
-#if VM_ECMA
-				lpt_putc(*fmt);
-#endif
-				write_serial(*fmt);
-				fmt++;
+				write(*fmt++);
 				break;
-			}
 			case '0':
-			{
 				/*reset*/
-#if VM_ECMA
-				lpt_putc(*fmt);
-#endif
-				write_serial(*fmt);
-				fmt++;
+				write(*fmt++);
 				attribute = 0x07;
 				break;
-			}
 			case '1':
-			{
 				/*bright(bold)*/
-#if VM_ECMA
-				lpt_putc(*fmt);
-#endif
-				write_serial(*fmt);
-				fmt++;
+				write(*fmt++);
 				attribute |= 0x08;
 				break;
-			}
 			case ';':
-			{
-#if VM_ECMA
-				lpt_putc(*fmt);
-#endif
-				write_serial(*fmt);
-				fmt++;
+				write(*fmt++);
 				break;
-			}
 			default:
-			{
 				*format = fmt;
 				return 0;
 			}
-			}
 		}
-#if VM_ECMA
-		lpt_putc(*fmt);
-#endif
-		write_serial(*fmt);
-		fmt++;
+		write(*fmt++);
 	}
 	*format = fmt;
 	return attribute;
 }
 
-
-
 /* Clear the screen and initialize VIDEO, XPOS and YPOS. */
 void
 cls (void)
 {
-	memsetw((unsigned short*)ttys[active_tty].data,(unsigned short)0x0700,COLUMNS*LINES);
+	memsetw(
+		(unsigned short*)ttys[active_tty].data,
+		(unsigned short)0x0700,
+		COLUMNS*LINES);
 
 	ttys[active_tty].xpos = 0;
 	ttys[active_tty].ypos = 0;

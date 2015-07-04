@@ -1,0 +1,3 @@
+i was checking why there are problems with -O1 and not with -O0
+
+the problem was that the frame pointe (ebp) was not being save. -fno-omit-frame-pointer would solve it (at least partially), but the real problem is deeper. we only needed ebp to update the list of ebp's since we were reallocating the stack at a different address. this is incorrect behaviour since it depends on how the compiler works. the correct way is to copy the page table (copy the virtual address space heirarchy).

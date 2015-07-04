@@ -146,7 +146,7 @@ int schedule(struct interrupt_frame *r)
 		);
 
 	/* outb val,port */
-	/* inb port, val */ // is this end of interrupt EOI?
+	// end of interrupt EOI? (return to new process)
 	ASM("outb %0,$0x20\n"::"a"((char)0x11));
 	ASM("outb %0,$0x21\n"::"a"((char)0x20));
 	ASM("outb %0,$0x21\n"::"a"((char)0x04));
@@ -154,12 +154,12 @@ int schedule(struct interrupt_frame *r)
 	ASM("outb %0,$0x21\n"::"a"((char)0x00));
 
 	ASM(
-		"popfl\n"
+		"popfl\n" // pop flags register
 		"popl %%ebp\n"
 		"popl %%esp\n"
 		"add $8, %%esp\n" // remove the int_no and error code
 		"sti\n"
-		"iret\n"
+		"iret\n" // end interrupt (once)
 		::
 		 "a"(r->eax),
 		 "b"(r->ebx),
@@ -214,14 +214,14 @@ int spawn_handler(struct interrupt_frame *r)
 	int* stack = reinterpret_cast<int*>(alloc_page());
 
 	//stack += 1024-50; // integers, => stack += 2*1024 bytes
-	stack += 1024-1;
+	stack += 1024-1 /*end of page*/; // end of page = beginning of stack. (stack grows updwards)
 
 	//memcpy((unsigned char *)stack,(unsigned char*)r->esp,50*sizeof(int));
 	*(stack--)=reinterpret_cast<int>(reinterpret_cast<int*>(taskend));
-	//*(stack--)=0;
-	*(stack--)=r->eflags;
+	*(stack--)=0; // new process %ebp is zero, so there is no previous stack frame and so no need to put on the stack (another interpretation is that this is an interrupt frame, and in interrupt frames, there is no saved ebp. check the irq code to know what to put on the stack (cf. popa instruction?)
+	*(stack--)=r->eflags; // this is not a normal stack frame; it is an interrupt frame.. that of `schedule'
 	*(stack--)=r->cs;
-	*(stack--)=proc;
+	*(stack--)=proc; // .. and to here the interrupt would return
 	*(stack--)=0x221122; // err_code
 	*(stack)=0x112211;
 
@@ -232,7 +232,7 @@ int spawn_handler(struct interrupt_frame *r)
 	processes[procIndex].frame.esp = reinterpret_cast<unsigned int>(stack); // TODO also alloc a new stack segment in GDT
 	processes[procIndex].frame.ebp = 0;//stack+5;//+old_ebp_offset;
 	processes[procIndex].frame.eax = procIndex+1; // ret val (+1, so it never gets a Zero, which is reserved for the parent process
-	processes[procIndex].frame.eip = proc;
+	processes[procIndex].frame.eip = proc; // this is a normal stack frame, since `proc' isn't going to execute iret!
 
 	if debug printf("\nspawn:child stack after truncation:\n");
 	if debug stack_trace(reinterpret_cast<int*>(processes[procIndex].frame.ebp), reinterpret_cast<int*>(processes[procIndex].frame.esp), reinterpret_cast<int*>(processes[procIndex].frame.eip));

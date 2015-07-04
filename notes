@@ -1,0 +1,3 @@
+From GCC mailing list: GCC already supports -ffixed-REG, -fcall-used-REG and -fcall-saved-REG
+options, which allow to tweak the calling conventions; but it is per
+translation unit right now.

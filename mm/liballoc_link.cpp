@@ -25,7 +25,8 @@ void* liballoc_alloc( size_t pages )
 	if(pages > 1)
 		panic("pages requested by liballoc > 1");
 
-	return alloc_page();
+	void *page = alloc_page();
+	return memset(reinterpret_cast<unsigned char *>(page), 0x00, 0x4000);
 }
 
 int liballoc_free( void* ptr, size_t pages )

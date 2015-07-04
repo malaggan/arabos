@@ -1,5 +1,6 @@
 #include <asm.h>
-#include <lib.h>
+#include <printf.h>
+#include <printk.h>
 
 char* edx_features[] = {"FPU ", "VME ", "DE ", "PSE ", "TSC ", "MSR ", "PAE ",
                         "MCE ", "CX8 ", "APIC ", "-", "SEP ", "MTRR ",

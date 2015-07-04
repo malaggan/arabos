@@ -1,6 +1,6 @@
 #include <kb.h>
 #include <console.h>
-#include <lib.h>
+#include <port.h>
 #include <idt.h>
 
 int shift=0; // shift pressed ?

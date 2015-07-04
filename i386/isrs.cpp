@@ -4,10 +4,10 @@
  *
  *	Notes: No warranty expressed or implied. Use at own risk. */
 #include <idt.h>
-#include <lib.h>
 #include <timer.h>
 #include <asm.h>
 #include <debug.h>
+#include <printf.h>
 
 /* These are function prototypes for all of the exception
  *	handlers: The first 32 entries in the IDT are reserved

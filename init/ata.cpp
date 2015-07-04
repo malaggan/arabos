@@ -1,6 +1,7 @@
 #include <asm.h>
-#include <lib.h>
 #include <types.h>
+#include <port.h>
+#include <printf.h>
 
 struct IDENTIFY_DEVICE_DATA {
 	struct {

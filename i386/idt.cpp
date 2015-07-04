@@ -1,6 +1,6 @@
 #include <idt.h>
-#include <lib.h>
 #include <asm.h>
+#include <memops.h>
 
 /* Declare an IDT of 256 entries. Although we will only use the
  *	first 32 entries in this tutorial, the rest exists as a bit

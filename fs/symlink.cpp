@@ -1,5 +1,5 @@
 #include <file_t.h>
-
+#include <string.h>
 // #include <boost/algorithm/string.hpp>
 // #include <libgen.h>
 

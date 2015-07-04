@@ -1,12 +1,13 @@
 #include <multiboot.h>
-#include <lib.h>
+#include <printk.h>
+#include <printf.h>
 #include <console.h>
-#include <lib.h>
 #include <gdt.h>
 #include <idt.h>
 #include <timer.h>
 #include <kb.h>
 #include <elf32.h>
+#include <serial.h>
 /* Macros. */
 
 /* Check if the bit BIT in FLAGS is set. */

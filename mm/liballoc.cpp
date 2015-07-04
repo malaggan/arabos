@@ -1,5 +1,5 @@
 #include <liballoc.h>
-#include <lib.h> // for panic
+#include <panic.h>
 // #define DBG // xxx
 // #define INFO
 

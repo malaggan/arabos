@@ -1,5 +1,6 @@
 #include <semaphore.h>
-#include <lib.h> // for panic // TODO: put in panic.h along with assert
+#include <panic.h>
+#include <types.h>
 
 void* alloc_page(); // TODO: put in a header file
 void free_page(void* pageBase);

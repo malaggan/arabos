@@ -1,11 +1,5 @@
 #include <file_t.h>
-
-// #include <libgen.h>
-// #include <stl/iterator>
-// #include <boost/algorithm/string.hpp>
-// #include <boost/container/detail/config_begin.hpp>
-// #include <boost/container/vector.hpp>
-// #include <boost/aligned_storage.hpp>
+#include <string.h>
 
 int sfs_rename (const char *path, const char *newpath)
 {

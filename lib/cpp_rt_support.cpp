@@ -1,3 +1,6 @@
+#include <panic.h>
+#include <printk.h>
+
 /* This file is to add runtime support functions for C++
  * To support:
  * 1- Pure virtual functions (done, not yet tested)
@@ -8,8 +11,6 @@
  * Note: Done with help from http://www.osdev.org/osfaq2/index.php/Doing%20a%20kernel%20in%20C%2B%2B
  * > When kernel exit I should call __cxa_finalize(nullptr) to call all the global dtors
  */
-
-#include <lib.h>
 
 /* 1- Pure virtual functions */
 /* untested */

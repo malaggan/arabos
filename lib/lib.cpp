@@ -1,6 +1,7 @@
 #include <asm.h>
-#include <lib.h>
 #include <liballoc.h> // for malloc
+#include <port.h>
+#include <serial.h>
 void *memcpy(void *dest, const void *src, size_t count)
 {
 	ASM("cld\n"

@@ -3,28 +3,10 @@
 #pragma once
 #define UNUSED __attribute__((__unused__))
 
-// #include <boost/container/static_vector.hpp>
-// #include <boost/optional.hpp>
-// #include <condition_variable>
-// #include <boost/mpl/set.hpp>
-// #include <type_traits>
-// #include <functional>
-// #include <cstring>
-// #include <cassert>
-// #include <memory>
-// #include <vector>
-// #include <chrono>
-// #include <array>
-// #include <cmath>
-// #include <list>
-// #include <string>
-// #include <array>
-// #include <map>
-// #include <utility>
-
 #include <types.h>
 #include <stl/new.hh> // for placement new.
-#include <lib.h> // for assert and printk
+#include <assert.h>
+#include <printk.h>
 #include <stl/iterator.hh>
 
 constexpr uint16_t BLOCK_SIZE = 512;
@@ -70,47 +52,9 @@ struct stat
 	// __ino64_t st_ino;			/* File serial number.			*/
 };
 
-inline char *dirname (char *path) __attribute__((always_inline));
-inline char *basename (char* path) __attribute__((always_inline));
+char *dirname (char *path);
+char *basename (char* path);
 
-inline char *dirname (char *path) {
-	if(!path || !*path)
-		return strdup(".");
-
-	// remove trailing slashes (they are not part of the path) // WARN: modifies argument
-	char *last = path + strnlen(path, 10000) - 1;
-	while(last!=path && *last == '/') *last-- = 0;
-
-	// find previous slash
-	while(last!=path && *last != '/') last--;
-
-	// either string is all made of slashes, or there is no slashes at all
-	if(last == path) return strdup(".");
-
-	// last points at the last slash
-	return strndup(path, last-path); // TODO: test
-}
-
-inline char *basename (char* path) {
-	if(!path || !*path)
-		return strdup(".");
-
-	// remove trailing slashes (they are not part of the path) // WARN: modifies argument
-	char *last = path + strnlen(path, 10000) - 1;
-	while(last!=path && *last == '/') *last-- = 0;
-
-	// string is all made of slashes,
-	if(last == path) return strdup("/");
-
-	// find previous slash
-	while(last!=path && *last != '/') last--;
-
-	//  there is no slashes at all
-	if(last == path) return strdup(path);
-
-	// last points at the last slash
-	return strdup(last + 1); // TODO: test
-}
 
 struct inode_t
 {

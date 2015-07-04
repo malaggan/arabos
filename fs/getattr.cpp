@@ -1,5 +1,5 @@
 #include <file_t.h>
-
+#include <memops.h>
 // #include <boost/algorithm/string.hpp>
 
 int sfs_getattr (const char *path, struct stat *stbuf)

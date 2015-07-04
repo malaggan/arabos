@@ -1,14 +1,14 @@
 #include <multiboot.h>
 #include <console.h>
-#include <lib.h>
 #include <gdt.h>
 #include <idt.h>
 #include <timer.h>
+#include <memops.h>
 #include <kb.h>
 #include <asm.h>
 #include <debug.h>
 #include <fork.h>
-
+#include <string.h>
 #include <stl/iterator.hh>
 
 void cppmain();

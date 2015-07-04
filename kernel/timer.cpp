@@ -1,6 +1,6 @@
+#include <port.h>
 #include <timer.h>
 #include <idt.h>
-#include <lib.h>
 #include <asm.h>
 
 /* This will keep track of how many ticks that the system

@@ -1,9 +1,12 @@
+#include <panic.h>
 #include <types.h>
 #include <fork.h>
 #include <timer.h>
 #include <asm.h>
-#include <lib.h>
+#include <memops.h>
 #include <debug.h>
+#include <printf.h>
+#include <printk.h>
 
 void* alloc_page(); // TODO: put in a header file
 

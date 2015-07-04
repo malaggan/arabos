@@ -1,6 +1,6 @@
-#include <lib.h>
 #include <debug.h>
 #include <asm.h>
+#include <printf.h>
 
 #ifdef DBG_STABS
 

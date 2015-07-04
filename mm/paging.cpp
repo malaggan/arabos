@@ -1,7 +1,8 @@
 #include <paging.h>
-#include <lib.h>
 #include <asm.h>
-
+#include <memops.h>
+#include <printk.h>
+#include <panic.h>
 #include "timer.h"
 
 int SET_BIT(const int x, const int b) {return (x|(1<<b)); }

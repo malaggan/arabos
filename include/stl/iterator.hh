@@ -3,9 +3,11 @@
 #pragma once
 
 #include <stl/new.hh>
-#include <lib.h>
 #include <asm.h> // for atomic_inc
 #include <types.h> // for SFINAE stuff
+#include <panic.h>
+#include <printf.h>
+#include <printk.h>
 
 namespace aos {
 

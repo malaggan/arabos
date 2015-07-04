@@ -1,6 +1,7 @@
 #include <idt.h>
-#include <lib.h>
 #include <asm.h>
+#include <port.h>
+#include <printf.h>
 
 /* These are own ISRs that point to our special IRQ handler
  *	instead of the regular 'fault_handler' function */

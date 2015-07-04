@@ -1,5 +1,7 @@
 #include <console.h>
-#include <lib.h>
+#include <port.h>
+#include <memops.h>
+#include <serial.h>
 
 struct tty_t ttys[TTY_CNT];
 unsigned int active_tty;

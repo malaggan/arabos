@@ -1,8 +1,13 @@
 #include <ecma48.h>
 #include <console.h> // needed by panic()
-#include <lib.h>
 #include <timer.h> // needed by panic()
 #include <asm.h>
+#include <printk.h>
+#include <printf.h>
+#include <serial.h>
+#include <string.h>
+
+#define MAX_CHARS 1024
 
 // imbed attribute in char, given c is an int
 int MK_CH_ATT(unsigned char c,unsigned char a)

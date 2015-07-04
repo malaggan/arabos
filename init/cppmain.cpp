@@ -5,7 +5,6 @@
 #include <idt.h>
 #include <timer.h>
 #include <kb.h>
-#include <mm.h>
 #include <asm.h>
 #include <debug.h>
 #include <fork.h>
@@ -248,6 +247,7 @@ void cppmain()
 
 	init_kb();
 
+	void init_paging();
 	init_paging();
 
 	SHOW_STAT_OK("Memory Manager");

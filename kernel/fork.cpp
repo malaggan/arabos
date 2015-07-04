@@ -4,7 +4,6 @@
 #include <asm.h>
 #include <lib.h>
 #include <debug.h>
-#include <mm.h>
 
 void* alloc_page(); // TODO: put in a header file
 

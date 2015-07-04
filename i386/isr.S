@@ -120,7 +120,6 @@ isr_common_stub:
 
   /* the pointer to the stack-frame-based-img of the interrupt frame */
 	movl %esp, %eax
-  //subl $4, %eax /* FIXME: there is an extra parameter pushed on the stack !!, this is just a fix */
 
 	pushl %eax // param
 	movl $fault_handler, %eax

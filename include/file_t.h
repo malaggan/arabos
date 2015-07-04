@@ -23,7 +23,7 @@
 // #include <utility>
 
 #include <types.h>
-#include <mm.h> // for placement new. // TODO: move new operators to <new.h>
+#include <stl/new.hh> // for placement new.
 #include <lib.h> // for assert and printk
 #include <stl/iterator.hh>
 

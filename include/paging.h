@@ -1,7 +1,6 @@
 #pragma once
 
 #include <types.h>
-#include <liballoc.h>
 
 // page table entry format :
 // addr/avail to os/zero/zero/dirty/accessed/page cache disable/pg write throuhg(1) back(0)/user,supervisor/write,read/present
@@ -18,10 +17,6 @@ typedef union
 		unsigned offset:12;
 	} data ;
 } __attribute__((packed)) linear_addr_t;
-
-void printk (const char *, ...);
-
-#include <stl/new.hh>
 
 enum CacheMode {WriteBack = 0, WriteThrough};
 enum Privilage {Supervisor = 0, User};
@@ -112,5 +107,3 @@ public:
 
 	void print() const;
 };
-
-void init_paging();

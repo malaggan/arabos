@@ -6,7 +6,6 @@
 #include <idt.h>
 #include <timer.h>
 #include <kb.h>
-#include <mm.h>
 #include <elf32.h>
 /* Macros. */
 

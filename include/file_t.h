@@ -55,7 +55,6 @@ struct stat
 char *dirname (char *path);
 char *basename (char* path);
 
-
 struct inode_t
 {
 	inode_t(inode_t const  &i);
@@ -103,7 +102,8 @@ struct file_t
 	int find(aos::string<128> const path) const; // AAAAAH return by value !
 	int find(aos::static_vector<aos::string<20>,10>::const_iterator first, aos::static_vector<aos::string<20>,10>::const_iterator last) const;
 
-	void split(const aos::string<128>& str,const aos::string<2>& delim,aos::static_vector<aos::string<20>,10>& parts); // TODO: should be static
+
+	aos::static_vector<aos::string<20>,10> split(const aos::string<128> str, const aos::string<2> delim);
 	void add(aos::static_vector<uint32_t,8> const & index);
 	void add(int index);
 	bool isDirectory() const;
@@ -260,8 +260,9 @@ public:
 		}
 	aos::static_vector<uint32_t,8> search(size_t total_size);
 };
-
+int convert(block_t &blockobj,int sec_num);
+int convert_to_write(block_t &blockobj,int sec_num);
 extern HDD hd;
-extern file_t& ROOT;
+extern block_t ROOT;
 
 aos::static_vector<aos::string<20>,10> sfs_readdir (const char *path);

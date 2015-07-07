@@ -1,7 +1,8 @@
 #include <asm.h>
 #include <types.h>
+#include <file_t.h>
 #include <port.h>
-#include <printf.h>
+#include <ata.h>
 
 struct IDENTIFY_DEVICE_DATA {
 	struct {
@@ -252,21 +253,21 @@ struct IDENTIFY_DEVICE_DATA {
 	uint16_t CheckSum :8;				// Indicates the checksum.
 } __attribute__((packed));
 
-constexpr uint16_t REG_DATA          = 0X1F0;
-constexpr uint16_t REG_FEATURES      = 0X1F1;
-constexpr uint16_t REG_ERROR         = 0X1F1;
-constexpr uint16_t REG_SECTOR_COUNT  = 0X1F2;
-constexpr uint16_t REG_LBA_LO        = 0X1F3;
-constexpr uint16_t REG_LBA_MID       = 0X1F4;
-constexpr uint16_t REG_LBA_HI        = 0X1F5;
-constexpr uint16_t REG_DEVICE        = 0X1F6;
-constexpr uint16_t REG_HEAD          = 0X1F6;
-constexpr uint16_t REG_STATUS        = 0X1F7;
-constexpr uint16_t REG_COMMAND       = 0X1F7;
+constexpr uint16_t REG_DATA         = 0X1F0;
+constexpr uint16_t REG_FEATURES     = 0X1F1;
+constexpr uint16_t REG_ERROR        = 0X1F1;
+constexpr uint16_t REG_SECTOR_COUNT	= 0X1F2;
+constexpr uint16_t REG_LBA_LO       = 0X1F3;
+constexpr uint16_t REG_LBA_MID      = 0X1F4;
+constexpr uint16_t REG_LBA_HI       = 0X1F5;
+constexpr uint16_t REG_DEVICE       = 0X1F6;
+constexpr uint16_t REG_HEAD         = 0X1F6;
+constexpr uint16_t REG_STATUS       = 0X1F7;
+constexpr uint16_t REG_COMMAND      = 0X1F7;
 
 // status
 constexpr uint8_t FLAG_BUSY          = 0b10000000;
-constexpr uint8_t FLAG_DEVICE_READY	 = 0b01000000;	// RDRY
+constexpr uint8_t FLAG_DEVICE_READY  = 0b01000000;	// RDRY
 constexpr uint8_t FLAG_DRQ           = 0b00001000;	// if DRQ is 0, the device doesn't have data for us
 
 constexpr uint8_t CMD_IDENTIFY_DRIVE = 0xEC;
@@ -320,17 +321,30 @@ void identify_drive()
 		printf("%c%c", data.FirmwareRevision[i+1], data.FirmwareRevision[i]);
 	printf("\n");
 
-	void read(uint16_t data[256]);
-	uint16_t d[256];
-	read(d);
-	for(int i = 0; i < 10; i++)
-		printf("read: %x\n",d[i]);
+
+	// uint16_t d[256];
+	//uint16_t * a;
+	// file_t ROOT =hd.blocks[0].change_type<file_t>("/",0777,file_type::D,3,false);
+	// uint16_t* b=reinterpret_cast<uint16_t*>(&ROOT);
+	// file_t* p1 = reinterpret_cast<file_t*>(b);
+
+	// write(b,0);
+	// read(d,0);
+	// printf("name :%d\n",( reinterpret_cast<file_t*>(b))->inode);
+	// printf("name :%s\n",( reinterpret_cast<file_t*>(b))->name.c_str());
+	// file_t* p1 = reinterpret_cast<file_t*>(d);
+	//  for(int i = 0; i < 10; i++)
+	// printf("read: %s\n",p1->name.c_str());
 }
 
-void read(uint16_t data[256])
+void read(uint16_t data[256],uint32_t sect_num)
 {
+	wait_not_busy();
+	cli();
+	wait_ready();
+
 	uint8_t slavebit = 0;
-	uint32_t LBA = 0x0;  // 28 bits
+	uint32_t LBA = sect_num;  // 28 bits
 	uint8_t count = 1; // read one sector
 	// Send 0xE0 for the "master" or 0xF0 for the "slave", ORed with the highest 4 bits of the LBA to port 0x1F6:
 	// Note on the "magic bits" sent to port 0x1f6: Bit 6 (value = 0x40) is the LBA bit. This must be set for either LBA28 or LBA48 transfers. It must be clear for CHS transfers. Bits 7 and 5 are obsolete for current ATA drives, but must be set for backwards compatibility with very old (ATA1) drives.
@@ -338,7 +352,7 @@ void read(uint16_t data[256])
 	constexpr uint8_t slave = 0xF0;
 
 	outportb(REG_DEVICE, master | ((LBA >> 24) & 0x0F));
-	// Send a nullptr byte to port 0x1F1, if you like (it is ignored and wastes lots of CPU time):
+	// Send a NULL byte to port 0x1F1, if you like (it is ignored and wastes lots of CPU time):
 	outportb(REG_ERROR, 0x00);
 	outportb(REG_SECTOR_COUNT, count);
 	outportb(REG_LBA_LO , static_cast<uint8_t>(LBA));
@@ -356,12 +370,17 @@ void read(uint16_t data[256])
 
 	// Note for polling PIO drivers: After transferring the last uint16_t of a PIO data block to the data IO port, give the drive a 400ns delay to reset its DRQ bit (and possibly set BSY again, while emptying/filling its buffer to/from the drive).
 
+	sti();
 }
 
-void write()
+void write( uint16_t data[256],uint32_t sect_num)
 {
+	wait_not_busy();
+	cli();
+	wait_ready();
+
 	uint8_t slavebit = 0;
-	uint32_t LBA = 0x0;  // 28 bits
+	uint32_t LBA = sect_num;  // 28 bits
 	uint8_t count = 1; // read one sector
 	// Send 0xE0 for the "master" or 0xF0 for the "slave", ORed with the highest 4 bits of the LBA to port 0x1F6:
 	// Note on the "magic bits" sent to port 0x1f6: Bit 6 (value = 0x40) is the LBA bit. This must be set for either LBA28 or LBA48 transfers. It must be clear for CHS transfers. Bits 7 and 5 are obsolete for current ATA drives, but must be set for backwards compatibility with very old (ATA1) drives.
@@ -369,15 +388,16 @@ void write()
 	constexpr uint8_t slave = 0xF0;
 
 	outportb(REG_DEVICE, master | ((LBA >> 24) & 0x0F));
-	// Send a nullptr byte to port 0x1F1, if you like (it is ignored and wastes lots of CPU time):
+	// Send a NULL byte to port 0x1F1, if you like (it is ignored and wastes lots of CPU time):
 	outportb(REG_ERROR, 0x00);
 	outportb(REG_SECTOR_COUNT, count);
 	outportb(REG_LBA_LO , static_cast<uint8_t>(LBA));
 	outportb(REG_LBA_MID, static_cast<uint8_t>(LBA >> 8));
 	outportb(REG_LBA_HI , static_cast<uint8_t>(LBA >> 16));
 	outportb(REG_COMMAND, CMD_WRITE_SECTORS);
-	uint16_t data[256] = {0xdead,0xbeef,0xdead,0xbeef,0xdead,0xbeef,0xdead,0xbeef,0xdead,0xbeef,0xdead,0xbeef};
-	for(uint16_t d : data)
-		outportw(REG_DATA, d);
+	// uint16_t data[256] = {0xdead,0xbeef,0xdead,0xbeef,0xdead,0xbeef,0xdead,0xbeef,0xdead,0xbeef,0xdead,0xbeef};
+	for(int i=0;i<256;i++)
+		outportw(REG_DATA, data[i]);
 	outportb(REG_COMMAND, CMD_CACHE_FLUSH);
+	sti();
 }

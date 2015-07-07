@@ -2,18 +2,31 @@
 
 aos::static_vector<aos::string<20>,10> sfs_readdir (const char *path)
 {
+	printk (DEBUG  "readdir :%s\n",path);
 
 	int parent;
-	parent=ROOT.find(path);
+	parent=ROOT.file.find(path);
 	aos::static_vector<aos::string<20>,10> temp;
-	if(!(hd.blocks[parent].get<file_t>().isDirectory()))
+	block_t bt;
+	convert(bt,parent);
+	if(!(bt.file.isDirectory()))
 		return temp;
-	aos::static_vector<uint32_t,94> file_inode=hd.blocks[hd.blocks[parent].get<file_t>().inode].get<inode_t>().index_file;
+	printk (DEBUG  "readdir2 :\n");
+
+	block_t it;
+	convert(it,bt.file.inode);
+	aos::static_vector<uint32_t,94> file_inode=it.inode.index_file;
+	printk (DEBUG  "readdir3 the size of file_inode%d:\n",file_inode.size());
 
 	temp.push_back(".");
 	temp.push_back("..");
 	for(unsigned int i=0;i<file_inode.size();i++){
-		temp.push_back(hd.blocks[file_inode.at(i)].get<file_t>().name);
+		block_t tr;
+		convert(tr,file_inode.at(i));
+		temp.push_back(tr.file.name);
+		printk (DEBUG  "readdir3 the name %s:\n",temp[i].c_str());
+//printk (DEBUG  "readdir3 the name %s:\n",tr.file.name.c_str());
+
 	}
 	return temp;
 }
@@ -57,7 +70,7 @@ int sfs_readdir (const char *path, void *buf, fuse_fill_dir_t filler, off_t UNUS
 }
 
 //for(auto& kv : *dir->children)
-//	filler(buf, kv.first.c_str(), nullptr, 0);
+//  filler(buf, kv.first.c_str(), nullptr, 0);
 
 
 
@@ -68,7 +81,7 @@ int sfs_readdir (const char *path, void *buf, fuse_fill_dir_t filler, off_t UNUS
 
   printk (DEBUG  "readdir \n");
 
-  auto dir= ROOT->find(path);
+  auto dir= ROOT.file.find(path);
 
   if(!(dir && dir->isDirectory()))
   return -ENOENT;

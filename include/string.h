@@ -3,6 +3,7 @@
 
 int strnlen(const char *str, int max);
 int strncmp(const char *s1, const char* s2, int max);
+int strncmp_prefix(const char *s1,const char* prefix);
 
 /* Return a new identical string.  */
 char * strdup (const char *str);

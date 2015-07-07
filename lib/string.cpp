@@ -78,6 +78,19 @@ int strncmp(const char *s1,const char* s2, int len)
 	return(*s1 - s2[-1]);
 }
 
+int strncmp_prefix(const char *s1,const char* prefix)
+{
+	auto len = strnlen(prefix,100);
+	if(s1 == prefix)
+		return(0);
+	while(*s1 == *prefix++ && len--)
+		if(*s1++ == '\0')
+			return(0);
+	if(!len)
+		return 0;
+	return(*s1 - prefix[-1]);
+}
+
 char * strdup (const char *s) { // TODO: use shared_ptr, or guarantee there's is no leak
 	size_t len = strnlen (s, 10000) + 1;
 

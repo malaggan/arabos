@@ -6,11 +6,18 @@
 
 *~
 *.d
-errors_summary
-grub.iso
-iso/kernel.tgz
-kernel.k
-kernel.map
+/errors_summary
+/link_errors
+/grub.iso
+/iso/kernel.tgz
+/kernel.k
+/kernel.map
+/kernel.sym
+/TAGS
+/#errors_summary#
+/.#errors_summary
+/*/error_log
+/bochsout.txt
 
 # Precompiled Headers
 *.gch
@@ -34,11 +41,3 @@ kernel.map
 *.exe
 *.out
 *.app
-
-/TAGS
-/#errors_summary#
-/.#errors_summary
-/kernel.sym
-/link_errors
-/fs/error_log
-/bochsout.txt

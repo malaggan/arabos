@@ -17,24 +17,24 @@ int sfs_rename (const char *path, const char *newpath)
 	printk (DEBUG  "rename new file index:%d\n",newfile);
 	int newparent=ROOT.file.find(dirname(strdup(newpath)));
 	printk (DEBUG  "rename new parent index:%d\n",newparent);
-	block_t ft;//the old file
-	convert(ft,i_file);
-	block_t ftparent;//the old parent
-	convert(ftparent,parent);
-	block_t ftnewparent;//the new parent
-	convert(ftnewparent,newparent);
-	block_t itparent;//inode of old parent
-	convert(itparent,ftparent.file.inode);
+	//the old file
+	auto ft = read_block(i_file);
+	//the old parent
+	auto ftparent = read_block(parent);
+	//the new parent
+	auto ftnewparent = read_block(newparent);
+	//inode of old parent
+	auto itparent = read_block(ftparent.file.inode);
 	//block_t itnewparent;//inode of new parent
 
 	//aos::static_vector<uint32_t,1> temp;
 	auto tmp=aos::find(itparent.inode.index_file.begin(),
 	                   itparent.inode.index_file.end(),i_file);
 	itparent.inode.index_file.erase(tmp,tmp+1);
-	convert_to_write(itparent,ftparent.file.inode);
+	itparent.write(ftparent.file.inode);
 	ft.file.name=basename(strdup(newpath));
 	printk (DEBUG  "rename new file name:%s\n",ft.file.name.c_str());
-	convert_to_write(ft,i_file);
+	ft.write(i_file);
 	ftnewparent.file.add(i_file);
 
 

@@ -3,10 +3,8 @@
 int sfs_read (const char UNUSED *path, char *buf, size_t size, off_t offset, int file_handle)//struct fuse_file_info *f)
 {
 	int index=file_handle; //f->fh;
-	block_t fileobj;
-	convert(fileobj,index);
-	block_t inode;
-	convert(inode,fileobj.file.inode);
+	auto fileobj = read_block(index);
+	auto inode = read_block(fileobj.file.inode);
 	printk(DEBUG "In READ the index file number1:%d \n",index);
 	printk(DEBUG "In read the size of index_files: %d\n",inode.inode.index_file.size());
 
@@ -18,8 +16,7 @@ int sfs_read (const char UNUSED *path, char *buf, size_t size, off_t offset, int
 	    i++)
 	{
 		printf(DEBUG "HERE index:%d\n" ,inode.inode.index_file[i]);
-		block_t dataobj;
-		convert(dataobj,inode.inode.index_file[i]);
+		auto dataobj = read_block(inode.inode.index_file[i]);
 		printf(DEBUG "HERE data size:%d\n" ,dataobj.data.data.size());
 
 		for(unsigned int j = 0;
@@ -44,7 +41,7 @@ int sfs_read (const char UNUSED *path, char *buf, size_t size, off_t offset, int
 
 		printk(DEBUG "In READ  before wait\n");
 		inode.inode.readcount++;
-		convert_to_write(inode,fileobj.file.inode);
+		inode.write(fileobj.file.inode);
 	}
 	printk(DEBUG "In READ after wait\n");
 	inode.inode.atime=aos::now();
@@ -66,7 +63,7 @@ int sfs_read (const char UNUSED *path, char *buf, size_t size, off_t offset, int
 
 	//aos::lock_guard<aos::mutex> guard{hd.blocks[index].file.mutex};
 	inode.inode.readcount--;
-	convert_to_write(inode,fileobj.file.inode);
+	inode.write(fileobj.file.inode);
 	printk(DEBUG "In READ end:%d\n",size);
 	printk(DEBUG "In READ end\n");
 

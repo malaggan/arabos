@@ -14,10 +14,8 @@ int sfs_getattr (const char *path, struct stat *stbuf)
 
 	//printk(DEBUG "getattr the name of the file is :%s\n",hd.blocks[file_inode].get<file_t>().name);
 	memset(reinterpret_cast<unsigned char*>(stbuf),0,sizeof(*stbuf));
-	block_t ft;
-	convert(ft,file_inode);
-	block_t it;
-	convert(it,ft.file.inode);
+	auto ft = read_block(file_inode);
+	auto it = read_block(ft.file.inode);
 	stbuf->st_mode = (!(ft.file.type==file_type::D)?S_IFREG:S_IFDIR) | ft.file.mode;
 
 	if(ft.file.isSymlink())

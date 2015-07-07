@@ -8,21 +8,11 @@ int sfs_unlink (const char *path)
 	char *dir = dirname (pathd);
 
 	int parent= ROOT.file.find(dir);
-	//auto& parent = hd.blocks[parent_node_number].file;
-	//auto& parent_inode = hd.blocks[parent.inode].inode;
-	block_t ftparent;
-	convert(ftparent,parent);
-	block_t itparent;
-	convert(itparent,ftparent.file.inode);
+	auto ftparent = read_block(parent);
+	auto itparent = read_block(ftparent.file.inode);
 	int current = ROOT.file.find(path);
-	//auto& current = hd.blocks[current_node_number].file;
-	//auto& current_inode = hd.blocks[current.inode].inode;
-	block_t ft;
-	convert(ft,current);
-	block_t it;
-	convert(it,ft.file.inode);
-	//int current = ROOT.file.find(path);
-
+	auto ft = read_block(current);
+	auto it = read_block(ft.file.inode);
 
 	if(current == -1)
 		return -ENOENT;
@@ -32,35 +22,28 @@ int sfs_unlink (const char *path)
 	for(unsigned int i = 0; i < it.inode.index_file.size() ; i++ )
 	{
 		if(it.inode.link == 1 ){
-			block_t btmp;
-			convert(btmp,it.inode.index_file[i]);
-			//hd.blocks[current_inode.index_file[i]].tag = block_type::free;
+			auto btmp = read_block(it.inode.index_file[i]);
 			btmp.tag=block_type::free;
-			//hd.blocks[current_inode.index_file[i]].data.data.clear();
 			btmp.data.data.clear();
-			convert_to_write(btmp,it.inode.index_file[i]);
-			//(hd.blocks[current.inode].inode).index_file.erase((hd.blocks[current.inode].inode).index_file.begin() + i);
+			btmp.write(it.inode.index_file[i]);
 			it.inode.index_file.erase(it.inode.index_file.begin()+i);
 
 		}
 	}
-	convert_to_write(it,ft.file.inode);
-	//hd.blocks[current_node_number].tag = block_type::free;
+	it.write(ft.file.inode);
 	ft.tag = block_type::free;
-	for(unsigned int i = 0 ; i < /*hd.blocks[parent.inode]*/itparent.inode.index_file.size() ; i++)
+	for(unsigned int i = 0 ; i < itparent.inode.index_file.size() ; i++)
 	{
-		if(/*hd.blocks[parent.inode]*/itparent.inode.index_file[i] == current/*static_cast<uint32_t>(current_node_number)*/){
-			/*hd.blocks[parent.inode]*/itparent.inode.index_file.erase(/*hd.blocks[parent.inode]*/itparent.inode.index_file.begin() + i);
+		if(itparent.inode.index_file[i] == current){
+			itparent.inode.index_file.erase(itparent.inode.index_file.begin() + i);
 			ft.tag=block_type::free;
 			it.tag=block_type::free;
-			convert_to_write(it,ft.file.inode);
-			convert_to_write(ft,current);
+			it.write(ft.file.inode);
+			ft.write(current);
 		}
 	}
-	convert_to_write(itparent,ftparent.file.inode);
+	itparent.write(ftparent.file.inode);
 
-//parent->children->erase(current->name);
-	//current.reset();
 	printk(DEBUG "END OF UNLINK\n");
 	return 0;
 

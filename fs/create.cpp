@@ -5,15 +5,12 @@
 
 int sfs_create (char const *path, mode_t mode, int /*out*/ *file_handle)
 {
-	printk (DEBUG  "create %s \n",path);
-	//printk (DEBUG  "create root name:%s\n",(ROOT.file.name).c_str());
 	auto p = ROOT.file.find(path);
-	if(p>=0)
+	if(p >= 0)
 		return -EEXIST;
 
 	auto strs=ROOT.file.split(aos::string<128>{path},aos::string<2>{"/"});
-	//printk (DEBUG  "create find str.end :%s\n",(*strs.begin()).c_str());
-	//strs.erase(strs.begin());
+
 	auto e = strs.end();
 
 	int parent;
@@ -23,13 +20,8 @@ int sfs_create (char const *path, mode_t mode, int /*out*/ *file_handle)
 		parent=ROOT.file.find(strs.begin(), --e);
 	printk (DEBUG  "create parent id :%d  ",parent);
 	printk (DEBUG  "create find str size :%d  ",strs.size());
-	// printk (DEBUG  "create ROOT.name:%s\n",(ROOT.file.name).c_str());
-	//printk (DEBUG  "create find str.end :%s\n",(*strs.end()).c_str());
-	//printk (DEBUG  "create find str size :%d\n",str.size());
 
-	// file_t *h=(new file_t("",0777,file_type::D,1,false));;
-	block_t ftparent;
-	convert(ftparent,parent);
+	block_t ftparent = read_block(parent);
 	if(ftparent.file.type==file_type::D)
 		printk (DEBUG  "create ft.file.isDirectory():   ");
 	printk (DEBUG  "create parent name:%s\n",ftparent.file.name.c_str());
@@ -52,15 +44,14 @@ int sfs_create (char const *path, mode_t mode, int /*out*/ *file_handle)
 	//write(f,free_index.front());
 	block_t ft;
 	ft.change_type<file_t>(*strs.rbegin(),mode,file_type::F,free_index.back(),false);
-	convert_to_write(ft,free_index.front());
+	ft.write(free_index.front());
 	block_t it;
 	it.change_type<inode_t>();
-	convert_to_write(it,free_index.back());
+	it.write(free_index.back());
 	ftparent.file.add(free_index.front());
-	block_t itparent;
-	convert(itparent,ftparent.file.inode);
+	block_t itparent = read_block(ftparent.file.inode);
 	printk (DEBUG  "create index files in inode of parent size %d \n",itparent.inode.index_file.size());
-	/*f->fh */ *file_handle = free_index.front();
+	*file_handle = free_index.front();
 	it.inode.usecount++;
 
 	return 0;

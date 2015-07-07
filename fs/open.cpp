@@ -6,10 +6,8 @@ int sfs_open (const char *path, int /*out*/ *file_handle)//struct fuse_file_info
 	int file= ROOT.file.find(path);
 	if(file==-1 )
 		return -ENOENT;
-	block_t fileobj;
-	convert(fileobj,file);
-	block_t inode;
-	convert(inode,fileobj.file.inode);
+	auto fileobj = read_block(file);
+	auto inode = read_block(fileobj.file.inode);
 	if(!(inode.inode.check_permission(0/*uid*/, 0/*gid*/)) && fileobj.file.type==file_type::D ) {
 		return -EACCES;
 	}
@@ -19,7 +17,7 @@ int sfs_open (const char *path, int /*out*/ *file_handle)//struct fuse_file_info
 	}
 	*file_handle =file;
 	inode.inode.usecount++;
-	convert_to_write(inode,fileobj.file.inode);
+	inode.write(fileobj.file.inode);
 	printk(DEBUG "In OPEN END\n");
 	return 0;
 }

@@ -1,5 +1,4 @@
 // -*- mode: c++; -*-
-// #define FUSE_USE_VERSION 26
 #pragma once
 #define UNUSED __attribute__((__unused__))
 
@@ -100,10 +99,13 @@ struct file_t
 	bool isRoot() const;
 
 	int find(aos::string<128> const path) const; // AAAAAH return by value !
-	int find(aos::static_vector<aos::string<20>,10>::const_iterator first, aos::static_vector<aos::string<20>,10>::const_iterator last) const;
+	int find(aos::static_vector<aos::string<20>,10>::const_iterator first,
+	         aos::static_vector<aos::string<20>,10>::const_iterator last) const;
 
+	aos::static_vector<aos::string<20>,10>
+	split(const aos::string<128> str,
+	      const aos::string<2> delim);
 
-	aos::static_vector<aos::string<20>,10> split(const aos::string<128> str, const aos::string<2> delim);
 	void add(aos::static_vector<uint32_t,8> const & index);
 	void add(int index);
 	bool isDirectory() const;
@@ -155,7 +157,8 @@ block_type tag_v<T,0> = block_type::free;
 // polymorphism uses pointers, and there is no guarantee that
 // pointers remain valid when the block is loaded from disk.
 // We need to use (extended) unions.
-struct block_t {
+#include <ata.h>
+struct block_t final {
 	/* static data member */
 	static constexpr uint16_t block_size = BLOCK_SIZE;
 
@@ -221,30 +224,42 @@ struct block_t {
 		static_assert(validate_size< block_t, block_size >::value, "sizeof(block_t) != block_size");
 	}
 
+	void read(sector_t sec_num) {
+		read_sector(reinterpret_cast<uint16_t*>(this), sec_num);
+	}
+
+	void write(sector_t sec_num) const {
+		write_sector(reinterpret_cast<uint16_t const *>(this), sec_num);
+	}
+
+
 	template <typename T, typename ...Args>
 	T& change_type(Args ...args) {
-		this->~block_t(); //why ????
+		this->~block_t();
 		tag = tag_v<T>;
 		new (&pad) T(aos::forward<Args>(args)...);   //Returns an rvalue reference to arg if arg is not an lvalue reference
 		return get<T>();
 	}
 	//get<>:Returns a reference to the Ith element of tuple tpl.
 
-#define getter(Type, Tag, Const)	  \
-	template <typename T> \
+#define getter(Type, Tag, Const)                \
+	template <typename T>                         \
 	aos::enable_if_t<aos::is_same<T,Type>::value, \
-	                 T Const &> get() Const { \
-		assert(tag == tag_v<T>); \
-		return Tag; \
+	                 T Const &> get() Const {     \
+		assert(tag == tag_v<T>);                    \
+		return Tag;                                 \
 	}
 
-	getter(inode_t	, inode     , const)
-	getter(inode_t	, inode     ,      )
-	getter(file_t	, file     , const)
-	getter(file_t	, file      ,      )
-	getter(data_t	, data      , const)
-	getter(data_t	, data      ,      )
+	getter(inode_t , inode     , const)
+	getter(inode_t , inode     ,      )
+	getter(file_t  , file      , const)
+	getter(file_t  , file      ,      )
+	getter(data_t  , data      , const)
+	getter(data_t  , data      ,      )
 };
+
+block_t read_block(sector_t sector_num);
+
 //bt return el tag if is valid
 // ~/opt/gcc/bin/g++  afs_create.cc -c -D_FILE_OFFSET_BITS=64 -I/usr/include/fuse  -std=c++14 -DBLOCK_SIZE=512 -DNUM_BLOCKS=100 -o afs_create.o |& less
 struct HDD
@@ -260,8 +275,7 @@ public:
 		}
 	aos::static_vector<uint32_t,8> search(size_t total_size);
 };
-int convert(block_t &blockobj,int sec_num);
-int convert_to_write(block_t &blockobj,int sec_num);
+
 extern HDD hd;
 extern block_t ROOT;
 

@@ -337,7 +337,7 @@ void identify_drive()
 	// printf("read: %s\n",p1->name.c_str());
 }
 
-void read(uint16_t data[256],uint32_t sect_num)
+void read_sector(uint16_t data[256], sector_t sect_num)
 {
 	wait_not_busy();
 	cli();
@@ -373,7 +373,7 @@ void read(uint16_t data[256],uint32_t sect_num)
 	sti();
 }
 
-void write( uint16_t data[256],uint32_t sect_num)
+void write_sector(uint16_t const data[256], sector_t sect_num)
 {
 	wait_not_busy();
 	cli();

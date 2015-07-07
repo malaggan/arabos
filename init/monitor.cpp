@@ -44,27 +44,23 @@ int sfs_unlink (const char *path);
 
 void monitor()
 {
-	char cmd[100];
-
 	identify_drive();
-	printf("abdelrhman test\n");
-	ROOT.change_type<file_t>("/",0777,file_type::D,1,false);
-	convert_to_write(ROOT,0);
-	convert(ROOT,0);
-	printk (DEBUG  "cppman ROOT.name:%s\n",ROOT.file.name.c_str());
+	ROOT.change_type<file_t>("/", 0777, file_type::D, 1 /* inode */, false);
+	ROOT.write(0);
+	ROOT.read(0);
 
 	printf("The MONITOR ! - type h for help");
 
 	for(;;)
 	{
 		printf("\n%% ");
-		*cmd=0;
+		char cmd[100] = {0};
 		readline(cmd,99);
 
 		int fh;//file handle
-		char bufwrite[100]="TTT";//buffer of write
-		char bufread[100]={0};//buffer for read
-		char buflink[100]={0};//buffer for symlinks
+		char bufwrite[100] = "TTT";//buffer of write
+		char bufread[100] = {0};//buffer for read
+		char buflink[100] = {0};//buffer for symlinks
 
 		// handle the command
 		if(!strncmp(cmd,"alloc_page",10))
@@ -130,16 +126,16 @@ void monitor()
 			block_t block;
 			block.tag=block_type::free;
 			for(int i=1;i<100;i++)
-				convert_to_write(block,i);           //////clean hard disk except root ////////////////
+				block.write(i);           //////clean hard disk except root ////////////////
 			block_t iROOT;
 			iROOT.change_type<inode_t>();
-			convert_to_write(iROOT,1);
+			iROOT.write(1);
 			printk (DEBUG  "cppman iROOT files size:%d\n",iROOT.inode.index_file.size());
 		}
 		else if(!strncmp_prefix(cmd,"status")) {
 			for(int i=0;i<10;i++) {
 				block_t p ;
-				convert(p,i);
+				p.read(i);
 				if(p.tag==block_type::free) {
 					printf("block :"WHITE"%d ",i);
 					printf("type:"WHITE"free \n");

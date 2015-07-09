@@ -279,4 +279,27 @@ public:
 extern HDD hd;
 extern block_t ROOT;
 
+int sfs_create (char const *path, mode_t mode, int /*out*/ *file_handle);
+int sfs_rename (const char *path, const char *newpath);
+int sfs_link (const char *oldpath, const char *newpath);
+int sfs_symlink(char const *target,char const *linkpath);
+int sfs_open (const char *path, int /*out*/ *file_handle);
+int sfs_read (const char *path, char *buf, size_t size, off_t offset, int file_handle);
+int sfs_write (const char *path, const char  *buf, size_t  size, off_t  offset,int file_handle);
+int sfs_readlink (const char *path, char *buf/*, size_t size*/);
+int sfs_release (const char *path, int file_handle);
+int sfs_truncate (const char *path, off_t size);
+int sfs_chmod (const char *path, mode_t mode);
+int sfs_chown (const char *path, uid_t uid, gid_t gid);
+int sfs_rmdir(const char *path);
+int sfs_unlink (const char *path);
+int sfs_mkdir(const char *path , mode_t mode);
 aos::static_vector<aos::string<20>,10> sfs_readdir (const char *path);
+int sfs_ls(char const  *path);
+int sfs_rmdir(const char *path);
+int sfs_unlink (const char *path);
+
+struct device_info_t {
+	size_t total_sectors;
+};
+device_info_t identify_drive();

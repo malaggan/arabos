@@ -15,6 +15,8 @@ void test_fork();
 void init_process()
 {
 	printk("in init now :)\n");
+	void test_fs();
+	test_fs();
 	monitor();
 
 #if 0

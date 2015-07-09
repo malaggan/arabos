@@ -5,7 +5,6 @@
 #include <file_t.h>
 #include <ecma48.h>
 
-void identify_drive();
 void readline(char* buf, int max);
 char* alloc_page();
 
@@ -21,26 +20,6 @@ void print_monitor_help()
 }
 
 aos::static_vector<aos::string<20>,10> dirs;
-int sfs_create (char const *path, mode_t mode, int /*out*/ *file_handle);
-int sfs_rename (const char *path, const char *newpath);
-int sfs_link (const char *oldpath, const char *newpath);
-int sfs_symlink(char const *target,char const *linkpath);
-int sfs_open (const char *path, int /*out*/ *file_handle);
-int sfs_read (const char *path, char *buf, size_t size, off_t offset, int file_handle);
-int sfs_write (const char *path, const char  *buf, size_t  size, off_t  offset,int file_handle);
-int sfs_readlink (const char *path, char *buf/*, size_t size*/);
-int sfs_release (const char *path, int file_handle);
-int sfs_truncate (const char *path, off_t size);
-int sfs_chmod (const char *path, mode_t mode);
-int sfs_chown (const char *path, uid_t uid, gid_t gid);
-int sfs_rmdir(const char *path);
-int sfs_unlink (const char *path);
-int sfs_mkdir(const char *path , mode_t mode);
-aos::static_vector<aos::string<20>,10> sfs_readdir (const char *path);
-int sfs_ls(char const  *path);
-int sfs_rmdir(const char *path);
-int sfs_unlink (const char *path);
-
 
 void monitor()
 {
@@ -72,7 +51,7 @@ void monitor()
 		else if(!strncmp(cmd,"quit",4))
 			return;
 		else if(!strncmp_prefix(cmd,"create"))
-			sfs_create(ROOT.file.split(cmd," ")[1].c_str(),0777,&fh);
+			sfs_create(ROOT.file.split(cmd," ")[1].c_str(), 0777, &fh);
 		else if(!strncmp_prefix(cmd,"rename"))
 		{
 			auto strs=ROOT.file.split(cmd," ");
@@ -158,5 +137,80 @@ void monitor()
 		}
 		else
 			printf("unrecognized montior command\n");
+	}
+}
+
+void status();
+
+void test_fs() {
+	device_info_t info = identify_drive();
+	size_t total_sectors = info.total_sectors;
+	char cmd[100] = {0};
+
+	int fh;//file handle
+	char bufwrite[100] = "TTT";//buffer of write
+	char bufread[100] = {0};//buffer for read
+	char buflink[100] = {0};//buffer for symlinks
+#if 0
+	// create
+	sfs_create("/aaaa", 0777, &fh);
+	// rename
+	sfs_rename("/aaaa","/bbbb");
+	// hardlink
+	sfs_link("/aaaa","/bbbb");
+	// symlink
+	sfs_symlink("/aaaa","/bbbb");
+	// open
+	sfs_open("/aaaa", &fh);
+	printk(DEBUG "cppman file handle: %d\n", fh);
+	// read
+	printk(DEBUG "cppman bufread: %s\n", bufread);
+	sfs_read("/aaaa", bufread, 1, 0, fh);
+	printk(DEBUG "cppman file handle: %d\n", fh);
+	printk(DEBUG "cppman bufread: %s\n", bufread);
+	// write
+	printk(DEBUG "cppman bufwrite: %s\n", bufwrite);
+	sfs_write("/aaaa", bufwrite, 3, 0, fh);
+	printk(DEBUG "cppman file handle: %d\n", fh);
+	printk(DEBUG "cppman bufwrite: %s\n", bufwrite);
+	// read link
+
+	printk(DEBUG "cppman buflink: %s\n", buflink);
+	sfs_readlink("/aaaa", buflink);
+	printk(DEBUG "cppman buflink: %s\n",buflink);
+
+	// mkdir
+	sfs_mkdir("/aaaa", 0777);
+	// ls
+	sfs_ls("/aaaa");
+	// rmdir
+	sfs_rmdir("/aaaa");
+	// unlink
+	sfs_unlink("/aaaa");
+	// clean
+	block_t block;
+	for(int i = 2; i < total_sectors; i++)
+		block.write(i); // clean hard disk except root
+	block.change_type<inode_t>(); // inode for the root
+	block.write(1);
+	printk(DEBUG "cppman iROOT files size: %d\n", iROOT.inode.index_file.size());
+#endif
+
+}
+
+void status() {
+	for(int i=0; i < /*total_sectors*/ 10; i++) {
+		auto p = read_block(i);
+		printf("block : ");
+		if(p.tag == block_type::free)
+			printf(WHITE  "%d " NORMAL "type: " WHITE  "free\n" NORMAL, i);
+		else if(p.tag == block_type::inode)
+			printf(BLUEB  "%d " NORMAL "type: " BLUEB  "inode"  NORMAL " {inode size index: %d}\n", i, p.inode.index_file.size());
+		else if(p.tag == block_type::file)
+			printf(REDB   "%d " NORMAL "type: " REDB   "file"   NORMAL " {file name: %s}\n", i, p.file.name.c_str());
+		else if(p.tag == block_type::data)
+			printf(GREENB "%d " NORMAL "type: " GREENB "data"   NORMAL " {first char in data: %c}\n", i, p.data.data[0]);
+		else
+			printk(DEBUG "Unknown block type!\n" );
 	}
 }

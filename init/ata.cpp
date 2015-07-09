@@ -281,7 +281,7 @@ void wait_not_busy()        {while(  inportb(REG_STATUS) & FLAG_BUSY        ) ;}
 void wait_ready()           {while(!(inportb(REG_STATUS) & FLAG_DEVICE_READY));}
 void wait_for_data()        {while(!(inportb(REG_STATUS) & FLAG_DRQ         ));}
 void select_master_device()	{outportb(REG_DEVICE, MASTER);}
-void identify_drive()
+device_info_t identify_drive()
 {
 	wait_not_busy();
 	cli();
@@ -321,20 +321,8 @@ void identify_drive()
 		printf("%c%c", data.FirmwareRevision[i+1], data.FirmwareRevision[i]);
 	printf("\n");
 
-
-	// uint16_t d[256];
-	//uint16_t * a;
-	// file_t ROOT =hd.blocks[0].change_type<file_t>("/",0777,file_type::D,3,false);
-	// uint16_t* b=reinterpret_cast<uint16_t*>(&ROOT);
-	// file_t* p1 = reinterpret_cast<file_t*>(b);
-
-	// write(b,0);
-	// read(d,0);
-	// printf("name :%d\n",( reinterpret_cast<file_t*>(b))->inode);
-	// printf("name :%s\n",( reinterpret_cast<file_t*>(b))->name.c_str());
-	// file_t* p1 = reinterpret_cast<file_t*>(d);
-	//  for(int i = 0; i < 10; i++)
-	// printf("read: %s\n",p1->name.c_str());
+	device_info_t ret; ret.total_sectors = data.CurrentSectorCapacity;
+	return ret;
 }
 
 void read_sector(uint16_t data[256], sector_t sect_num)
